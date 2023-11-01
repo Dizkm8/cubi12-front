@@ -26,7 +26,6 @@ Follow these steps to get the project up and running on your local machine:
    cd frontend
    ```
 3. Change directory to the "cubitwelve" folder, where the main application code is located.
-
    ```bash
    cd cubitwelve
    ```
