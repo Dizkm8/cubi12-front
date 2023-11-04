@@ -1,13 +1,15 @@
-import { Typography } from "@mui/material";
-import EditProfile from "../../features/profile/edit-profile";
-import Navbar from "../utils/navbar";
+import { Container } from "@mui/material";
+import HomePage from "../../features/home/HomePage";
+import Navbar from "../components/Navbar";
 
 function App() {
   return (
-    <div className="App">
+    <>
       <Navbar />
-      <EditProfile />
-    </div>
+      <Container maxWidth="xl" sx={{ paddingTop: "3rem" }}>
+        <HomePage />
+      </Container>
+    </>
   );
 }
 
