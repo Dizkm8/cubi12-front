@@ -12,7 +12,7 @@ import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 // @ts-ignore
-import Cubi12Logo from "../static/images/cubi12.svg"
+import Cubi12Logo from "../static/images/cubi12.svg";
 import { primaryBlueColor } from "../static/colors";
 const pages = ["Inicio", "Malla Interactiva", "Mi Progreso"];
 const settings = ["Mi Perfil", "Cerrar Sesión"];
@@ -41,10 +41,28 @@ const Navbar = () => {
   };
 
   return (
-    <AppBar position="static"  sx={{backgroundColor: primaryBlueColor}}>
+    <AppBar position="static" sx={{ backgroundColor: primaryBlueColor }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          <Avatar sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} alt="Cubi12 Logo" src={Cubi12Logo} />
+          <Avatar
+            sx={{ display: { xs: "none", md: "flex" }, mr: 1 }}
+            alt="Cubi12 Logo"
+            src={Cubi12Logo}
+          />
+          <Typography
+            variant="h6"
+            noWrap
+            component="a"
+            sx={{
+              mr: 2,
+              display: { xs: "none", md: "flex" },
+              fontFamily: "monospace",
+              fontWeight: 400,
+              color: "inherit",
+            }}
+          >
+            CUBI12
+          </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
             <IconButton
               size="large"
@@ -81,9 +99,13 @@ const Navbar = () => {
               ))}
             </Menu>
           </Box>
-          <Avatar sx={{ display: { xs: "flex", md: "none" }, mr: 1 }} alt="Cubi12 Logo" src={Cubi12Logo} />
-          <Box sx={{ flexGrow: 20, display: { xs: "none", md: "flex" }}} />
-          <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" }}} />
+          <Avatar
+            sx={{ display: { xs: "flex", md: "none" }, mr: 1 }}
+            alt="Cubi12 Logo"
+            src={Cubi12Logo}
+          />
+          <Box sx={{ flexGrow: 20, display: { xs: "none", md: "flex" } }} />
+          <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }} />
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
             {pages.map((page) => (
               <Button
