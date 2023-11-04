@@ -1,16 +1,20 @@
-import { SyntheticEvent, useRef, useState, useEffect, useContext } from 'react';
+import React from 'react';
+import { SyntheticEvent, useRef, useState, useEffect, useContext, createContext } from 'react';
 import { Paper, Typography, Grid, TextField, Button, MenuItem, Box } from '@mui/material';
 import { Link } from 'react-router-dom';
 import agent from '../../app/api/agent';
 
 const pwdRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{10,16}$/;
+const authContext = createContext({});
 
 export default function EditProfile() {
 
+
     const userRef = useRef();
     const errRef = useRef<HTMLInputElement>(null);
+    
+    const [user, setUser] = useState({});
 
-    const [user, setUser] = useState(null);
     const [career, setCareer] = useState('');
     const [name, setName] = useState('');
     const [firstLastName, setFirstLastName] = useState('');
@@ -86,7 +90,7 @@ export default function EditProfile() {
     
         try {
             
-            await agent.Auth.updateProfile({ pwd });
+            await agent.Auth.updatePassword({ pwd });
             
             console.log('Contraseña actualizada con éxito');
 
@@ -94,9 +98,9 @@ export default function EditProfile() {
             setPwd('');
             setMatchPwd('');
 
-        } catch (err: any) {
-            if (err?.response) {
-                if (err.response.status === 409) {
+        } catch (error: any) {
+            if (error?.response) {
+                if (error.response.status === 409) {
                     setErrMsg('Username Taken');
                 } else {
                     setErrMsg('Registration Failed');
