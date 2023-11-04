@@ -1,14 +1,7 @@
-import { Typography } from "@mui/material";
-import EditProfile from "../../features/profile/edit-profile";
-import Navbar from "../utils/navbar";
+import Navbar from "../components/Navbar";
 
 function App() {
-  return (
-    <div className="App">
-      <Navbar />
-      <EditProfile />
-    </div>
-  );
+  return <Navbar />;
 }
 
 export default App;
