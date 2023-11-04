@@ -1,6 +1,7 @@
 import { Container } from "@mui/material";
 import HomePage from "../../features/home/HomePage";
 import Navbar from "../components/Navbar";
+import EditProfile from '../../features/profile/edit-profile'; 
 
 function App() {
   return (
@@ -9,6 +10,7 @@ function App() {
       <Container maxWidth="xl" sx={{ paddingTop: "3rem" }}>
         <HomePage />
       </Container>
+      <EditProfile />
     </>
   );
 }

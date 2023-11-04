@@ -16,7 +16,7 @@ const requests = {
 const Auth = {
     register : (form: any) => requests.post("auth/register", form), // TODO: Fix if needed
     login : (form: any) => requests.post("auth/login", form), // TODO: Fix if needed
-    updatePassword : (form: any) => requests.post("auth/update-password", form), // TODO: Fix if needed
+    updatePassword : (form: any) => requests.post("auth/login", form), // TODO: Fix if needed
     updateProfile: (form: any) => requests.put("users/update-profile", form), // TODO: Fix if needed
 }
 

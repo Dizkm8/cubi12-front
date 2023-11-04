@@ -14,6 +14,7 @@ import MenuItem from "@mui/material/MenuItem";
 // @ts-ignore
 import Cubi12Logo from "../static/images/cubi12.svg";
 import { primaryBlueColor } from "../static/colors";
+import EditProfileRouter from "../routes/EditProfileRouter";
 const pages = ["Inicio", "Malla Interactiva", "Mi Progreso"];
 const settings = ["Mi Perfil", "Cerrar Sesión"];
 

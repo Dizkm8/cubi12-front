@@ -1,19 +1,16 @@
 import React from 'react';
-import { SyntheticEvent, useRef, useState, useEffect, useContext, createContext } from 'react';
+import { SyntheticEvent, useRef, useState, useEffect, useContext } from 'react';
 import { Paper, Typography, Grid, TextField, Button, MenuItem, Box } from '@mui/material';
 import { Link } from 'react-router-dom';
-import agent from '../../app/api/agent';
+import Agent from '../../app/api/agent';
 
 const pwdRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{10,16}$/;
-const authContext = createContext({});
 
 export default function EditProfile() {
 
 
     const userRef = useRef();
     const errRef = useRef<HTMLInputElement>(null);
-    
-    const [user, setUser] = useState({});
 
     const [career, setCareer] = useState('');
     const [name, setName] = useState('');
@@ -37,7 +34,7 @@ export default function EditProfile() {
     const [careers, setCareers] = useState([]);
 
     useEffect(() => {
-        agent.requests.get('Careers')
+        Agent.requests.get('Careers')
         .then(response => {
             setCareers(response.map((career: any) => career.name));
             })
@@ -90,9 +87,9 @@ export default function EditProfile() {
     
         try {
             
-            await agent.Auth.updatePassword({ pwd });
+            await Agent.Auth.updatePassword({ pwd });
             
-            console.log('Contraseña actualizada con éxito');
+            console.log('Password updated successfully!');
 
             setSuccess(true);
             setPwd('');
@@ -128,7 +125,7 @@ export default function EditProfile() {
                     {/* Title */}
                     <Grid container>
                         {/* My info title */}
-                        <Grid item style={{ marginLeft: '5%', marginRight: '20%' }}>
+                        <Grid item style={{ marginLeft: '5%', marginRight: '10%' }}>
                             <Typography
                                 fontSize={38}
                                 color={tab === 'my-info' ? 'black' : '#626262'}
@@ -139,7 +136,7 @@ export default function EditProfile() {
                             </Typography>
                         </Grid>
                         {/* Password title */}
-                        <Grid item>
+                        <Grid item >
                             <Typography
                                 fontSize={38}
                                 color={tab === 'password' ? 'black' : '#626262'}
