@@ -3,18 +3,19 @@ import { SyntheticEvent, useRef, useState, useEffect, useContext } from 'react';
 import { Paper, Typography, Grid, TextField, Button, MenuItem, Box } from '@mui/material';
 import { Link } from 'react-router-dom';
 import Agent from '../../app/api/agent';
+import agent from '../../app/api/agent';
 
-const pwdRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{10,16}$/;
+const pwdRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{10,16}$/;
 const namesRegex = /^[A-Za-z\s]+$/;
 
 export default function EditProfile() {
 
     const errRef = useRef<HTMLInputElement>(null);
 
-    const [name, setName] = useState('');
+    let  [name, setName] = useState('');
     const [rut, setRut] = useState('');
-    const [firstLastName, setFirstLastName] = useState('');
-    const [secondLastName, setSecondLastName] = useState('');
+    let [firstLastName, setFirstLastName] = useState('');
+    let [secondLastName, setSecondLastName] = useState('');
     const [email, setEmail] = useState('');
     const [career, setCareer] = useState('');
 
@@ -61,16 +62,36 @@ export default function EditProfile() {
         
         e.preventDefault();
 
-        console.log({
-            name,
-            firstLastName,
-            secondLastName
-        });
+        setName('');
+        setFirstLastName('');
+        setSecondLastName('');
+        setErrMsg('');
 
         if (!name && !firstLastName && !secondLastName) {
             setErrMsg('Nada que actualizar');
             return;
         }
+
+        if(name === ''){
+            name = user.name;
+        }
+        if(firstLastName === ''){
+            firstLastName = user.firstLastName;
+        }
+        if(secondLastName === '' ){
+            secondLastName = user.secondLastName;
+        }
+
+        if (!namesRegex.test(name) || !namesRegex.test(firstLastName) || !namesRegex.test(secondLastName)) {
+            setErrMsg('Nombre inválido');
+            return;
+        }
+        
+        console.log({
+            name,
+            firstLastName,
+            secondLastName
+        });
 
         try {
             await Agent.Auth.updateProfile({ name, firstLastName, secondLastName });
@@ -79,7 +100,6 @@ export default function EditProfile() {
             setName('');
             setFirstLastName('');
             setSecondLastName('');
-            setCareer('');
 
         } catch (error: any) {
             if (error?.response) {
@@ -107,20 +127,21 @@ export default function EditProfile() {
             pwd,
             matchPwd
         })
-    
+
         if (!pwd) {
             setErrMsg('Nada que actualizar');
             return;
-        } else if (!pwdRegex.test(pwd) || pwd !== matchPwd) {
+        } else if (!pwdRegex.test(pwd) || pwd !== matchPwd || !currentPwd) {
             setErrMsg('Contraseña inválida');
             return;
         }
     
         try {
             
-            await Agent.Auth.updatePassword({ currentPwd, pwd, matchPwd });
+            agent.Auth.updatePassword({ currentPwd, pwd, matchPwd });
             
             console.log('Password updated successfully!');
+            setCurrentPwd('');
             setPwd('');
             setMatchPwd('');
 
@@ -128,7 +149,9 @@ export default function EditProfile() {
             if (error?.response) {
                 if (error.response.status === 409) {
                     console.log('Username Taken');
-                } else {
+                } 
+                else {
+                    console.log(error.response);
                     console.log('Registration Failed');
                 }
             } else {
@@ -138,6 +161,7 @@ export default function EditProfile() {
                 errRef.current.focus();
             }
         }
+        console.log('E!');
     };
 
     return (
@@ -193,7 +217,6 @@ export default function EditProfile() {
                                         fontFamily: 'Raleway, sans-serif'
                                     }}>Nombre</label>
                                     <TextField
-                                    autoComplete='given-name'
                                     name='name'
                                     required
                                     fullWidth
@@ -228,7 +251,6 @@ export default function EditProfile() {
                                         fontFamily: 'Raleway, sans-serif'
                                     }}>Primer apellido</label>
                                     <TextField
-                                    autoComplete='given-name'
                                     name='firstLastName'
                                     required
                                     fullWidth
