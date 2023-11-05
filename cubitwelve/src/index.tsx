@@ -1,14 +1,14 @@
 import React from "react";
-import ReactDOM from "react-dom/client";
+import ReactDOM from "react-dom";
 import App from "./app/layout/App";
 import { CssBaseline } from "@mui/material";
+import { BrowserRouter as Router } from 'react-router-dom';
 
-const root = ReactDOM.createRoot(
-  document.getElementById("root") as HTMLElement
-);
-root.render(
-  <React.StrictMode>
+
+ReactDOM.render(
+  <Router>
     <CssBaseline />
     <App />
-  </React.StrictMode>
+  </Router>,
+  document.getElementById("root")
 );

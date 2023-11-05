@@ -1,0 +1,12 @@
+{
+  "name": "pablo",
+  "firstLastName": "robledo",
+  "secondLastName": "villalobos",
+  "rut": "20.776.296-2",
+  "email": "pablo.robledo@alumnos.ucn.cl",
+  "careerId": 36,
+  "password": "P@ssw0rd123",
+  "repeatedPassword": "P@ssw0rd123"
+}
+
+borrar adddays authservices

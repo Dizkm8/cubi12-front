@@ -14,7 +14,8 @@ import MenuItem from "@mui/material/MenuItem";
 // @ts-ignore
 import Cubi12Logo from "../static/images/cubi12.svg";
 import { primaryBlueColor } from "../static/colors";
-import EditProfileRouter from "../routes/EditProfileRouter";
+import { Link } from 'react-router-dom';
+
 const pages = ["Inicio", "Malla Interactiva", "Mi Progreso"];
 const settings = ["Mi Perfil", "Cerrar Sesión"];
 
@@ -109,13 +110,18 @@ const Navbar = () => {
           <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }} />
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
             {pages.map((page) => (
-              <Button
-                key={page}
-                onClick={handleCloseNavMenu}
-                sx={{ my: 2, color: "white", display: "block" }}
+              <Link 
+                style={{ textDecoration: "none", color: "inherit" }}
+                to={page === "Inicio" ? "/" : page === "Malla Interactiva" ? "interactive-mesh" : "my-progress"}
               >
-                {page}
-              </Button>
+                <Button
+                  key={page}
+                  onClick={handleCloseNavMenu}
+                  sx={{ my: 2, color: "white", display: "block" }}
+                >
+                  {page}
+                </Button>
+              </Link>
             ))}
           </Box>
 
@@ -142,9 +148,14 @@ const Navbar = () => {
               onClose={handleCloseUserMenu}
             >
               {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center">{setting}</Typography>
-                </MenuItem>
+                <Link 
+                  style={{ textDecoration: "none", color: "inherit" }}
+                  to={setting === "Mi Perfil" ? "/edit-profile" : "/logout"}
+                >
+                  <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                    <Typography textAlign="center">{setting}</Typography>
+                  </MenuItem>
+                </Link>
               ))}
             </Menu>
           </Box>

@@ -5,38 +5,35 @@ import { Link } from 'react-router-dom';
 import Agent from '../../app/api/agent';
 
 const pwdRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{10,16}$/;
+const namesRegex = /^[A-Za-z\s]+$/;
 
 export default function EditProfile() {
 
-
-    const userRef = useRef();
     const errRef = useRef<HTMLInputElement>(null);
 
-    const [career, setCareer] = useState('');
     const [name, setName] = useState('');
+    const [rut, setRut] = useState('');
     const [firstLastName, setFirstLastName] = useState('');
     const [secondLastName, setSecondLastName] = useState('');
+    const [email, setEmail] = useState('');
+    const [career, setCareer] = useState('');
 
+    const [currentPwd, setCurrentPwd] = useState('');
     const [pwd, setPwd] = useState('');
-    const [validPwd, setValidPwd] = useState(false);
-    const [pwdFocus, setPwdFocus] = useState(false);
-
     const [matchPwd, setMatchPwd] = useState('');
-    const [validMatch, setValidMatch] = useState(false);
-    const [matchFocus, setMatchFocus] = useState(false);
 
     const [errMsg, setErrMsg] = useState('');
 
-    const [success, setSuccess] = useState(false);
-
     const [tab, setTab] = useState('my-info');
+
+    const [user, setUser] = useState({name: '', firstLastName: '', secondLastName: '', rut: '', email: '', career: {id: '', name: ''}});
 
     const [careers, setCareers] = useState([]);
 
     useEffect(() => {
         Agent.requests.get('Careers')
-        .then(response => {
-            setCareers(response.map((career: any) => career.name));
+            .then(response => {
+                setCareers(response.map((career: any) => career.name));
             })
             .catch(error => {
                 console.error('Error loading careers:', error);
@@ -44,9 +41,17 @@ export default function EditProfile() {
     }, []);
 
     useEffect(() => {
-        setValidPwd(pwdRegex.test(pwd));
-        setValidMatch(pwd === matchPwd);
-    }, [pwd, matchPwd]);
+        Agent.Auth.profile()
+            .then(response => {
+                setUser(response);
+                setRut(response.rut);
+                setEmail(response.email);
+                setCareer(response.career.name);
+            })
+            .catch(error => {
+                console.error('Error loading user:', error);
+            });
+    }, [user]);
 
     useEffect(() => {
         setErrMsg('');
@@ -59,9 +64,37 @@ export default function EditProfile() {
         console.log({
             name,
             firstLastName,
-            secondLastName,
-            career
+            secondLastName
         });
+
+        if (!name && !firstLastName && !secondLastName) {
+            setErrMsg('Nada que actualizar');
+            return;
+        }
+
+        try {
+            await Agent.Auth.updateProfile({ name, firstLastName, secondLastName });
+            
+            console.log('My info updated successfully!');
+            setName('');
+            setFirstLastName('');
+            setSecondLastName('');
+            setCareer('');
+
+        } catch (error: any) {
+            if (error?.response) {
+                if (error.response.status === 409) {
+                    console.log('Username Taken');
+                } else {
+                    console.log('Registration Failed');
+                }
+            } else {
+                console.log('No Server Response');
+            }
+            if (errRef.current) {
+                errRef.current.focus();
+            }
+        }
 
     };
 
@@ -70,6 +103,7 @@ export default function EditProfile() {
         e.preventDefault();
 
         console.log({
+            currentPwd,
             pwd,
             matchPwd
         })
@@ -77,33 +111,28 @@ export default function EditProfile() {
         if (!pwd) {
             setErrMsg('Nada que actualizar');
             return;
-        } else if (!pwdRegex.test(pwd)) {
+        } else if (!pwdRegex.test(pwd) || pwd !== matchPwd) {
             setErrMsg('Contraseña inválida');
-            return;
-        } else if (pwd !== matchPwd) {
-            setErrMsg('Validación de contraseña inválida');
             return;
         }
     
         try {
             
-            await Agent.Auth.updatePassword({ pwd });
+            await Agent.Auth.updatePassword({ currentPwd, pwd, matchPwd });
             
             console.log('Password updated successfully!');
-
-            setSuccess(true);
             setPwd('');
             setMatchPwd('');
 
         } catch (error: any) {
             if (error?.response) {
                 if (error.response.status === 409) {
-                    setErrMsg('Username Taken');
+                    console.log('Username Taken');
                 } else {
-                    setErrMsg('Registration Failed');
+                    console.log('Registration Failed');
                 }
             } else {
-                setErrMsg('No Server Response');
+                console.log('No Server Response');
             }
             if (errRef.current) {
                 errRef.current.focus();
@@ -112,16 +141,20 @@ export default function EditProfile() {
     };
 
     return (
-        <Grid container justifyContent='center' alignItems='center' style={{ height: '100vh' }}>
+        <Grid container
+        direction="column"
+        justifyContent="center"
+        alignItems="center"
+        gap="2rem">
             <Box
                 sx={{
-                    marginTop: 8,
+                    marginTop: '2%',
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
                 }}
             >
-                <Paper elevation={3} style={{ padding: '40px', border: '1px solid #1C478F', borderRadius: '8px', width: '35%', height: 'fit-content' }}>
+                <Paper elevation={3} style={{ padding: '40px', border: '1px solid #1C478F', borderRadius: '8px', width: '60%', height: 'fit-content' }}>
                     {/* Title */}
                     <Grid container>
                         {/* My info title */}
@@ -166,6 +199,7 @@ export default function EditProfile() {
                                     fullWidth
                                     id='name'
                                     label=''
+                                    placeholder={user.name}
                                     onChange={(e) => setName(e.target.value)}
                                     />
                                 </Grid>
@@ -182,6 +216,7 @@ export default function EditProfile() {
                                         id='dni'
                                         label=''
                                         name='dni'
+                                        value={rut}
                                         InputProps={{ readOnly: true }}
                                     />
                                 </Grid>
@@ -199,6 +234,7 @@ export default function EditProfile() {
                                     fullWidth
                                     id='firstLastName'
                                     label=''
+                                    placeholder={user.firstLastName}
                                     onChange={(e) => setFirstLastName(e.target.value)}
                                     />
                                 </Grid>
@@ -215,6 +251,7 @@ export default function EditProfile() {
                                     id='secondLastName'
                                     label=''
                                     name='secondLastName'
+                                    placeholder={user.secondLastName}
                                     onChange={(e) => setSecondLastName(e.target.value)}
                                     />
                                 </Grid>
@@ -231,6 +268,7 @@ export default function EditProfile() {
                                     id='email'
                                     label=''
                                     name='email'
+                                    value={email}
                                     InputProps={{ readOnly: true }}
                                     />
                                 </Grid>
@@ -250,18 +288,23 @@ export default function EditProfile() {
                                         value={career}
                                         onChange={(e) => setCareer(e.target.value)}
                                         >
-                                        {careers.map((career, index) => (
-                                            <MenuItem key={index} value={career}>
+                                        {<MenuItem value={career}>
                                                 {career}
-                                            </MenuItem>
-                                        ))}
+                                        </MenuItem>}
                                     </TextField>
                                 </Grid>
                                 {/* Buttons */}
                                 <Grid item xs={12}>
+                                    {/* Error message */}
+                                    {errMsg && (
+                                        <Typography color='error' style={{ marginBottom: '16px', textAlign: 'right' }}>
+                                            {errMsg}
+                                        </Typography>
+                                    )}
                                     <Box sx={{ display: 'flex', marginTop: '2%', marginBottom: '2%', justifyContent: 'flex-end' }}>
                                         {/* Cancel button */}
                                         <Button
+                                            name='cancel-button'
                                             variant='outlined'
                                             color='secondary'
                                             style={{
@@ -272,10 +315,12 @@ export default function EditProfile() {
                                                 fontFamily: 'Raleway, sans-serif',
                                                 fontSize: '1rem',
                                             }}
+                                            onClick={() => { window.location.reload(); }}
                                         >Cancelar
                                         </Button>
                                         {/* Save button */}
                                         <Button
+                                            name='update-button'
                                             type='submit'
                                             variant='contained'
                                             color='warning'
@@ -312,7 +357,7 @@ export default function EditProfile() {
                                         id='password'
                                         label=''
                                         name='password'
-                                        InputProps={{ readOnly: true }}
+                                        onChange={(e) => setCurrentPwd(e.target.value)}
                                     />
                                 </Grid>
                                 {/* New password input */}
@@ -360,6 +405,7 @@ export default function EditProfile() {
                                     <Box sx={{ display: 'flex', marginTop: '2%', marginBottom: '2%', justifyContent: 'flex-end' }}>
                                         {/* Cancel button */}
                                         <Button
+                                            name='cancel-button'
                                             variant='outlined'
                                             color='secondary'
                                             style={{
@@ -370,10 +416,12 @@ export default function EditProfile() {
                                                 fontFamily: 'Raleway, sans-serif',
                                                 fontSize: ''
                                             }}
+                                            onClick={() => { window.location.reload() }}
                                         >Cancelar
                                         </Button>
                                         {/* Update button */}
                                         <Button
+                                            name='update-button'
                                             type='submit'
                                             variant='contained'
                                             color= 'warning'

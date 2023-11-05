@@ -1,16 +1,14 @@
 import { Container } from "@mui/material";
-import HomePage from "../../features/home/HomePage";
 import Navbar from "../components/Navbar";
-import EditProfile from '../../features/profile/edit-profile'; 
+import AppRoutes from '../routes/AppRoutes';
 
 function App() {
   return (
     <>
       <Navbar />
       <Container maxWidth="xl" sx={{ paddingTop: "3rem" }}>
-        <HomePage />
+        <AppRoutes />
       </Container>
-      <EditProfile />
     </>
   );
 }
