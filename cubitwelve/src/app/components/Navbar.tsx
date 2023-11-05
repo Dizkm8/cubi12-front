@@ -109,20 +109,20 @@ const Navbar = () => {
           <Box sx={{ flexGrow: 20, display: { xs: "none", md: "flex" } }} />
           <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }} />
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
-            {pages.map((page) => (
-              <Link 
-                style={{ textDecoration: "none", color: "inherit" }}
-                to={page === "Inicio" ? "/" : page === "Malla Interactiva" ? "interactive-mesh" : "my-progress"}
+          {pages.map((page) => (
+            <Link 
+              key={page}
+              style={{ textDecoration: "none", color: "inherit" }}
+              to={page === "Inicio" ? "/" : page === "Malla Interactiva" ? "interactive-mesh" : "my-progress"}
+            >
+              <Button
+                sx={{ my: 2, color: "white", display: "block" }}
+                onClick={handleCloseNavMenu}
               >
-                <Button
-                  key={page}
-                  onClick={handleCloseNavMenu}
-                  sx={{ my: 2, color: "white", display: "block" }}
-                >
-                  {page}
-                </Button>
-              </Link>
-            ))}
+                {page}
+              </Button>
+            </Link>
+          ))}
           </Box>
 
           <Box sx={{ flexGrow: 0 }}>
@@ -147,16 +147,17 @@ const Navbar = () => {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              {settings.map((setting) => (
-                <Link 
-                  style={{ textDecoration: "none", color: "inherit" }}
-                  to={setting === "Mi Perfil" ? "/edit-profile" : "/logout"}
-                >
-                  <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                    <Typography textAlign="center">{setting}</Typography>
-                  </MenuItem>
-                </Link>
-              ))}
+            {settings.map((setting) => (
+              <Link
+                key={setting}
+                style={{ textDecoration: "none", color: "inherit" }}
+                to={setting === "Mi Perfil" ? "/edit-profile" : "/logout"}
+              >
+                <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                  <Typography key={setting} textAlign="center">{setting}</Typography>
+                </MenuItem>
+              </Link>
+            ))}
             </Menu>
           </Box>
         </Toolbar>

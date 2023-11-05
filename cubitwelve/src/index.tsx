@@ -1,14 +1,14 @@
 import React from "react";
-import ReactDOM from "react-dom";
-import App from "./app/layout/App";
-import { CssBaseline } from "@mui/material";
-import { BrowserRouter as Router } from 'react-router-dom';
+import ReactDOM from "react-dom/client";
+import { RouterProvider } from "react-router-dom";
+import { router } from "../src/app/routes/Routes";
 
+const root = ReactDOM.createRoot(
+  document.getElementById("root") as HTMLElement
+  );
 
-ReactDOM.render(
-  <Router>
-    <CssBaseline />
-    <App />
-  </Router>,
-  document.getElementById("root")
+  root.render(
+    <React.StrictMode>
+      <RouterProvider router={router}/>
+    </React.StrictMode>
 );
