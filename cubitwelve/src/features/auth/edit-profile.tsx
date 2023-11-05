@@ -52,7 +52,7 @@ export default function EditProfile() {
             .catch(error => {
                 console.error('Error loading user:', error);
             });
-    }, [user]);
+    }, []);
 
     useEffect(() => {
         setErrMsg('');
@@ -67,7 +67,10 @@ export default function EditProfile() {
         setSecondLastName('');
         setErrMsg('');
 
-        if (!name && !firstLastName && !secondLastName) {
+        if ((!name && !firstLastName && !secondLastName)) {
+            setErrMsg('Nada que actualizar');
+            return;
+        } else if (name === user.name || firstLastName === user.firstLastName || secondLastName === user.secondLastName) {
             setErrMsg('Nada que actualizar');
             return;
         }
@@ -118,6 +121,16 @@ export default function EditProfile() {
 
     };
 
+    const sentData = (password: string, currentPassword: string, repeatedPassword: string) => {
+        agent.Auth.updatePassword({password, currentPassword, repeatedPassword})
+            .then(response => {
+                console.log(response);
+            })
+            .catch(error => {
+                console.error('Error updating password:', error);
+            });
+    }
+
     const handleSubmitPassword = async (e: SyntheticEvent) => {
         
         e.preventDefault();
@@ -131,14 +144,18 @@ export default function EditProfile() {
         if (!pwd) {
             setErrMsg('Nada que actualizar');
             return;
-        } else if (!pwdRegex.test(pwd) || pwd !== matchPwd || !currentPwd) {
+        } else if (!pwdRegex.test(pwd) || !pwdRegex.test(currentPwd) ||pwd !== matchPwd || !currentPwd) {
             setErrMsg('Contraseña inválida');
             return;
         }
     
         try {
             
-            agent.Auth.updatePassword({ currentPwd, pwd, matchPwd });
+            console.log(`currentPwd: ${typeof currentPwd} - ${currentPwd.toString()}`);
+            console.log(`pwd: ${typeof pwd} - ${pwd.toString()}`);
+            console.log(`matchPwd: ${typeof matchPwd} - ${matchPwd.toString()}`);
+
+            sentData(pwd, currentPwd, matchPwd);
             
             console.log('Password updated successfully!');
             setCurrentPwd('');
@@ -147,7 +164,7 @@ export default function EditProfile() {
 
         } catch (error: any) {
             if (error?.response) {
-                if (error.response.status === 409) {
+                if (error.response.status === 409 || error.response.status === 400) {
                     console.log('Username Taken');
                 } 
                 else {
@@ -161,7 +178,6 @@ export default function EditProfile() {
                 errRef.current.focus();
             }
         }
-        console.log('E!');
     };
 
     return (
