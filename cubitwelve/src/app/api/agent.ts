@@ -16,9 +16,10 @@ const requests = {
 const Auth = {
     register : (form: any) => requests.post("auth/register", form), // TODO: Fix if needed
     login : (form: any) => requests.post("auth/login", form), // TODO: Fix if needed
+
 }
 
 
-const agent = { Auth };
+const agent = { Auth, requests };
 
 export default agent;

@@ -1,7 +1,13 @@
-import { Typography } from "@mui/material";
+import { CssBaseline } from "@mui/material";
+import { Outlet } from "react-router-dom";
 
-function App() {
-  return <Typography variant="h1">Hello World!</Typography>;
+const App = () => {
+  return (
+    <>
+      <CssBaseline/>
+      <Outlet/>
+    </>
+  );
 }
 
 export default App;
