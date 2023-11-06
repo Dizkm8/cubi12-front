@@ -5,42 +5,52 @@ import { Link } from 'react-router-dom';
 import Agent from '../../app/api/agent';
 import agent from '../../app/api/agent';
 
+// Regex for password and names
 const pwdRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{10,16}$/;
 const namesRegex = /^[A-Za-z\s]+$/;
 
 export default function EditProfile() {
 
+    // Error message reference
     const errRef = useRef<HTMLInputElement>(null);
 
+    // Names state
     let  [name, setName] = useState('');
-    const [rut, setRut] = useState('');
     let [firstLastName, setFirstLastName] = useState('');
     let [secondLastName, setSecondLastName] = useState('');
+
+    // User data state
+    const [rut, setRut] = useState('');
     const [email, setEmail] = useState('');
     const [career, setCareer] = useState('');
 
-    const [currentPwd, setCurrentPwd] = useState('');
-    const [pwd, setPwd] = useState('');
-    const [matchPwd, setMatchPwd] = useState('');
+    // Password state
+    let [currentPwd, setCurrentPwd] = useState('');
+    let [pwd, setPwd] = useState('');
+    let [matchPwd, setMatchPwd] = useState('');
 
+    // Error message state
     const [errMsg, setErrMsg] = useState('');
 
+    // Tab state
     const [tab, setTab] = useState('my-info');
 
+    // User state
     const [user, setUser] = useState({name: '', firstLastName: '', secondLastName: '', rut: '', email: '', career: {id: '', name: ''}});
 
-    const [careers, setCareers] = useState([]);
 
-    useEffect(() => {
-        Agent.requests.get('Careers')
-            .then(response => {
-                setCareers(response.map((career: any) => career.name));
-            })
-            .catch(error => {
-                console.error('Error loading careers:', error);
-            });
-    }, []);
+    // const [careers, setCareers] = useState([]);
+    // useEffect(() => {
+    //     Agent.requests.get('Careers')
+    //         .then(response => {
+    //             setCareers(response.map((career: any) => career.name));
+    //         })
+    //         .catch(error => {
+    //             console.error('Error loading careers:', error);
+    //         });
+    // }, []);
 
+    // Load user data
     useEffect(() => {
         Agent.Auth.profile()
             .then(response => {
@@ -54,19 +64,74 @@ export default function EditProfile() {
             });
     }, []);
 
-    useEffect(() => {
-        setErrMsg('');
-    }, [pwd, matchPwd]);
+    // Clear inputs
+    const clearInputs = (names: boolean, password: boolean, cancel: boolean) => {
 
+        // Clear error message
+        setErrMsg('');
+
+        // Clear name inputs
+        if (names) {
+            if(!cancel) {
+                user.name = name;
+                user.firstLastName = firstLastName;
+                user.secondLastName = secondLastName;
+            }
+            name = '';
+            firstLastName = '';
+            secondLastName = '';
+            setName('');
+            setFirstLastName('');
+            setSecondLastName('');
+        }
+        // Clear password inputs
+        else if (password) {
+            currentPwd = '';
+            pwd = '';
+            matchPwd = '';
+            setCurrentPwd('');
+            setPwd('');
+            setMatchPwd('');
+        }
+    }
+
+    // Send my info data to server
+    const sendMyInfoData = (name: string, firstLastName: string, secondLastName: string) => {
+        agent.Auth.updateProfile({name, firstLastName, secondLastName})
+            .then(response => {
+                console.log(response);
+            })
+            .catch(error => {
+                console.error('Error updating profile:', error);
+                return;
+            });
+
+        console.log('Name(s) updated successfully!');
+    }
+
+    // Send password data to server
+    const sendPasswordData = (password: string, currentPassword: string, repeatedPassword: string) => {
+        agent.Auth.updatePassword({password, currentPassword, repeatedPassword})
+            .then(response => {
+                console.log(response);
+            })
+            .catch(error => {
+                console.error('Error updating password:', error);
+                setErrMsg('Contraseña inválida');
+            });
+
+        console.log('Password updated successfully!');
+    }
+
+    // Handle my info submit
     const handleSubmitMyInfo = async (e: SyntheticEvent) => {
         
         e.preventDefault();
 
-        setName('');
-        setFirstLastName('');
-        setSecondLastName('');
+        // Clear error message
         setErrMsg('');
 
+        // Check if inputs are empty
         if ((!name && !firstLastName && !secondLastName)) {
             setErrMsg('Nada que actualizar');
             return;
@@ -75,34 +140,24 @@ export default function EditProfile() {
             return;
         }
 
-        if(name === ''){
-            name = user.name;
-        }
-        if(firstLastName === ''){
-            firstLastName = user.firstLastName;
-        }
-        if(secondLastName === '' ){
-            secondLastName = user.secondLastName;
-        }
+        // if inputs are empty, set them to the current user data
+        name = name === '' ? user.name : name;
+        firstLastName = firstLastName === '' ? user.firstLastName : firstLastName;
+        secondLastName = secondLastName === '' ? user.secondLastName : secondLastName;
 
+        // Check if inputs are valids
         if (!namesRegex.test(name) || !namesRegex.test(firstLastName) || !namesRegex.test(secondLastName)) {
-            setErrMsg('Nombre inválido');
+            setErrMsg('Nombre(s) inválido(s)');
             return;
         }
-        
-        console.log({
-            name,
-            firstLastName,
-            secondLastName
-        });
 
         try {
-            await Agent.Auth.updateProfile({ name, firstLastName, secondLastName });
             
-            console.log('My info updated successfully!');
-            setName('');
-            setFirstLastName('');
-            setSecondLastName('');
+            // Send data to server
+            sendMyInfoData(name, firstLastName, secondLastName);
+
+            // Clean name inputs
+            clearInputs(true, false, false);
 
         } catch (error: any) {
             if (error?.response) {
@@ -121,46 +176,34 @@ export default function EditProfile() {
 
     };
 
-    const sentData = (password: string, currentPassword: string, repeatedPassword: string) => {
-        agent.Auth.updatePassword({password, currentPassword, repeatedPassword})
-            .then(response => {
-                console.log(response);
-            })
-            .catch(error => {
-                console.error('Error updating password:', error);
-            });
-    }
-
+    // Handle password submit
     const handleSubmitPassword = async (e: SyntheticEvent) => {
         
         e.preventDefault();
 
-        console.log({
-            currentPwd,
-            pwd,
-            matchPwd
-        })
+         // Clear error message
+        setErrMsg('');
 
+        // Check if inputs are empty
         if (!pwd) {
+            clearInputs(false, true, false);
             setErrMsg('Nada que actualizar');
             return;
-        } else if (!pwdRegex.test(pwd) || !pwdRegex.test(currentPwd) ||pwd !== matchPwd || !currentPwd) {
+        } 
+        // Check if passwords match or its valid
+        else if (!pwdRegex.test(pwd) || !pwdRegex.test(currentPwd) ||pwd !== matchPwd || !currentPwd) {
+            clearInputs(false, true, false);
             setErrMsg('Contraseña inválida');
             return;
         }
     
         try {
-            
-            console.log(`currentPwd: ${typeof currentPwd} - ${currentPwd.toString()}`);
-            console.log(`pwd: ${typeof pwd} - ${pwd.toString()}`);
-            console.log(`matchPwd: ${typeof matchPwd} - ${matchPwd.toString()}`);
 
-            sentData(pwd, currentPwd, matchPwd);
-            
-            console.log('Password updated successfully!');
-            setCurrentPwd('');
-            setPwd('');
-            setMatchPwd('');
+            // Send data to server
+            sendPasswordData(pwd, currentPwd, matchPwd);
+
+            // Clean password inputs
+            clearInputs(false, true, false);
 
         } catch (error: any) {
             if (error?.response) {
@@ -233,11 +276,11 @@ export default function EditProfile() {
                                         fontFamily: 'Raleway, sans-serif'
                                     }}>Nombre</label>
                                     <TextField
+                                    id='name'
                                     name='name'
+                                    value={name}
                                     required
                                     fullWidth
-                                    id='name'
-                                    label=''
                                     placeholder={user.name}
                                     onChange={(e) => setName(e.target.value)}
                                     />
@@ -250,12 +293,12 @@ export default function EditProfile() {
                                         fontFamily: 'Raleway, sans-serif'
                                     }}>RUT</label>
                                     <TextField
-                                        required
-                                        fullWidth
                                         id='dni'
-                                        label=''
                                         name='dni'
                                         value={rut}
+                                        label=''
+                                        required
+                                        fullWidth
                                         InputProps={{ readOnly: true }}
                                     />
                                 </Grid>
@@ -267,11 +310,12 @@ export default function EditProfile() {
                                         fontFamily: 'Raleway, sans-serif'
                                     }}>Primer apellido</label>
                                     <TextField
+                                    id='firstLastName'
                                     name='firstLastName'
+                                    value={firstLastName}
+                                    label=''
                                     required
                                     fullWidth
-                                    id='firstLastName'
-                                    label=''
                                     placeholder={user.firstLastName}
                                     onChange={(e) => setFirstLastName(e.target.value)}
                                     />
@@ -284,11 +328,12 @@ export default function EditProfile() {
                                         fontFamily: 'Raleway, sans-serif'
                                     }}>Segundo apellido</label>
                                     <TextField
+                                    id='secondLastName'
+                                    name='secondLastName'
+                                    value={secondLastName}
+                                    label=''
                                     required
                                     fullWidth
-                                    id='secondLastName'
-                                    label=''
-                                    name='secondLastName'
                                     placeholder={user.secondLastName}
                                     onChange={(e) => setSecondLastName(e.target.value)}
                                     />
@@ -301,12 +346,12 @@ export default function EditProfile() {
                                         fontFamily: 'Raleway, sans-serif'
                                     }}>Correo electrónico</label>
                                     <TextField
-                                    required
-                                    fullWidth
                                     id='email'
-                                    label=''
                                     name='email'
                                     value={email}
+                                    label=''
+                                    required
+                                    fullWidth
                                     InputProps={{ readOnly: true }}
                                     />
                                 </Grid>
@@ -318,12 +363,12 @@ export default function EditProfile() {
                                         fontFamily: 'Raleway, sans-serif'
                                     }}>Carrera</label>
                                     <TextField
-                                        label=''
                                         variant='outlined'
-                                        select
-                                        fullWidth
                                         name='career'
                                         value={career}
+                                        label=''
+                                        select
+                                        fullWidth
                                         onChange={(e) => setCareer(e.target.value)}
                                         >
                                         {<MenuItem value={career}>
@@ -353,7 +398,7 @@ export default function EditProfile() {
                                                 fontFamily: 'Raleway, sans-serif',
                                                 fontSize: '1rem',
                                             }}
-                                            onClick={() => { window.location.reload(); }}
+                                            onClick={() => { clearInputs(true, false, true) }}
                                         >Cancelar
                                         </Button>
                                         {/* Save button */}
@@ -389,13 +434,14 @@ export default function EditProfile() {
                                         fontFamily: 'Raleway, sans-serif'
                                     }}>Contraseña Actual</label>
                                     <TextField
+                                        id='password'
+                                        name='password'
                                         type='password'
+                                        value={currentPwd}
+                                        label=''
                                         required
                                         fullWidth
-                                        id='password'
-                                        label=''
-                                        name='password'
-                                        onChange={(e) => setCurrentPwd(e.target.value)}
+                                        onChange={(e) => [setCurrentPwd(e.target.value)]}
                                     />
                                 </Grid>
                                 {/* New password input */}
@@ -406,12 +452,13 @@ export default function EditProfile() {
                                         fontFamily: 'Raleway, sans-serif'
                                     }}>Nueva Contraseña</label>
                                     <TextField
+                                        id='new-password'
+                                        name='new-password'
                                         type='password'
+                                        value={pwd}
+                                        label=''
                                         required
                                         fullWidth
-                                        id='new-password'
-                                        label=''
-                                        name='new-password'
                                         onChange={(e) => setPwd(e.target.value)}
                                     />
                                 </Grid>
@@ -423,12 +470,13 @@ export default function EditProfile() {
                                         fontFamily: 'Raleway, sans-serif'
                                     }}>Repetir Nueva Contraseña</label>
                                     <TextField
+                                        id='repeat-new-password'
+                                        name='repeat-new-password'
                                         type='password'
+                                        value={matchPwd}
+                                        label=''
                                         required
                                         fullWidth
-                                        id='repeat-new-password'
-                                        label=''
-                                        name='repeat-new-password'
                                         onChange={(e) => setMatchPwd(e.target.value)}
                                     />
                                 </Grid>
@@ -454,7 +502,7 @@ export default function EditProfile() {
                                                 fontFamily: 'Raleway, sans-serif',
                                                 fontSize: ''
                                             }}
-                                            onClick={() => { window.location.reload() }}
+                                            onClick={() => { clearInputs(false, true, true) }}
                                         >Cancelar
                                         </Button>
                                         {/* Update button */}
