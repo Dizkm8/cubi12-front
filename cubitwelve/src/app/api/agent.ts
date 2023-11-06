@@ -2,7 +2,7 @@ import axios, {AxiosResponse} from "axios";
 import { config } from "yargs";
 
 const API_PORT = 5000;
-const token = "eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9lbWFpbGFkZHJlc3MiOiJsdWlzLmFyZGlsZXNAYWx1bW5vcy51Y24uY2wiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJzdHVkZW50IiwiZXhwIjoxNjk5NjM1NDIwfQ.CW1WniOkT8aL1h7eszGBrVxGFjU94CUX4sysqXYmYAQ";
+const token = "";
 axios.defaults.baseURL = `http://localhost:${API_PORT}/api/`;
 axios.defaults.withCredentials = true;
 axios.interceptors.request.use
