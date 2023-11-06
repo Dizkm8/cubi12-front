@@ -13,37 +13,37 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 // @ts-ignore
 import Cubi12Logo from "../static/images/cubi12.svg";
-import { primaryBlueColor } from "../static/colors";
+import { primary_blue_color } from "../static/colors";
 import { Link } from 'react-router-dom';
 
 const pages = ["Inicio", "Malla Interactiva", "Mi Progreso"];
 const settings = ["Mi Perfil", "Cerrar Sesión"];
 
 const Navbar = () => {
-  const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
+  const [anchor_el_nav, set_anchor_el_nav] = React.useState<null | HTMLElement>(
     null
   );
-  const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
+  const [anchor_el_user, set_anchor_el_user] = React.useState<null | HTMLElement>(
     null
   );
 
-  const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorElNav(event.currentTarget);
+  const handle_open_nav_menu = (event: React.MouseEvent<HTMLElement>) => {
+    set_anchor_el_nav(event.currentTarget);
   };
-  const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorElUser(event.currentTarget);
-  };
-
-  const handleCloseNavMenu = () => {
-    setAnchorElNav(null);
+  const handle_open_user_menu = (event: React.MouseEvent<HTMLElement>) => {
+    set_anchor_el_user(event.currentTarget);
   };
 
-  const handleCloseUserMenu = () => {
-    setAnchorElUser(null);
+  const handle_close_nav_menu = () => {
+    set_anchor_el_nav(null);
+  };
+
+  const handle_close_user_menu = () => {
+    set_anchor_el_user(null);
   };
 
   return (
-    <AppBar position="static" sx={{ backgroundColor: primaryBlueColor }}>
+    <AppBar position="static" sx={{ backgroundColor: primary_blue_color }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <Avatar
@@ -71,14 +71,14 @@ const Navbar = () => {
               aria-label="account of current user"
               aria-controls="menu-appbar"
               aria-haspopup="true"
-              onClick={handleOpenNavMenu}
+              onClick={handle_open_nav_menu}
               color="inherit"
             >
               <MenuIcon />
             </IconButton>
             <Menu
               id="menu-appbar"
-              anchorEl={anchorElNav}
+              anchorEl={anchor_el_nav}
               anchorOrigin={{
                 vertical: "bottom",
                 horizontal: "left",
@@ -88,14 +88,14 @@ const Navbar = () => {
                 vertical: "top",
                 horizontal: "left",
               }}
-              open={Boolean(anchorElNav)}
-              onClose={handleCloseNavMenu}
+              open={Boolean(anchor_el_nav)}
+              onClose={handle_close_nav_menu}
               sx={{
                 display: { xs: "block", md: "none" },
               }}
             >
               {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
+                <MenuItem key={page} onClick={handle_close_nav_menu}>
                   <Typography textAlign="center">{page}</Typography>
                 </MenuItem>
               ))}
@@ -117,7 +117,7 @@ const Navbar = () => {
             >
               <Button
                 sx={{ my: 2, color: "white", display: "block" }}
-                onClick={handleCloseNavMenu}
+                onClick={handle_close_nav_menu}
               >
                 {page}
               </Button>
@@ -127,14 +127,14 @@ const Navbar = () => {
 
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+              <IconButton onClick={handle_open_user_menu} sx={{ p: 0 }}>
                 <Avatar alt="Remy Sharp" src={""} />
               </IconButton>
             </Tooltip>
             <Menu
               sx={{ mt: "45px" }}
               id="menu-appbar"
-              anchorEl={anchorElUser}
+              anchorEl={anchor_el_user}
               anchorOrigin={{
                 vertical: "top",
                 horizontal: "right",
@@ -144,8 +144,8 @@ const Navbar = () => {
                 vertical: "top",
                 horizontal: "right",
               }}
-              open={Boolean(anchorElUser)}
-              onClose={handleCloseUserMenu}
+              open={Boolean(anchor_el_user)}
+              onClose={handle_close_user_menu}
             >
             {settings.map((setting) => (
               <Link
@@ -153,7 +153,7 @@ const Navbar = () => {
                 style={{ textDecoration: "none", color: "inherit" }}
                 to={setting === "Mi Perfil" ? "/edit-profile" : "/logout"}
               >
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                <MenuItem key={setting} onClick={handle_close_user_menu}>
                   <Typography key={setting} textAlign="center">{setting}</Typography>
                 </MenuItem>
               </Link>

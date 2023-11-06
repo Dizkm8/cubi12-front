@@ -1,9 +1,9 @@
 import { CssBaseline, } from "@mui/material";
 import { Container } from "@mui/material";
 import { Outlet } from "react-router-dom";
-import Navbar from "../components/Navbar";
+import Navbar from "../components/navbar";
 
-const App = () => {
+const app = () => {
   return (
     <>
       <Navbar />
@@ -15,4 +15,4 @@ const App = () => {
   );
 }
 
-export default App;
+export default app;

@@ -1,7 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
-import App from "../../app/layout/App";
-import HomePage from "../../features/home/HomePage";
-import EditProfile from "../../features/auth/edit-profile";
+import App from "../layout/app";
+import HomePage from "../../features/home/home.page";
+import EditProfile from "../../features/auth/edit.profile";
 
 export const router = createBrowserRouter([
   {
