@@ -23,6 +23,10 @@ import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import HelpIcon from '@mui/icons-material/Help';
 import { styled } from '@mui/material/styles';
+import FormHelperText from '@mui/material/FormHelperText';
+import { faCheck, faTimes, faInfoCircle } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
 
 
 
@@ -44,18 +48,23 @@ export default function SignUp() {
     const FirstLastName: string = data.get("firstName")?.toString() ?? "";
     const SecondLastName: string = data.get("lastName")?.toString() ?? "";
     const RUT: string = data.get("rut")?.toString() ?? "";
-    const careera: number = parseInt(data.get("career")?.toString() ?? "");
+    const CareerId: number = parseInt(data.get("career")?.toString() ?? "");
     const email: string = data.get("email")?.toString() ?? "";
     const Password: string = data.get("password")?.toString() ?? "";
     const RepeatedPassword: string = data.get("repeatPassword")?.toString() ?? "";
 
+    console.log(careers)
+
+    
     
    
-    sendData(name,FirstLastName, SecondLastName, RUT, careera, email, Password, RepeatedPassword);
+    sendData(name,FirstLastName, SecondLastName, RUT, CareerId, email, Password, RepeatedPassword);
     };
 
-    const sendData =(name: string , FirstLastName: string, SecondLastName: string, RUT: string, careera: number, email: string, Password: string, RepeatedPassword: string) => {
-        Agent.Auth.register({name,FirstLastName,SecondLastName,RUT,careera,email,Password,RepeatedPassword})
+
+    const sendData =(name: string , FirstLastName: string, SecondLastName: string, RUT: string, CareerId: number, email: string, Password: string, RepeatedPassword: string) => {
+          
+      Agent.Auth.register({name,FirstLastName,SecondLastName,RUT,CareerId,email,Password,RepeatedPassword})
         .then(res => console.log(res))
         .catch(err => console.log(err));
         
@@ -68,7 +77,7 @@ export default function SignUp() {
         try{
             Agent.requests.get('Careers')
             .then(response => {
-                setCareers(response.map((career: any) => career.name));
+                setCareers(response.map((career: any) => career));
                 })
                 .catch(error => {
                     console.error('Error loading careers:', error);
@@ -154,7 +163,7 @@ useEffect(() => {
         backgroundSize: 'cover', 
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
-        height: '100vh',
+        height: 'fullscreen',
         justifyContent:"center", 
         alignItems:"center",
         display:"flex"
@@ -171,7 +180,7 @@ useEffect(() => {
             flexDirection: 'column',
             alignItems: 'center',
             boxShadow:'0px 4px 6px rgba(0, 0, 0, 0.5)', 
-            height:575,
+            height:'80%', //height: 575
             width: 450,
             mb:3,
             backgroundColor: '#F5F5F5',
@@ -221,10 +230,10 @@ useEffect(() => {
                     }}
                     />
                 </Grid>
+
                   
               <Grid item xs={12} md={6}>
                 <TextField
-
                   onChange={(e) => setFirstName(e.target.value)}
                   aria-invalid={validFirstName ? "false" : "true"}
                   onFocus={() => setFirstNameFocus(true)}
@@ -281,8 +290,8 @@ useEffect(() => {
                     }
                 }}
                   sx={{
-                    
                     mr:3,
+                   
                     boxShadow:'0px 2px 2px rgba(0, 0, 0, 0.2)',
                    
                   }}
@@ -298,6 +307,8 @@ useEffect(() => {
                     onBlur={() => setRutFocus(false)}
                     value={rut}
                     error={!validRut && rutFocus}
+
+                    
                     
                     variant='filled'
                     id="rut"
@@ -402,8 +413,8 @@ useEffect(() => {
                     >
 
                     {careers.map((career,index) => (
-                    <MenuItem key={index} value={careers[index]}>
-                    {career}
+                    <MenuItem key={index} value={career['id']}>
+                    {career['name']}
                     </MenuItem>
                     ))}
                     </TextField>
@@ -414,6 +425,7 @@ useEffect(() => {
               <Grid item xs={12}>
               
                 <TextField
+                  
                   required
                   fullWidth
                   aria-invalid={validPwd ? "false" : "true"}
@@ -422,6 +434,7 @@ useEffect(() => {
                   onBlur={() => setPwdFocus(false)}
                   value={pwd}
                   error={!validPwd && pwdFocus}
+                  aria-describedby="pwdnote"
                   name="password"
                   label="Contraseña"
                   type="password"
@@ -443,7 +456,21 @@ useEffect(() => {
                     boxShadow:'0px 2px 2px rgba(0, 0, 0, 0.2)', 
                     
                 }}
+                
                 />
+                
+                {pwdFocus && (
+                    <FormHelperText id="pwdnote" className={!validPwd ? "instructions" : "offscreen"} sx={{
+                      ml:3,
+                    }}>
+                      
+                      <div>
+                            <FontAwesomeIcon icon={faInfoCircle} style={{ marginRight: '5px' }}  />
+                            Contraseña debe contener al menos 10 caracteres, una mayúscula y un número.      
+                      </div>
+                           
+                    </FormHelperText>
+)}
               </Grid>
               <Grid item xs={12}>
                     <TextField
@@ -497,7 +524,7 @@ useEffect(() => {
             </Grid>
             <Button
               type="submit"
-              style={{ backgroundColor: '#1C478F', width:402, height:50}}
+              style={{ backgroundColor: '#1C478F', width:'89%', height:50}}
               variant="contained"
               sx={{ mt: 2, mb: 2, fontFamily: 'Raleway, sans-serif', fontSize: '20px', fontWeight: 300,textTransform: 'none'}}
               disabled={!validPwd || !validMatch || !validRut || !validName || !validFirstName || !validLastName ? true : false}
