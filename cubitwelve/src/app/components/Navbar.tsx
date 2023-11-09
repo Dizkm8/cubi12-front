@@ -19,7 +19,7 @@ import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 
 const Navbar = () => {
-  const { authenticated } = useContext(AuthContext);
+  const { authenticated, setAuthenticated } = useContext(AuthContext);
 
   const pages = authenticated ? ["Inicio", "Malla Interactiva", "Mi Progreso"] : ["Inicio", "Malla Interactiva"];
   const settings = authenticated ? ["Mis datos", "Cerrar Sesión"] : ["Invitado", "Iniciar Sesión"];
@@ -155,7 +155,8 @@ const Navbar = () => {
               <Link
                 key={setting}
                 style={{ textDecoration: "none", color: setting === 'Invitado' ? 'gray' : 'inherit', }}
-                to={setting === "Iniciar Sesión" ? "/login" : setting === "Mis datos" ? "/edit-profile" : setting === "Cerrar Sesión" ? "/logout" : "/register"}
+                to={setting === "Iniciar Sesión" ? "/login" : setting === "Mis datos" ? "/edit-profile" : setting === "Cerrar Sesión" ? "/" : "#"}
+                onClick={() => { if (setting === "Cerrar Sesión") { setAuthenticated(false); } }} 
               >
                 <MenuItem key={setting} onClick={handle_close_user_menu} disabled={setting === "Invitado"}>
                   <Typography key={setting} style={{ textAlign: 'center' }}>{setting}</Typography>

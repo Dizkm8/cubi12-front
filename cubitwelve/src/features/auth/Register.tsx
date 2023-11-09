@@ -167,7 +167,7 @@ useEffect(() => {
         backgroundSize: 'cover', 
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
-        height: 'fullscreen',
+        height: '100vh',
         justifyContent:"center", 
         alignItems:"center",
         display:"flex"
@@ -514,7 +514,7 @@ useEffect(() => {
                     ¿Ya tienes cuenta?{' '}
                     <Link
                         marginRight={3}
-                        href="#"
+                        href="/login"
                         color="primary"
                         underline="hover"
                         fontWeight="600"
