@@ -2,7 +2,7 @@ import axios, {AxiosResponse} from "axios";
 import { config } from "yargs";
 
 const API_PORT = 5000;
-const token = "";
+let token = "";
 axios.defaults.baseURL = `http://localhost:${API_PORT}/api/`;
 axios.defaults.withCredentials = true;
 axios.interceptors.request.use
@@ -20,8 +20,8 @@ const requests = {
 }
 
 const Auth = {
-    register : (form: any) => requests.post("auth/register", form), // TODO: Fix if needed
-    login : (form: any) => requests.post("auth/login", form), // TODO: Fix if needed
+    register : (form: any) => requests.post("auth/register", form).then(response => token = response.token), // TODO: Fix if needed
+    login : (form: any) => requests.post("auth/login", form).then(response => token = response.token), // TODO: Fix if needed
     updatePassword : (form: any) => requests.put("auth/update-password", form), // TODO: Fix if needed
     updateProfile: (form: any) => requests.put("users/update-profile", form), // TODO: Fix if needed
     profile: () => requests.get("users/profile"), // TODO: Fix if needed

@@ -1,18 +1,19 @@
 import { CssBaseline, } from "@mui/material";
-import { Container } from "@mui/material";
-import { Outlet } from "react-router-dom";
-import Navbar from "../components/navbar";
+import { BrowserRouter } from "react-router-dom";
+import { AuthProvider } from "../context/AuthContext";
+import Routes from "../router/Routes";
 
-const app = () => {
+function App() {
   return (
     <>
-      <Navbar />
-      <Container maxWidth="xl" sx={{ paddingTop: "3rem" }}>
-        <CssBaseline />
-        <Outlet />
-      </Container>
+      <CssBaseline />
+      <BrowserRouter>
+        <AuthProvider>
+          <Routes />
+        </AuthProvider>
+      </BrowserRouter>
     </>
   );
 }
 
-export default app;
+export default App;

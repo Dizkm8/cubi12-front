@@ -15,11 +15,15 @@ import MenuItem from "@mui/material/MenuItem";
 import Cubi12Logo from "../static/images/cubi12.svg";
 import { primary_blue_color } from "../static/colors";
 import { Link } from 'react-router-dom';
-
-const pages = ["Inicio", "Malla Interactiva", "Mi Progreso"];
-const settings = ["Mi Perfil", "Cerrar Sesión"];
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 
 const Navbar = () => {
+  const { authenticated } = useContext(AuthContext);
+
+  const pages = authenticated ? ["Inicio", "Malla Interactiva", "Mi Progreso"] : ["Inicio", "Malla Interactiva"];
+  const settings = authenticated ? ["Mis datos", "Cerrar Sesión"] : ["Invitado", "Iniciar Sesión"];
+
   const [anchor_el_nav, set_anchor_el_nav] = React.useState<null | HTMLElement>(
     null
   );
@@ -113,7 +117,7 @@ const Navbar = () => {
             <Link 
               key={page}
               style={{ textDecoration: "none", color: "inherit" }}
-              to={page === "Inicio" ? "/" : page === "Malla Interactiva" ? "interactive-mesh" : "my-progress"}
+              to={ page === "Inicio" ? "/" : page === "Malla Interactiva" ? "/interactive-mesh" : "/my-progress" }
             >
               <Button
                 sx={{ my: 2, color: "white", display: "block" }}
@@ -150,11 +154,11 @@ const Navbar = () => {
             {settings.map((setting) => (
               <Link
                 key={setting}
-                style={{ textDecoration: "none", color: "inherit" }}
-                to={setting === "Mi Perfil" ? "/edit-profile" : "/logout"}
+                style={{ textDecoration: "none", color: setting === 'Invitado' ? 'gray' : 'inherit', }}
+                to={setting === "Iniciar Sesión" ? "/login" : setting === "Mis datos" ? "/edit-profile" : setting === "Cerrar Sesión" ? "/logout" : "/register"}
               >
-                <MenuItem key={setting} onClick={handle_close_user_menu}>
-                  <Typography key={setting} textAlign="center">{setting}</Typography>
+                <MenuItem key={setting} onClick={handle_close_user_menu} disabled={setting === "Invitado"}>
+                  <Typography key={setting} style={{ textAlign: 'center' }}>{setting}</Typography>
                 </MenuItem>
               </Link>
             ))}
@@ -165,4 +169,5 @@ const Navbar = () => {
     </AppBar>
   );
 };
+
 export default Navbar;
