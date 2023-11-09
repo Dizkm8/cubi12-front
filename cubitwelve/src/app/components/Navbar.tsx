@@ -13,7 +13,7 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 // @ts-ignore
 import Cubi12Logo from "../static/images/cubi12.svg";
-import { primary_blue_color } from "../static/colors";
+import { primaryBlueColor } from "../static/colors";
 import { Link } from 'react-router-dom';
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
@@ -24,30 +24,30 @@ const Navbar = () => {
   const pages = authenticated ? ["Inicio", "Malla Interactiva", "Mi Progreso"] : ["Inicio", "Malla Interactiva"];
   const settings = authenticated ? ["Mis datos", "Cerrar Sesión"] : ["Invitado", "Iniciar Sesión"];
 
-  const [anchor_el_nav, set_anchor_el_nav] = React.useState<null | HTMLElement>(
+  const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null
   );
-  const [anchor_el_user, set_anchor_el_user] = React.useState<null | HTMLElement>(
+  const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
     null
   );
 
-  const handle_open_nav_menu = (event: React.MouseEvent<HTMLElement>) => {
-    set_anchor_el_nav(event.currentTarget);
+  const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorElNav(event.currentTarget);
   };
-  const handle_open_user_menu = (event: React.MouseEvent<HTMLElement>) => {
-    set_anchor_el_user(event.currentTarget);
-  };
-
-  const handle_close_nav_menu = () => {
-    set_anchor_el_nav(null);
+  const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorElUser(event.currentTarget);
   };
 
-  const handle_close_user_menu = () => {
-    set_anchor_el_user(null);
+  const handleCloseNavMenu = () => {
+    setAnchorElNav(null);
+  };
+
+  const handleCloseUserMenu = () => {
+    setAnchorElUser(null);
   };
 
   return (
-    <AppBar position="static" sx={{ backgroundColor: primary_blue_color }}>
+    <AppBar position="static" sx={{ backgroundColor: primaryBlueColor }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <Avatar
@@ -75,14 +75,14 @@ const Navbar = () => {
               aria-label="account of current user"
               aria-controls="menu-appbar"
               aria-haspopup="true"
-              onClick={handle_open_nav_menu}
+              onClick={handleOpenNavMenu}
               color="inherit"
             >
               <MenuIcon />
             </IconButton>
             <Menu
               id="menu-appbar"
-              anchorEl={anchor_el_nav}
+              anchorEl={anchorElNav}
               anchorOrigin={{
                 vertical: "bottom",
                 horizontal: "left",
@@ -92,14 +92,14 @@ const Navbar = () => {
                 vertical: "top",
                 horizontal: "left",
               }}
-              open={Boolean(anchor_el_nav)}
-              onClose={handle_close_nav_menu}
+              open={Boolean(anchorElNav)}
+              onClose={handleCloseNavMenu}
               sx={{
                 display: { xs: "block", md: "none" },
               }}
             >
               {pages.map((page) => (
-                <MenuItem key={page} onClick={handle_close_nav_menu}>
+                <MenuItem key={page} onClick={handleCloseNavMenu}>
                   <Typography textAlign="center">{page}</Typography>
                 </MenuItem>
               ))}
@@ -121,7 +121,7 @@ const Navbar = () => {
             >
               <Button
                 sx={{ my: 2, color: "white", display: "block" }}
-                onClick={handle_close_nav_menu}
+                onClick={handleCloseNavMenu}
               >
                 {page}
               </Button>
@@ -131,14 +131,14 @@ const Navbar = () => {
 
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
-              <IconButton onClick={handle_open_user_menu} sx={{ p: 0 }}>
+              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <Avatar alt="Remy Sharp" src={""} />
               </IconButton>
             </Tooltip>
             <Menu
               sx={{ mt: "45px" }}
               id="menu-appbar"
-              anchorEl={anchor_el_user}
+              anchorEl={anchorElUser}
               anchorOrigin={{
                 vertical: "top",
                 horizontal: "right",
@@ -148,8 +148,8 @@ const Navbar = () => {
                 vertical: "top",
                 horizontal: "right",
               }}
-              open={Boolean(anchor_el_user)}
-              onClose={handle_close_user_menu}
+              open={Boolean(anchorElUser)}
+              onClose={handleCloseUserMenu}
             >
             {settings.map((setting) => (
               <Link
@@ -158,7 +158,7 @@ const Navbar = () => {
                 to={setting === "Iniciar Sesión" ? "/login" : setting === "Mis datos" ? "/edit-profile" : setting === "Cerrar Sesión" ? "/" : "#"}
                 onClick={() => { if (setting === "Cerrar Sesión") { setAuthenticated(false); } }} 
               >
-                <MenuItem key={setting} onClick={handle_close_user_menu} disabled={setting === "Invitado"}>
+                <MenuItem key={setting} onClick={handleCloseUserMenu} disabled={setting === "Invitado"}>
                   <Typography key={setting} style={{ textAlign: 'center' }}>{setting}</Typography>
                 </MenuItem>
               </Link>

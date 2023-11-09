@@ -18,9 +18,7 @@ const initialValue: AuthContext = {
 const AuthContext = createContext<AuthContext>(initialValue);
 
 const AuthProvider = ({ children }: Props) => {
-    const [authenticated, setAuthenticated] = useState(
-        initialValue.authenticated
-    );
+    const [authenticated, setAuthenticated] = useState(initialValue.authenticated);
 
     const navigate = useNavigate();
 

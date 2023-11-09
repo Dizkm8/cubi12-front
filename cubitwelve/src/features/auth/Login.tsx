@@ -38,7 +38,6 @@ export default function SignUp() {
     const data = new FormData(event.currentTarget);
     const Email: string = data.get("email")?.toString() ?? "";
     const Password: string = data.get("password")?.toString() ?? "";
-    console.log({Email, Password})
     sendData(Email, Password);
     };
 
@@ -53,14 +52,12 @@ export default function SignUp() {
         const isValid = pwdRegex.test(value);
         setPwdError(!isValid)
       }
-      console.log({name, value})
     }
     const sendData =(email: string, password: string) => {
         Agent.Auth.login({email, password})
         .then((data)=>{
           setAuthenticated(true);
           navigate("/")
-          console.log(data);
         })
         .catch((err)=>{
           console.log(err);
