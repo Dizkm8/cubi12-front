@@ -3,20 +3,20 @@ import { SyntheticEvent, useRef, useState, useEffect, useContext } from "react";
 import { Paper, Typography, Grid, TextField, Button, MenuItem, Box } from "@mui/material";
 import { Link } from "react-router-dom";
 import Agent from "../../app/api/agent";
-import { primary_blue_color, primary_orange_color, primary_red_color } from "../../app/static/colors";
+import { primaryBlueColor, primaryOrangeColor, primaryRedColor } from "../../app/static/colors";
 
 // Regex for password and names
-const pwd_regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{10,16}$/;
-const names_regex = /^[A-Za-z\s]+$/;
+const pwdRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{10,16}$/;
+const namesRegex = /^[A-Za-z\s]+$/;
 
 // Messages
-const nothing_update = "Nada que actualizar";
-const invalid_pwd = "Contraseña(s) inválida(s)";
-const invalid_names = "Nombre(s) inválido(s)";
+const nothingUpdate = "Nada que actualizar";
+const invalidPwd = "Contraseña(s) inválida(s)";
+const invalidNames = "Nombre(s) inválido(s)";
 
 export default function EditProfile() {
     // Error message reference
-    const error_ref = useRef<HTMLInputElement>(null);
+    const errorRef = useRef<HTMLInputElement>(null);
 
     // Names state
     let [name, setName] = useState("");
@@ -24,9 +24,9 @@ export default function EditProfile() {
     let [secondLastName, setSecondLastName] = useState("");
 
     // User data state
-    const [rut, set_rut] = useState("");
-    const [email, set_email] = useState("");
-    const [career, set_career] = useState("");
+    const [rut, setRut] = useState("");
+    const [email, setEmail] = useState("");
+    const [career, setCareer] = useState("");
 
     // Password state
     let [currentPwd, setCurrentPwd] = useState("");
@@ -34,10 +34,10 @@ export default function EditProfile() {
     let [matchPwd, setMatchPwd] = useState("");
 
     // Error message state
-    const [error_message, set_error_message] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
 
     // Tab state
-    const [tab, set_tab] = useState("my-info");
+    const [tab, setTab] = useState("my-info");
 
     // User state
     const [user, set_user] = useState({name: "", firstLastName: "", secondLastName: "", rut: "", email: "", career: {id: "", name: ""}});
@@ -47,17 +47,17 @@ export default function EditProfile() {
         Agent.Auth.profile()
             .then(response => {
                 set_user(response);
-                set_rut(response.rut);
-                set_email(response.email);
-                set_career(response.career.name);
+                setRut(response.rut);
+                setEmail(response.email);
+                setCareer(response.career.name);
             })
             .catch(error => { console.error("Error loading user:", error); });
     }, []);
 
     // Clear inputs
-    const clear_inputs = (names: boolean, password: boolean, cancel: boolean) => {
+    const clearInputs = (names: boolean, password: boolean, cancel: boolean) => {
         // Clear error message
-        set_error_message("");
+        setErrorMessage("");
 
         // Clear name inputs
         if (names) {
@@ -85,12 +85,11 @@ export default function EditProfile() {
     }
 
     // Send my info data to server
-    const send_my_info_data = (name: string, firstLastName: string, secondLastName: string) => {
+    const sendMyInfoData = (name: string, firstLastName: string, secondLastName: string) => {
         Agent.Auth.updateProfile({
             name, firstLastName, secondLastName
         })
             .then(response => {
-                console.log(response);
                 console.log("Name(s) updated successfully!");
             })
             .catch(error => {
@@ -100,31 +99,31 @@ export default function EditProfile() {
     }
 
     // Send password data to server
-    const send_password_data = (password: string, currentPassword: string, repeatedPassword: string) => {
+    const sendPasswordData = (password: string, currentPassword: string, repeatedPassword: string) => {
         Agent.Auth.updatePassword({password, currentPassword, repeatedPassword})
             .then(response => { 
                 console.log("Password updated successfully!"); 
             })
             .catch(error => {
                 console.error("Error updating password:", error);
-                set_error_message(invalid_pwd);
+                setErrorMessage(invalidPwd);
             });
     }
 
     // Handle my info submit
-    const handle_submit_my_info = async (e: SyntheticEvent) => {
+    const handleSubmitMyInfo = async (e: SyntheticEvent) => {
         // Prevent default submit action
         e.preventDefault();
 
         // Clear error message
-        set_error_message("");
+        setErrorMessage("");
 
         // Check if inputs are empty
         if ((!name && !firstLastName && !secondLastName)) {
-            set_error_message(nothing_update);
+            setErrorMessage(nothingUpdate);
             return;
         } else if (name === user.name || firstLastName === user.firstLastName || secondLastName === user.secondLastName) {
-            set_error_message(nothing_update);
+            setErrorMessage(nothingUpdate);
             return;
         }
 
@@ -134,17 +133,17 @@ export default function EditProfile() {
         secondLastName = secondLastName === "" ? user.secondLastName : secondLastName;
 
         // Check if inputs are valids
-        if (!names_regex.test(name) || !names_regex.test(firstLastName) || !names_regex.test(secondLastName)) {
-            set_error_message(invalid_names);
+        if (!namesRegex.test(name) || !namesRegex.test(firstLastName) || !namesRegex.test(secondLastName)) {
+            setErrorMessage(invalidNames);
             return;
         }
 
         try {
             // Send data to server
-            send_my_info_data(name, firstLastName, secondLastName);
+            sendMyInfoData(name, firstLastName, secondLastName);
 
             // Clean name inputs
-            clear_inputs(true, false, false);
+            clearInputs(true, false, false);
 
         } catch (error: any) {
             if (error?.response) {
@@ -157,43 +156,45 @@ export default function EditProfile() {
                 console.log("No Server Response");
             }
             
-            if (error_ref.current) {
-                error_ref.current.focus();
+            if (errorRef.current) {
+                errorRef.current.focus();
             }
         }
     };
 
     // Handle password submit
-    const handle_submit_password = async (e: SyntheticEvent) => {
+    const handleSubmitPassword = async (e: SyntheticEvent) => {
         // Prevent default submit action
         e.preventDefault();
 
          // Clear error message
-        set_error_message("");
+        setErrorMessage("");
 
         // Check if inputs are empty
         if (!pwd) {
-            clear_inputs(false, true, false);
-            set_error_message(nothing_update);
+            clearInputs(false, true, false);
+            setErrorMessage(nothingUpdate);
             return;
         } 
         // Check if passwords match or its valid
-        else if (!pwd_regex.test(pwd) || !pwd_regex.test(currentPwd) ||pwd !== matchPwd || !currentPwd) {
-            clear_inputs(false, true, false);
-            set_error_message(invalid_pwd);
+        else if (!pwdRegex.test(pwd) || !pwdRegex.test(currentPwd) ||pwd !== matchPwd || !currentPwd) {
+            clearInputs(false, true, false);
+            setErrorMessage(invalidPwd);
             return;
         }
     
         try {
             // Send data to server
-            send_password_data(pwd, currentPwd, matchPwd);
+            sendPasswordData(pwd, currentPwd, matchPwd);
 
             // Clean password inputs
-            clear_inputs(false, true, false);
+            clearInputs(false, true, false);
 
         } catch (error: any) {
             if (error?.response) {
-                if (error.response.status === 409 || error.response.status === 400) console.log("Username Taken");
+                if (error.response.status === 409 || error.response.status === 400) {
+                    console.log("Username Taken");
+                }
                 else {
                     console.log(error.response);
                     console.log("Registration Failed");
@@ -201,8 +202,8 @@ export default function EditProfile() {
             } else {
                 console.log("No Server Response");
             }
-            if (error_ref.current) {
-                error_ref.current.focus();
+            if (errorRef.current) {
+                errorRef.current.focus();
             }
         }
     };
@@ -221,7 +222,7 @@ export default function EditProfile() {
                     alignItems: "center",
                 }}
             >
-                <Paper elevation={3} style={{ padding: "40px", border: `1px solid ${primary_blue_color}`, borderRadius: "8px", width: "60%", height: "fit-content" }}>
+                <Paper elevation={3} style={{ padding: "40px", border: `1px solid ${primaryBlueColor}`, borderRadius: "8px", width: "60%", height: "fit-content" }}>
                     {/* Title */}
                     <Grid container>
                         {/* My info title */}
@@ -231,7 +232,7 @@ export default function EditProfile() {
                                 color={tab === "my-info" ? "black" : "#626262"}
                                 variant="h5"
                                 style={{ cursor: "pointer" }}
-                                onClick={() => { set_tab("my-info") }}
+                                onClick={() => { setTab("my-info") }}
                             >Mis Datos
                             </Typography>
                         </Grid>
@@ -243,14 +244,14 @@ export default function EditProfile() {
                                 variant="h5"
                                 style={{ cursor: "pointer" }}
                                 id="tab-password"
-                                onClick={() => set_tab("password")}
+                                onClick={() => setTab("password")}
                             >Contraseña
                             </Typography>
                         </Grid>
                     </Grid>
                     {/* My info page */}
                     {tab === "my-info" && (
-                        <Box component="form" noValidate onSubmit={handle_submit_my_info} sx={{ mt: 3 }}>
+                        <Box component="form" noValidate onSubmit={handleSubmitMyInfo} sx={{ mt: 3 }}>
                             <Grid container spacing={4} sx={{ marginTop: "5px" }}>
                                 {/* Name input */}
                                 <Grid item xs={12} sm={6}>
@@ -353,7 +354,7 @@ export default function EditProfile() {
                                         label=""
                                         select
                                         fullWidth
-                                        onChange={(e) => set_career(e.target.value)}
+                                        onChange={(e) => setCareer(e.target.value)}
                                         >
                                         {<MenuItem value={career}>
                                                 {career}
@@ -363,9 +364,9 @@ export default function EditProfile() {
                                 {/* Buttons */}
                                 <Grid item xs={12}>
                                     {/* Error message */}
-                                    {error_message && (
+                                    {errorMessage && (
                                         <Typography color="error" style={{ marginBottom: "16px", textAlign: "right" }}>
-                                            {error_message}
+                                            {errorMessage}
                                         </Typography>
                                     )}
                                     <Box sx={{ display: "flex", marginTop: "2%", marginBottom: "2%", justifyContent: "flex-end" }}>
@@ -375,14 +376,14 @@ export default function EditProfile() {
                                             variant="outlined"
                                             color="secondary"
                                             style={{
-                                                color: `${primary_red_color}`,
+                                                color: `${primaryRedColor}`,
                                                 marginRight: "16px",
                                                 transform: "scale(1.05)",
                                                 boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.2)",
                                                 fontFamily: "Raleway, sans-serif",
                                                 fontSize: "1rem",
                                             }}
-                                            onClick={() => { clear_inputs(true, false, true) }}
+                                            onClick={() => { clearInputs(true, false, true) }}
                                         >Cancelar
                                         </Button>
                                         {/* Save button */}
@@ -394,7 +395,7 @@ export default function EditProfile() {
                                             style={{
                                                 transform: "scale(1.05)",
                                                 color: "black",
-                                                backgroundColor: `${primary_orange_color}`,
+                                                backgroundColor: `${primaryOrangeColor}`,
                                                 boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.2)",
                                                 fontFamily: "Raleway, sans-serif",
                                                 fontSize: "1rem",
@@ -408,7 +409,7 @@ export default function EditProfile() {
                     )}
                     {/* Password page */}
                     {tab === "password" && (
-                        <Box component="form" noValidate onSubmit={handle_submit_password} sx={{ mt: 3 }}>
+                        <Box component="form" noValidate onSubmit={handleSubmitPassword} sx={{ mt: 3 }}>
                             <Grid container spacing={6} sx={{ marginTop: "5px" }}>
                                 {/* Password input */}
                                 <Grid item xs={12}>
@@ -467,9 +468,9 @@ export default function EditProfile() {
                                 {/* Buttons */}
                                 <Grid item xs={12}>
                                     {/* Error message */}
-                                    {error_message && (
+                                    {errorMessage && (
                                         <Typography color="error" style={{ marginBottom: "16px", textAlign: "right" }}>
-                                            {error_message}
+                                            {errorMessage}
                                         </Typography>
                                     )}
                                     <Box sx={{ display: "flex", marginTop: "2%", marginBottom: "2%", justifyContent: "flex-end" }}>
@@ -479,14 +480,14 @@ export default function EditProfile() {
                                             variant="outlined"
                                             color="secondary"
                                             style={{
-                                                color: `${primary_red_color}`,
+                                                color: `${primaryRedColor}`,
                                                 marginRight: "16px",
                                                 transform: "scale(1.05)",
                                                 boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.2)",
                                                 fontFamily: "Raleway, sans-serif",
                                                 fontSize: ""
                                             }}
-                                            onClick={() => { clear_inputs(false, true, true) }}
+                                            onClick={() => { clearInputs(false, true, true) }}
                                         >Cancelar
                                         </Button>
                                         {/* Update button */}
@@ -498,7 +499,7 @@ export default function EditProfile() {
                                             style={{
                                                 transform: "scale(1.05)",
                                                 color: "black",
-                                                backgroundColor: `${primary_orange_color}`,
+                                                backgroundColor: `${primaryOrangeColor}`,
                                                 boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.2)",
                                                 fontFamily: "Raleway, sans-serif",
                                                 fontSize: "1rem"
