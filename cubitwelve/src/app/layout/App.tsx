@@ -1,7 +1,21 @@
-import { Typography } from "@mui/material";
+import { CssBaseline } from "@mui/material";
+import { BrowserRouter } from "react-router-dom";
+import { AuthProvider } from "../context/AuthContext";
+import Routes from "../routes/Routes";
 
-function App() {
-  return <Typography variant="h1">Hello World!</Typography>;
+
+
+function App(){
+  return (
+    <>
+      <CssBaseline/>
+      <BrowserRouter>
+        <AuthProvider>
+          <Routes/>
+        </AuthProvider>
+      </BrowserRouter>
+    </>
+  );
 }
 
 export default App;

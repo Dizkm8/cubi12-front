@@ -19,6 +19,6 @@ const Auth = {
 }
 
 
-const agent = { Auth };
+const agent = { Auth,requests };
 
 export default agent;
