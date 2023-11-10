@@ -1,4 +1,4 @@
-import { CardMedia, Grid, Typography } from "@mui/material";
+import { Grid, Typography } from "@mui/material";
 // @ts-ignore
 import Cubi12Logo from "../../app/static/images/cubi12.svg";
 

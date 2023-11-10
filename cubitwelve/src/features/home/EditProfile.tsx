@@ -1,13 +1,13 @@
 import React from "react";
-import { SyntheticEvent, useRef, useState, useEffect, useContext } from "react";
+import { SyntheticEvent, useRef, useState, useEffect } from "react";
 import { Paper, Typography, Grid, TextField, Button, MenuItem, Box } from "@mui/material";
-import { Link } from "react-router-dom";
 import Agent from "../../app/api/agent";
 import { primaryBlueColor, primaryOrangeColor, primaryRedColor } from "../../app/static/colors";
+import { startCase } from 'lodash';
 
 // Regex for password and names
 const pwdRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{10,16}$/;
-const namesRegex = /^[A-Za-z\s]+$/;
+const namesRegex = /^[A-Za-záéíóúüñÁÉÍÓÚÜÑ\s]+$/;
 
 // Messages
 const nothingUpdate = "Nada que actualizar";
@@ -41,7 +41,7 @@ export default function EditProfile() {
 
     // User state
     const [user, set_user] = useState({name: "", firstLastName: "", secondLastName: "", rut: "", email: "", career: {id: "", name: ""}});
-
+    
     // Load user data
     useEffect(() => {
         Agent.Auth.profile()
@@ -49,7 +49,7 @@ export default function EditProfile() {
                 set_user(response);
                 setRut(response.rut);
                 setEmail(response.email);
-                setCareer(response.career.name);
+                setCareer(startCase(response.career.name));
             })
             .catch(error => { console.error("Error loading user:", error); });
     }, []);
@@ -263,10 +263,9 @@ export default function EditProfile() {
                                     <TextField
                                     id="name"
                                     name="name"
-                                    value={name}
+                                    defaultValue={user.name}
                                     required
                                     fullWidth
-                                    placeholder={user.name}
                                     onChange={(e) => setName(e.target.value)}
                                     />
                                 </Grid>
@@ -284,7 +283,7 @@ export default function EditProfile() {
                                         label=""
                                         required
                                         fullWidth
-                                        InputProps={{ readOnly: true }}
+                                        disabled
                                     />
                                 </Grid>
                                 {/* First Lastname input */}
@@ -297,11 +296,10 @@ export default function EditProfile() {
                                     <TextField
                                     id="firstLastName"
                                     name="firstLastName"
-                                    value={firstLastName}
+                                    defaultValue={user.firstLastName}
                                     label=""
                                     required
                                     fullWidth
-                                    placeholder={user.firstLastName}
                                     onChange={(e) => setFirstLastName(e.target.value)}
                                     />
                                 </Grid>
@@ -315,11 +313,10 @@ export default function EditProfile() {
                                     <TextField
                                     id="secondLastName"
                                     name="secondLastName"
-                                    value={secondLastName}
+                                    defaultValue={user.secondLastName}
                                     label=""
                                     required
                                     fullWidth
-                                    placeholder={user.secondLastName}
                                     onChange={(e) => setSecondLastName(e.target.value)}
                                     />
                                 </Grid>
@@ -337,7 +334,7 @@ export default function EditProfile() {
                                     label=""
                                     required
                                     fullWidth
-                                    InputProps={{ readOnly: true }}
+                                    disabled
                                     />
                                 </Grid>
                                 {/* Career input */}

@@ -1,5 +1,4 @@
 import axios, {AxiosResponse} from "axios";
-import { config } from "yargs";
 
 const API_PORT = 5000;
 let token = "";
@@ -10,13 +9,13 @@ axios.interceptors.request.use
     config.headers.Authorization = `Bearer ${token}`;
     return config;
 });
-const response_body = (response: AxiosResponse) => response.data;
+const responseBody = (response: AxiosResponse) => response.data;
 
 const requests = {
-    get: (url: string, params?: URLSearchParams) => axios.get(url, {params}).then(response_body),
-    post: (url: string, body: {}) => axios.post(url, body).then(response_body),
-    put: (url: string, body: {}) => axios.put(url, body).then(response_body),
-    delete: (url: string) => axios.delete(url).then(response_body),
+    get: (url: string, params?: URLSearchParams) => axios.get(url, {params}).then(responseBody),
+    post: (url: string, body: {}) => axios.post(url, body).then(responseBody),
+    put: (url: string, body: {}) => axios.put(url, body).then(responseBody),
+    delete: (url: string) => axios.delete(url).then(responseBody),
 }
 
 const Auth = {
