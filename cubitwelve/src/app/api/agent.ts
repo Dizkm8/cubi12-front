@@ -1,7 +1,7 @@
 import axios, {AxiosResponse} from "axios";
 
 const API_PORT = 5000;
-let token = "";
+let token = localStorage.getItem("token");
 axios.defaults.baseURL = `http://localhost:${API_PORT}/api/`;
 axios.defaults.withCredentials = true;
 axios.interceptors.request.use
@@ -9,6 +9,7 @@ axios.interceptors.request.use
     config.headers.Authorization = `Bearer ${token}`;
     return config;
 });
+
 const responseBody = (response: AxiosResponse) => response.data;
 
 const requests = {
@@ -26,7 +27,6 @@ const Auth = {
     profile: () => requests.get("users/profile"), // TODO: Fix if needed
 }
 
-
-const agent = { Auth, requests };
+const agent = { Auth, requests, token };
 
 export default agent;

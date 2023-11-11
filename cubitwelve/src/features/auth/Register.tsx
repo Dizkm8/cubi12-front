@@ -67,6 +67,8 @@ export default function SignUp() {
     const sendData =(name: string , firstLastName: string, secondLastName: string, rut: string, careerId: number, email: string, password: string, repeatedPassword: string) => {
         Agent.Auth.register({name,firstLastName,secondLastName,rut,email,careerId,password,repeatedPassword})
         .then(res => {
+            Agent.token = res;
+            localStorage.setItem("token", res);
             setAuthenticated(true);
             navigate("/");
         })

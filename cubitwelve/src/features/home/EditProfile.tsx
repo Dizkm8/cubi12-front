@@ -3,7 +3,7 @@ import { SyntheticEvent, useRef, useState, useEffect } from "react";
 import { Paper, Typography, Grid, TextField, Button, MenuItem, Box } from "@mui/material";
 import Agent from "../../app/api/agent";
 import { primaryBlueColor, primaryOrangeColor, primaryRedColor } from "../../app/static/colors";
-import { startCase } from 'lodash';
+import { set, startCase } from 'lodash';
 
 // Regex for password and names
 const pwdRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{10,16}$/;
@@ -13,6 +13,7 @@ const namesRegex = /^[A-Za-záéíóúüñÁÉÍÓÚÜÑ\s]+$/;
 const nothingUpdate = "Nada que actualizar";
 const invalidPwd = "Contraseña(s) inválida(s)";
 const invalidNames = "Nombre(s) inválido(s)";
+const updateSuccess = "Actualización exitosa";
 
 export default function EditProfile() {
     // Error message reference
@@ -34,7 +35,7 @@ export default function EditProfile() {
     let [matchPwd, setMatchPwd] = useState("");
 
     // Error message state
-    const [errorMessage, setErrorMessage] = useState("");
+    const [message, setMessage] = useState("");
 
     // Tab state
     const [tab, setTab] = useState("my-info");
@@ -47,6 +48,9 @@ export default function EditProfile() {
         Agent.Auth.profile()
             .then(response => {
                 set_user(response);
+                setName(response.name);
+                setFirstLastName(response.firstLastName);
+                setSecondLastName(response.secondLastName);
                 setRut(response.rut);
                 setEmail(response.email);
                 setCareer(startCase(response.career.name));
@@ -57,7 +61,7 @@ export default function EditProfile() {
     // Clear inputs
     const clearInputs = (names: boolean, password: boolean, cancel: boolean) => {
         // Clear error message
-        setErrorMessage("");
+        setMessage("");
 
         // Clear name inputs
         if (names) {
@@ -91,6 +95,7 @@ export default function EditProfile() {
         })
             .then(response => {
                 console.log("Name(s) updated successfully!");
+                setMessage(updateSuccess);
             })
             .catch(error => {
                 console.error("Error updating profile:", error);
@@ -102,11 +107,12 @@ export default function EditProfile() {
     const sendPasswordData = (password: string, currentPassword: string, repeatedPassword: string) => {
         Agent.Auth.updatePassword({password, currentPassword, repeatedPassword})
             .then(response => { 
-                console.log("Password updated successfully!"); 
+                console.log("Password updated successfully!");
+                setMessage(updateSuccess);
             })
             .catch(error => {
                 console.error("Error updating password:", error);
-                setErrorMessage(invalidPwd);
+                setMessage(invalidPwd);
             });
     }
 
@@ -116,14 +122,14 @@ export default function EditProfile() {
         e.preventDefault();
 
         // Clear error message
-        setErrorMessage("");
+        setMessage("");
 
         // Check if inputs are empty
         if ((!name && !firstLastName && !secondLastName)) {
-            setErrorMessage(nothingUpdate);
+            setMessage(nothingUpdate);
             return;
         } else if (name === user.name || firstLastName === user.firstLastName || secondLastName === user.secondLastName) {
-            setErrorMessage(nothingUpdate);
+            setMessage(nothingUpdate);
             return;
         }
 
@@ -134,7 +140,7 @@ export default function EditProfile() {
 
         // Check if inputs are valids
         if (!namesRegex.test(name) || !namesRegex.test(firstLastName) || !namesRegex.test(secondLastName)) {
-            setErrorMessage(invalidNames);
+            setMessage(invalidNames);
             return;
         }
 
@@ -168,18 +174,18 @@ export default function EditProfile() {
         e.preventDefault();
 
          // Clear error message
-        setErrorMessage("");
+        setMessage("");
 
         // Check if inputs are empty
         if (!pwd) {
             clearInputs(false, true, false);
-            setErrorMessage(nothingUpdate);
+            setMessage(nothingUpdate);
             return;
         } 
         // Check if passwords match or its valid
         else if (!pwdRegex.test(pwd) || !pwdRegex.test(currentPwd) ||pwd !== matchPwd || !currentPwd) {
             clearInputs(false, true, false);
-            setErrorMessage(invalidPwd);
+            setMessage(invalidPwd);
             return;
         }
     
@@ -361,9 +367,9 @@ export default function EditProfile() {
                                 {/* Buttons */}
                                 <Grid item xs={12}>
                                     {/* Error message */}
-                                    {errorMessage && (
+                                    {message && (
                                         <Typography color="error" style={{ marginBottom: "16px", textAlign: "right" }}>
-                                            {errorMessage}
+                                            {message}
                                         </Typography>
                                     )}
                                     <Box sx={{ display: "flex", marginTop: "2%", marginBottom: "2%", justifyContent: "flex-end" }}>
@@ -465,9 +471,9 @@ export default function EditProfile() {
                                 {/* Buttons */}
                                 <Grid item xs={12}>
                                     {/* Error message */}
-                                    {errorMessage && (
+                                    {message && (
                                         <Typography color="error" style={{ marginBottom: "16px", textAlign: "right" }}>
-                                            {errorMessage}
+                                            {message}
                                         </Typography>
                                     )}
                                     <Box sx={{ display: "flex", marginTop: "2%", marginBottom: "2%", justifyContent: "flex-end" }}>
