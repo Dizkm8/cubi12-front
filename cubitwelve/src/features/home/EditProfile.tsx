@@ -1,10 +1,10 @@
 import React from "react";
-import { SyntheticEvent, useRef, useState, useEffect } from "react";
 import { Paper, Typography, Grid, TextField, Button, MenuItem, Box, FormHelperText } from "@mui/material";
+import { primaryBlueColor, primaryOrangeColor, primaryRedColor } from "../../app/static/colors";
+import { SyntheticEvent, useRef, useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import Agent from "../../app/api/agent";
-import { primaryBlueColor, primaryOrangeColor, primaryRedColor } from "../../app/static/colors";
 import { startCase } from "lodash";
 
 // Regex for password and names
@@ -44,10 +44,10 @@ export default function EditProfile() {
     const [message, setMessage] = useState("");
 
     // Tab state
-    const [tab, setTab] = useState("my-info");
+    const [tab, setTab] = useState("info");
 
     // User state
-    const [user, setUser] = useState({name: "", firstLastName: "", secondLastName: "", rut: "", email: "", career: {id: "", name: ""}});
+    const [user, setUser] = useState({name: "", firstLastName: "", secondLastName: "", rut: "", email: "", career: { id: "", name: "" }});
     
     // Load user data
     useEffect(() => {
@@ -64,6 +64,7 @@ export default function EditProfile() {
             .catch(error => { console.error("Error loading user:", error); });
     }, []);
 
+    // Check if password is valid
     useEffect(() => {
         if (pwdRegex.test(pwd)) {
             setValidPwd(true);
@@ -77,6 +78,14 @@ export default function EditProfile() {
             setValidMatchPwd(false);
         }
     }, [pwd, matchPwd]);
+
+    // Update URL
+    useEffect(() => {
+        setMessage("");
+        const getUrl = new URL(window.location.href);
+        getUrl.searchParams.set('tab', tab);
+        window.history.pushState({}, '', getUrl.href);
+    }, [tab])
 
     // Clear inputs
     const clearInputs = (names: boolean, password: boolean, cancel: boolean) => {
@@ -243,10 +252,10 @@ export default function EditProfile() {
                         <Grid item style={{ marginLeft: "5%", marginRight: "10%" }}>
                             <Typography
                                 fontSize={38}
-                                color={tab === "my-info" ? "black" : "#626262"}
+                                color={tab === "info" ? "black" : "#626262"}
                                 variant="h5"
                                 style={{ cursor: "pointer" }}
-                                onClick={() => { setTab("my-info") }}
+                                onClick={() => setTab("info") }
                             >Mis Datos
                             </Typography>
                         </Grid>
@@ -257,13 +266,13 @@ export default function EditProfile() {
                                 color={tab === "password" ? "black" : "#626262"}
                                 variant="h5"
                                 style={{ cursor: "pointer" }}
-                                onClick={() => setTab("password")}
+                                onClick={() => setTab("password") }
                             >Contraseña
                             </Typography>
                         </Grid>
                     </Grid>
                     {/* My info page */}
-                    {tab === "my-info" && (
+                    {tab === "info" && (
                         <Box component="form" noValidate onSubmit={handleSubmitMyInfo} sx={{ mt: 3 }}>
                             <Grid container spacing={4} sx={{ marginTop: "5px" }}>
                                 {/* Name input */}
