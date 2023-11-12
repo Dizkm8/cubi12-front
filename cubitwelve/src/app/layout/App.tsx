@@ -1,11 +1,17 @@
-import { CssBaseline } from "@mui/material";
-import { Outlet } from "react-router-dom";
+import { CssBaseline, } from "@mui/material";
+import { BrowserRouter } from "react-router-dom";
+import { AuthProvider } from "../context/AuthContext";
+import Routes from "../router/Routes";
 
-const App = () => {
+function App() {
   return (
     <>
-      <CssBaseline/>
-      <Outlet/>
+      <CssBaseline />
+      <BrowserRouter>
+        <AuthProvider>
+          <Routes />
+        </AuthProvider>
+      </BrowserRouter>
     </>
   );
 }

@@ -16,7 +16,11 @@ import "./Register.css"
 import Paper from '@mui/material/Paper';
 import MenuItem from '@mui/material/MenuItem';
 import Agent from '../../app/api/agent';
+<<<<<<< HEAD
 import { useRef, useState, useEffect } from "react";
+=======
+import { useRef, useState, useEffect, useContext } from "react";
+>>>>>>> dev
 import DeleteIcon from '@mui/icons-material/Delete';
 import IconButton from '@mui/material/IconButton';
 import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
@@ -26,6 +30,11 @@ import { styled } from '@mui/material/styles';
 import FormHelperText from '@mui/material/FormHelperText';
 import { faCheck, faTimes, faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+<<<<<<< HEAD
+=======
+import { AuthContext } from '../../app/context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+>>>>>>> dev
 
 
 
@@ -41,6 +50,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 const defaultTheme = createTheme();
 
 export default function SignUp() {
+<<<<<<< HEAD
+=======
+  const { authenticated, setAuthenticated } = useContext(AuthContext);
+  const navigate = useNavigate();
+>>>>>>> dev
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -53,8 +67,11 @@ export default function SignUp() {
     const Password: string = data.get("password")?.toString() ?? "";
     const RepeatedPassword: string = data.get("repeatPassword")?.toString() ?? "";
 
+<<<<<<< HEAD
     console.log(careers)
 
+=======
+>>>>>>> dev
     
     
    
@@ -62,10 +79,21 @@ export default function SignUp() {
     };
 
 
+<<<<<<< HEAD
     const sendData =(name: string , FirstLastName: string, SecondLastName: string, RUT: string, CareerId: number, email: string, Password: string, RepeatedPassword: string) => {
           
       Agent.Auth.register({name,FirstLastName,SecondLastName,RUT,CareerId,email,Password,RepeatedPassword})
         .then(res => console.log(res))
+=======
+    const sendData =(name: string , firstLastName: string, secondLastName: string, rut: string, careerId: number, email: string, password: string, repeatedPassword: string) => {
+        Agent.Auth.register({name,firstLastName,secondLastName,rut,email,careerId,password,repeatedPassword})
+        .then(res => {
+            Agent.token = res;
+            localStorage.setItem("token", res);
+            setAuthenticated(true);
+            navigate("/");
+        })
+>>>>>>> dev
         .catch(err => console.log(err));
         
 
@@ -163,7 +191,11 @@ useEffect(() => {
         backgroundSize: 'cover', 
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
+<<<<<<< HEAD
         height: 'fullscreen',
+=======
+        height: '100vh',
+>>>>>>> dev
         justifyContent:"center", 
         alignItems:"center",
         display:"flex"
@@ -510,7 +542,11 @@ useEffect(() => {
                     ¿Ya tienes cuenta?{' '}
                     <Link
                         marginRight={3}
+<<<<<<< HEAD
                         href="#"
+=======
+                        href="/login"
+>>>>>>> dev
                         color="primary"
                         underline="hover"
                         fontWeight="600"
@@ -528,8 +564,11 @@ useEffect(() => {
               variant="contained"
               sx={{ mt: 2, mb: 2, fontFamily: 'Raleway, sans-serif', fontSize: '20px', fontWeight: 300,textTransform: 'none'}}
               disabled={!validPwd || !validMatch || !validRut || !validName || !validFirstName || !validLastName ? true : false}
+<<<<<<< HEAD
               
               
+=======
+>>>>>>> dev
             >
             Registrarme
             </Button>

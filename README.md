@@ -1,46 +1,70 @@
+# Getting Started with Create React App
 
-# CUBI12
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-<div style="text-align:center;">
-    <img src="cubitwelve/src/app/static/images/logo.png" alt="Image Alt Text" width="100" height="100" />
-</div>
-Cubi12 is (currently) an open source project to help students at UCN (Universidad Católica del Norte) at Chile to understand all the subjects they can take and their progress in the career.
+## Available Scripts
 
-## Prerequisites
+In the project directory, you can run:
 
-Before you begin, make sure you have the following software and tools installed on your system.
+### `npm start`
 
-1. [Node](https://nodejs.org/en/blog/release/v18.17.1) version 18 or later.
-2. npm version 9 or later (Normally it's shipped with Node).
-3. Port 3000 available.
-4. [git](https://git-scm.com/) version 2.33 or later.
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-## Getting Started
+The page will reload when you make changes.\
+You may also see any lint errors in the console.
 
-Follow these steps to get the project up and running on your local machine:
+### `npm test`
 
-1. Clone the repository to your local machine.
+Launches the test runner in the interactive watch mode.\
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-2. Navigate to the project directory.
-   ```bash
-   cd frontend
-   ```
-3. Change directory to the "cubitwelve" folder, where the main application code is located.
-   ```bash
-   cd cubitwelve
-   ```
+### `npm run build`
 
-4. Install project dependencies using npm.
-   ```bash
-   npm install
-   ```
+Builds the app for production to the `build` folder.\
+It correctly bundles React in production mode and optimizes the build for the best performance.
 
-## Running the App
+The build is minified and the filenames include the hashes.\
+Your app is ready to be deployed!
 
-To start the development server and run the React app on port 3000, use the following command:
+See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-```bash
-npm start
-```
+### `npm run eject`
 
-This will start the development server, and you can access the app in your web browser by visiting http://localhost:3000.
+**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+
+If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+
+Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+
+You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+
+## Learn More
+
+You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+
+To learn React, check out the [React documentation](https://reactjs.org/).
+
+### Code Splitting
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+
+### Analyzing the Bundle Size
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+
+### Making a Progressive Web App
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+
+### Advanced Configuration
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+
+### Deployment
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+
+### `npm run build` fails to minify
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
