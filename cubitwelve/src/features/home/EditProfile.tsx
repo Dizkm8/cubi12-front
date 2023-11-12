@@ -3,7 +3,7 @@ import { SyntheticEvent, useRef, useState, useEffect } from "react";
 import { Paper, Typography, Grid, TextField, Button, MenuItem, Box } from "@mui/material";
 import Agent from "../../app/api/agent";
 import { primaryBlueColor, primaryOrangeColor, primaryRedColor } from "../../app/static/colors";
-import { set, startCase } from 'lodash';
+import { first, set, startCase } from 'lodash';
 
 // Regex for password and names
 const pwdRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{10,16}$/;
@@ -20,9 +20,9 @@ export default function EditProfile() {
     const errorRef = useRef<HTMLInputElement>(null);
 
     // Names state
-    let [name, setName] = useState("");
-    let [firstLastName, setFirstLastName] = useState("");
-    let [secondLastName, setSecondLastName] = useState("");
+    const [name, setName] = useState("");
+    const [firstLastName, setFirstLastName] = useState("");
+    const [secondLastName, setSecondLastName] = useState("");
 
     // User data state
     const [rut, setRut] = useState("");
@@ -30,9 +30,12 @@ export default function EditProfile() {
     const [career, setCareer] = useState("");
 
     // Password state
-    let [currentPwd, setCurrentPwd] = useState("");
-    let [pwd, setPwd] = useState("");
-    let [matchPwd, setMatchPwd] = useState("");
+    const [currentPwd, setCurrentPwd] = useState("");
+    const [pwd, setPwd] = useState("");
+    const [matchPwd, setMatchPwd] = useState("");
+
+    // Valid password state
+    const[validPwd, setValidPwd] = useState(false);
 
     // Error message state
     const [message, setMessage] = useState("");
@@ -41,13 +44,13 @@ export default function EditProfile() {
     const [tab, setTab] = useState("my-info");
 
     // User state
-    const [user, set_user] = useState({name: "", firstLastName: "", secondLastName: "", rut: "", email: "", career: {id: "", name: ""}});
+    const [user, setUser] = useState({name: "", firstLastName: "", secondLastName: "", rut: "", email: "", career: {id: "", name: ""}});
     
     // Load user data
     useEffect(() => {
         Agent.Auth.profile()
             .then(response => {
-                set_user(response);
+                setUser(response);
                 setName(response.name);
                 setFirstLastName(response.firstLastName);
                 setSecondLastName(response.secondLastName);
@@ -57,6 +60,15 @@ export default function EditProfile() {
             })
             .catch(error => { console.error("Error loading user:", error); });
     }, []);
+
+    useEffect(() => {
+        if (pwdRegex.test(pwd)) {
+            setValidPwd(true);
+            console.log("Valid password");
+        } else {
+            setValidPwd(false);
+        }
+    }, [pwd]);
 
     // Clear inputs
     const clearInputs = (names: boolean, password: boolean, cancel: boolean) => {
@@ -70,18 +82,12 @@ export default function EditProfile() {
                 user.firstLastName = firstLastName;
                 user.secondLastName = secondLastName;
             }
-            name = "";
-            firstLastName = "";
-            secondLastName = "";
-            setName("");
-            setFirstLastName("");
-            setSecondLastName("");
+            setName(user.name);
+            setFirstLastName(user.firstLastName);
+            setSecondLastName(user.secondLastName);
         }
         // Clear password inputs
         else if (password) {
-            currentPwd = "";
-            pwd = "";
-            matchPwd = "";
             setCurrentPwd("");
             setPwd("");
             setMatchPwd("");
@@ -95,6 +101,9 @@ export default function EditProfile() {
         })
             .then(response => {
                 console.log("Name(s) updated successfully!");
+                user.name = name;
+                user.firstLastName = firstLastName;
+                user.secondLastName = secondLastName;
                 setMessage(updateSuccess);
             })
             .catch(error => {
@@ -123,20 +132,14 @@ export default function EditProfile() {
 
         // Clear error message
         setMessage("");
-
         // Check if inputs are empty
         if ((!name && !firstLastName && !secondLastName)) {
             setMessage(nothingUpdate);
             return;
-        } else if (name === user.name || firstLastName === user.firstLastName || secondLastName === user.secondLastName) {
+        } else if (name === user.name && firstLastName === user.firstLastName && secondLastName === user.secondLastName) {
             setMessage(nothingUpdate);
             return;
         }
-
-        // if inputs are empty, set them to the current user data
-        name = name === "" ? user.name : name;
-        firstLastName = firstLastName === "" ? user.firstLastName : firstLastName;
-        secondLastName = secondLastName === "" ? user.secondLastName : secondLastName;
 
         // Check if inputs are valids
         if (!namesRegex.test(name) || !namesRegex.test(firstLastName) || !namesRegex.test(secondLastName)) {
@@ -147,9 +150,6 @@ export default function EditProfile() {
         try {
             // Send data to server
             sendMyInfoData(name, firstLastName, secondLastName);
-
-            // Clean name inputs
-            clearInputs(true, false, false);
 
         } catch (error: any) {
             if (error?.response) {
@@ -228,7 +228,7 @@ export default function EditProfile() {
                     alignItems: "center",
                 }}
             >
-                <Paper elevation={3} style={{ padding: "40px", border: `1px solid ${primaryBlueColor}`, borderRadius: "8px", width: "60%", height: "fit-content" }}>
+                <Paper elevation={3} style={{ padding: "40px", border: `1px solid ${primaryBlueColor}`, borderRadius: "8px", width: "40%", height: "fit-content" }}>
                     {/* Title */}
                     <Grid container>
                         {/* My info title */}
@@ -269,7 +269,7 @@ export default function EditProfile() {
                                     <TextField
                                     id="name"
                                     name="name"
-                                    defaultValue={user.name}
+                                    value={name}
                                     required
                                     fullWidth
                                     onChange={(e) => setName(e.target.value)}
@@ -302,7 +302,7 @@ export default function EditProfile() {
                                     <TextField
                                     id="firstLastName"
                                     name="firstLastName"
-                                    defaultValue={user.firstLastName}
+                                    value={firstLastName}
                                     label=""
                                     required
                                     fullWidth
@@ -319,7 +319,7 @@ export default function EditProfile() {
                                     <TextField
                                     id="secondLastName"
                                     name="secondLastName"
-                                    defaultValue={user.secondLastName}
+                                    value={secondLastName}
                                     label=""
                                     required
                                     fullWidth

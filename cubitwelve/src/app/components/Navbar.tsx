@@ -24,17 +24,13 @@ const Navbar = () => {
     if (localStorage.getItem("token")) {
       Agent.Auth.profile()
           .then(response => {
-              setName(response.name);
-              setFirstLastName(response.firstLastName);
+            setLoggedName(response.name + " " + response.firstLastName);
           })
           .catch(error => { console.error("Error loading user:", error); });
     }
   }, []);
 
-  const [name, setName] = useState("");
-  const [firstLastName, setFirstLastName] = useState("");
-
-  const loggedName = name + " " + firstLastName;
+  const [loggedName, setLoggedName] = useState("");
 
   const { authenticated, setAuthenticated } = useContext(AuthContext);
 
