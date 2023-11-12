@@ -1,13 +1,15 @@
 import React from "react";
 import { SyntheticEvent, useRef, useState, useEffect } from "react";
-import { Paper, Typography, Grid, TextField, Button, MenuItem, Box } from "@mui/material";
+import { Paper, Typography, Grid, TextField, Button, MenuItem, Box, FormHelperText } from "@mui/material";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import Agent from "../../app/api/agent";
 import { primaryBlueColor, primaryOrangeColor, primaryRedColor } from "../../app/static/colors";
-import { first, set, startCase } from 'lodash';
+import { startCase } from "lodash";
 
 // Regex for password and names
 const pwdRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{10,16}$/;
-const namesRegex = /^[A-Za-záéíóúüñÁÉÍÓÚÜÑ\s]+$/;
+const namesRegex = /^[A-Za-záéíóúüñÁÉÍÓÚÜÑ\s]{3,50}$/;
 
 // Messages
 const nothingUpdate = "Nada que actualizar";
@@ -36,6 +38,7 @@ export default function EditProfile() {
 
     // Valid password state
     const[validPwd, setValidPwd] = useState(false);
+    const [validMatchPwd, setValidMatchPwd] = useState(false);
 
     // Error message state
     const [message, setMessage] = useState("");
@@ -64,11 +67,16 @@ export default function EditProfile() {
     useEffect(() => {
         if (pwdRegex.test(pwd)) {
             setValidPwd(true);
-            console.log("Valid password");
         } else {
             setValidPwd(false);
         }
-    }, [pwd]);
+
+        if(pwd === matchPwd) {
+            setValidMatchPwd(true);
+        } else {
+            setValidMatchPwd(false);
+        }
+    }, [pwd, matchPwd]);
 
     // Clear inputs
     const clearInputs = (names: boolean, password: boolean, cancel: boolean) => {
@@ -228,7 +236,7 @@ export default function EditProfile() {
                     alignItems: "center",
                 }}
             >
-                <Paper elevation={3} style={{ padding: "40px", border: `1px solid ${primaryBlueColor}`, borderRadius: "8px", width: "40%", height: "fit-content" }}>
+                <Paper elevation={3} style={{ padding: "40px", border: `1px solid ${primaryBlueColor}`, borderRadius: "8px", width: "70vh", height: "fit-content" }}>
                     {/* Title */}
                     <Grid container>
                         {/* My info title */}
@@ -243,13 +251,12 @@ export default function EditProfile() {
                             </Typography>
                         </Grid>
                         {/* Password title */}
-                        <Grid item >
+                        <Grid item style={{ marginLeft: "5%", marginRight: "10%" }}>
                             <Typography
                                 fontSize={38}
                                 color={tab === "password" ? "black" : "#626262"}
                                 variant="h5"
                                 style={{ cursor: "pointer" }}
-                                id="tab-password"
                                 onClick={() => setTab("password")}
                             >Contraseña
                             </Typography>
@@ -261,11 +268,15 @@ export default function EditProfile() {
                             <Grid container spacing={4} sx={{ marginTop: "5px" }}>
                                 {/* Name input */}
                                 <Grid item xs={12} sm={6}>
-                                    <label htmlFor="name" style={{
-                                        marginRight: "100%",
-                                        fontSize: 18,
-                                        fontFamily: "Raleway, sans-serif"
-                                    }}>Nombre</label>
+                                    <Typography
+                                        style={{
+                                            marginRight: "100%",
+                                            fontSize: 18,
+                                            fontFamily: "Raleway, sans-serif"
+                                        }}
+                                    >
+                                        Nombre
+                                    </Typography>
                                     <TextField
                                     id="name"
                                     name="name"
@@ -277,11 +288,15 @@ export default function EditProfile() {
                                 </Grid>
                                 {/* DNI input */}
                                 <Grid item xs={12} sm={6}>
-                                    <label htmlFor="name" style={{
-                                        marginRight: "100%",
-                                        fontSize: 18,
-                                        fontFamily: "Raleway, sans-serif"
-                                    }}>RUT</label>
+                                    <Typography
+                                        style={{
+                                            marginRight: "100%",
+                                            fontSize: 18,
+                                            fontFamily: "Raleway, sans-serif"
+                                        }}
+                                    >
+                                        RUT
+                                    </Typography>
                                     <TextField
                                         id="dni"
                                         name="dni"
@@ -294,11 +309,15 @@ export default function EditProfile() {
                                 </Grid>
                                 {/* First Lastname input */}
                                 <Grid item xs={12} sm={6}>
-                                    <label htmlFor="name" style={{
-                                        marginRight: "100%",
-                                        fontSize: 18,
-                                        fontFamily: "Raleway, sans-serif"
-                                    }}>Primer apellido</label>
+                                    <Typography
+                                        style={{
+                                            marginRight: "100%",
+                                            fontSize: 18,
+                                            fontFamily: "Raleway, sans-serif"
+                                        }}
+                                    >
+                                        Primer apellido
+                                    </Typography>
                                     <TextField
                                     id="firstLastName"
                                     name="firstLastName"
@@ -311,11 +330,15 @@ export default function EditProfile() {
                                 </Grid>
                                 {/* Second Lastname input */}
                                 <Grid item xs={12} sm={6}>
-                                    <label htmlFor="name" style={{
-                                        marginRight: "100%",
-                                        fontSize: 18,
-                                        fontFamily: "Raleway, sans-serif"
-                                    }}>Segundo apellido</label>
+                                    <Typography
+                                        style={{
+                                            marginRight: "100%",
+                                            fontSize: 18,
+                                            fontFamily: "Raleway, sans-serif"
+                                        }}
+                                    >
+                                        Segundo apellido
+                                    </Typography>
                                     <TextField
                                     id="secondLastName"
                                     name="secondLastName"
@@ -328,11 +351,15 @@ export default function EditProfile() {
                                 </Grid>
                                 {/* Email input */}
                                 <Grid item xs={12}>
-                                    <label htmlFor="name" style={{
-                                        marginRight: "100%",
-                                        fontSize: 18,
-                                        fontFamily: "Raleway, sans-serif"
-                                    }}>Correo electrónico</label>
+                                    <Typography
+                                        style={{
+                                            marginRight: "100%",
+                                            fontSize: 18,
+                                            fontFamily: "Raleway, sans-serif"
+                                        }}
+                                    >
+                                        Correo electrónico
+                                    </Typography>
                                     <TextField
                                     id="email"
                                     name="email"
@@ -345,11 +372,15 @@ export default function EditProfile() {
                                 </Grid>
                                 {/* Career input */}
                                 <Grid item xs={12}>
-                                    <label htmlFor="name" style={{
-                                        marginRight: "100%",
-                                        fontSize: 18,
-                                        fontFamily: "Raleway, sans-serif"
-                                    }}>Carrera</label>
+                                    <Typography
+                                        style={{
+                                            marginRight: "100%",
+                                            fontSize: 18,
+                                            fontFamily: "Raleway, sans-serif"
+                                        }}
+                                    >
+                                        Carrera
+                                    </Typography>
                                     <TextField
                                         variant="outlined"
                                         name="career"
@@ -416,16 +447,20 @@ export default function EditProfile() {
                             <Grid container spacing={6} sx={{ marginTop: "5px" }}>
                                 {/* Password input */}
                                 <Grid item xs={12}>
-                                    <label htmlFor="password" style={{
-                                        marginRight: "100%",
-                                        fontSize: 18,
-                                        fontFamily: "Raleway, sans-serif"
-                                    }}>Contraseña Actual</label>
+                                    <Typography
+                                        style={{
+                                            marginRight: "100%",
+                                            fontSize: 18,
+                                            fontFamily: "Raleway, sans-serif"
+                                        }}
+                                    >
+                                        Contraseña Actual
+                                    </Typography>
                                     <TextField
                                         id="password"
                                         name="password"
                                         type="password"
-                                        value={currentPwd}
+                                        value={ currentPwd }
                                         label=""
                                         required
                                         fullWidth
@@ -434,39 +469,61 @@ export default function EditProfile() {
                                 </Grid>
                                 {/* New password input */}
                                 <Grid item xs={12}>
-                                    <label htmlFor="name" style={{
-                                        marginRight: "100%",
-                                        fontSize: 18,
-                                        fontFamily: "Raleway, sans-serif"
-                                    }}>Nueva Contraseña</label>
+                                    <Typography
+                                        style={{
+                                            marginRight: "100%",
+                                            fontSize: 18,
+                                            fontFamily: "Raleway, sans-serif"
+                                        }}
+                                    >
+                                        Nueva Contraseña
+                                    </Typography>
                                     <TextField
                                         id="new-password"
                                         name="new-password"
                                         type="password"
-                                        value={pwd}
+                                        value={ pwd }
+                                        error={ !pwd ? false : !validPwd }
                                         label=""
                                         required
                                         fullWidth
-                                        onChange={(e) => setPwd(e.target.value)}
+                                        onChange={ (e) => setPwd(e.target.value) }
                                     />
+                                    {(!validPwd && pwd) && (
+                                        <FormHelperText id="pwdnote" className={ !validPwd ? "instructions" : "offscreen" } sx={{ ml:3 }}>    
+                                        <FontAwesomeIcon icon={ faInfoCircle } style={{ marginRight: "5px" }} />
+                                                Contraseña debe contener entre 10 a 16 caracteres, una mayúscula, una minúscula y un número.
+                                        </FormHelperText>
+                                    )}
                                 </Grid>
                                 {/* Repeat new password input */}
                                 <Grid item xs={12}>
-                                    <label htmlFor="name" style={{
-                                        marginRight: "100%",
-                                        fontSize: 18,
-                                        fontFamily: "Raleway, sans-serif"
-                                    }}>Repetir Nueva Contraseña</label>
+                                    <Typography
+                                        style={{
+                                            marginRight: "100%",
+                                            fontSize: 18,
+                                            fontFamily: "Raleway, sans-serif"
+                                        }}
+                                    >
+                                        Repetir Nueva Contraseña
+                                    </Typography>
                                     <TextField
                                         id="repeat-new-password"
                                         name="repeat-new-password"
                                         type="password"
-                                        value={matchPwd}
+                                        value={ matchPwd }
+                                        error={ !validMatchPwd }
                                         label=""
                                         required
                                         fullWidth
-                                        onChange={(e) => setMatchPwd(e.target.value)}
+                                        onChange={ (e) => setMatchPwd(e.target.value) }
                                     />
+                                    {!validMatchPwd && (
+                                        <FormHelperText id="pwdnote" className={ !validPwd ? "instructions" : "offscreen" } sx={{ ml:3 }}>    
+                                        <FontAwesomeIcon icon={ faInfoCircle } style={{ marginRight: "5px" }} />
+                                                Contraseñas no coinciden.
+                                        </FormHelperText>
+                                    )}
                                 </Grid>
                                 {/* Buttons */}
                                 <Grid item xs={12}>
