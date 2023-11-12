@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
@@ -11,27 +11,41 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import "./Login.css"
 import Paper from '@mui/material/Paper';
 import Agent from '../../app/api/agent';
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AuthContext } from '../../app/context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import Alert from '@mui/material/Alert';
+import Fade from '@mui/material/Fade';
+import useEnhancedEffect from '@mui/material/utils/useEnhancedEffect';
+
 
 const defaultTheme = createTheme();
 
-const pwdRegex : RegExp = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{10,16}$/;
-const emailRegex : RegExp = /^.+@[^\.].*\.[a-z]{2,}$/;
+const pwdRegex : RegExp = /^.+$/;
+const emailRegex : RegExp = /^([A-Z]+|[a-z]+)+[.]([A-Z]+|[a-z]+)+[0-9]*(@.+[.]ucn[.]cl){1}$/;
 
-export default function SignUp() {
+export default function LogIn() {
   const {authenticated,setAuthenticated} = useContext(AuthContext);
   const navigate = useNavigate();
 
   const [pwd, setPwd] = useState<string>('');
   const[email,setemail] = useState<string>('');
+
+  const [validPwd, setValidPwd] = useState(false);
+  const [validEmail, setValidEmail] = useState(false);
   
   const [emailError,setEmailError] = useState<boolean>(false);
   const [pwdError,setPwdError] = useState<boolean>(false);
   
-  const emailErrorMsg:string = "El email es invalido";
-  const pwdErrorMsg:string = "La contraseña es invalida";
+  const emailErrorMsg:string = "Ingrese un correo electrónico válido";
+  const pwdErrorMsg:string = "El campo esta vacío";
+
+  const [checked, setChecked] = React.useState(false);
+  const [disabled, setDisabled] = React.useState(true);
+
+  const handleChange = () => {
+    setChecked((prev) => !prev);
+  };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -40,6 +54,15 @@ export default function SignUp() {
     const Password: string = data.get("password")?.toString() ?? "";
     sendData(Email, Password);
     };
+
+    useEffect(()=>{
+      if(emailError||pwdError|| !email || !pwd){
+        setDisabled(true);
+      } else{
+        setDisabled(false);
+      }
+
+    },);
 
     const handleFieldChange = (event:any) =>{
       const { name,value} = event.target;
@@ -63,12 +86,14 @@ export default function SignUp() {
         })
         .catch((err)=>{
           console.log(err);
+          setChecked(true);
         })
   };
 
 
 
   return (
+  <div data-testing="LogIn" className='s'>
     <Paper style={{
         backgroundImage: 'url(/background.jpg)',
         backgroundSize: 'cover', 
@@ -91,24 +116,35 @@ export default function SignUp() {
             flexDirection: 'column',
             alignItems: 'center',
             boxShadow:'0px 4px 6px rgba(0, 0, 0, 0.5)', 
-            height:450,
+            height:'100%',
             width: 500,
             mb:3,
-            backgroundColor: '#F5F5F5',
-            
+            backgroundColor: '#F5F5F5',      
          }}>
     
              <Typography component="h1" variant="h5" className='font-title' sx={{marginBottom:1, mt:3, fontSize:30}}>
                INICIAR SESIÓN
              </Typography>
-
-        
-
             <Grid container spacing={1.1} justifyContent="flex-end" >
+              <Grid item xs= {12}>
+              {checked && (  
+              <Fade in={checked}>
+                  <Alert severity="error" sx={{
+                    width:430,
+                    ml:4,
+                    mr:3,
+                    mb:1,         
+                    textAlign: 'center',              
+                  }}>
+                  Credenciales incorrectas
+                  </Alert>
+                </Fade>
+                )}
+              </Grid>   
+
               <Grid item xs={12}>
                 <TextField
                   required
-
                   id="email"
                   label="Correo electrónico"
                   name="email"
@@ -119,6 +155,7 @@ export default function SignUp() {
                   helperText={emailError ? emailErrorMsg:""  }
                   autoComplete="email"
                   size='small'
+                  
                   InputLabelProps={{
                     sx: {
                       fontSize: '14px',
@@ -129,15 +166,14 @@ export default function SignUp() {
                     width:430,
                     ml:4,
                     mr:3,
-                    mb:3,
-                    boxShadow:'0px 2px 2px rgba(0, 0, 0, 0.2)', 
+                    mb:1,  
+                    boxShadow: !emailError ? '0px 2px 2px rgba(0, 0, 0, 0.2)' : 'none',
                     
                 }}
                 />
               </Grid>
                     
-              <Grid item xs={12}>
-              
+              <Grid item xs={12}>         
                 <TextField
                   required
                   fullWidth
@@ -154,18 +190,14 @@ export default function SignUp() {
                   InputLabelProps={{
                     sx: {
                       fontSize: '14px',
-                      fontFamily: 'Raleway',
-                      
-                      
+                      fontFamily: 'Raleway',             
                     }
                 }}
                 sx={{
                     width:430,
                     ml:4,
                     mr:3,
-                    mb:1,
-                    boxShadow:'0px 2px 2px rgba(0, 0, 0, 0.2)', 
-                    
+                    boxShadow: !pwdError ? '0px 2px 2px rgba(0, 0, 0, 0.2)' : 'none',                   
                 }}
                 />
               </Grid>
@@ -179,6 +211,7 @@ export default function SignUp() {
                         underline="hover"
                         fontWeight="600"
                         style={{ color: '#edb84c' }}
+                        
                     >
                         Registrate
                     </Link>
@@ -189,20 +222,21 @@ export default function SignUp() {
                     type="submit"
                     style={{ backgroundColor:'#1C478F',width:432,height:50}}
                     variant="contained"
-                    sx={{ mt:3,mr:4.6, fontFamily: 'Raleway, sans-serif', fontSize: '20px', fontWeight: 300,textTransform: 'none'}}
-                    
+                    sx={{ mt:1,mr:4.6, fontFamily: 'Raleway, sans-serif', fontSize: '20px', fontWeight: 300,textTransform: 'none'}}
+                    disabled={disabled}
+                  
                   >
                   Ingresar
                   </Button>
 
                 </Grid>
-                <Grid item>
+                <Grid item >
                   <Button
                     href="/"
                     type="submit"
                     style={{ backgroundColor:'#F5F5F5',width:432,border: '1px solid #1C478F',color:'#1C478F'}}
                     variant="contained"
-                    sx={{ mt:1,mr:4.6, fontFamily: 'Raleway, sans-serif', fontSize: '20px', fontWeight: 300,textTransform: 'none'}}
+                    sx={{ mb:3,mr:4.6, fontFamily: 'Raleway, sans-serif', fontSize: '20px', fontWeight: 300,textTransform: 'none'}}
                   >
                   Invitado
                   </Button>
@@ -212,7 +246,6 @@ export default function SignUp() {
       </Container>
     </ThemeProvider>
     </Paper>
+   </div> 
   );
-
-  
 }

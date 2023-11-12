@@ -2,11 +2,12 @@ import { useContext } from "react";
 import { useLocation } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { Routes as Router, Navigate, Outlet, Route } from "react-router-dom";
-import HomePage from "../../features/home/HomePage";
 import EditProfile from "../../features/home/EditProfile";
 import Register from "../../features/auth/Register";
 import Login from "../../features/auth/Login";
 import Navbar from "../components/Navbar"
+import HomePage from "../../features/home/HomePage";
+
 
 type Props = {};
 
