@@ -31,15 +31,6 @@ import { useNavigate } from 'react-router-dom';
 import { startCase } from 'lodash';
 
 
-
-
-
-
-
-
-
-
-
 // TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
 
@@ -58,13 +49,9 @@ export default function SignUp() {
     const Password: string = data.get("password")?.toString() ?? "";
     const RepeatedPassword: string = data.get("repeatPassword")?.toString() ?? "";
 
-    
-    
-   
+  
     sendData(name,FirstLastName, SecondLastName, RUT, CareerId, email, Password, RepeatedPassword);
     };
-
-
     const sendData =(name: string , firstLastName: string, secondLastName: string, rut: string, careerId: number, email: string, password: string, repeatedPassword: string) => {
         Agent.Auth.register({name,firstLastName,secondLastName,rut,email,careerId,password,repeatedPassword})
         .then(res => {
@@ -74,11 +61,7 @@ export default function SignUp() {
             navigate("/");
         })
         .catch(err => console.log(err));
-        
-
   };
-  
-  
   
     useEffect(() => {
         try{
@@ -94,11 +77,7 @@ export default function SignUp() {
         }
     }, []);
     
-
-
-    
-
-    const rutRegex = /^(\d{1,3}(\.\d{3})*-\d|(\d{1,3}(\.\d{3})*-[Kk]))$/;
+  const rutRegex = /^(\d{1,3}(\.\d{3})*-\d|(\d{1,3}(\.\d{3})*-[Kk]))$/;
   const pwdRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{10,16}$/;
   const nameRegex = /^[a-zA-Z]{3,50}$/;
   const flNameRegex = /^[a-zA-Z]{3,30}$/;
@@ -197,6 +176,7 @@ return (
           <Grid container spacing={1.1} justifyContent="flex-end" >
               <Grid item xs={12} >
                   <TextField
+                  
                   aria-describedby="namenote"
                   onChange={(e) => setName(e.target.value)}
                   aria-invalid={validName ? "false" : "true"}
@@ -225,16 +205,7 @@ return (
                   }}
                   
                   />
-                  {nameFocus && (
-                  <FormHelperText id="namenote" className={!validName ? "instructions" : "offscreen"} sx={{
-                    ml:3, mr:3,
-                  }}> 
-                    <div>
-                          <FontAwesomeIcon icon={faInfoCircle} style={{ marginRight: '5px' }}  />
-                          Debe contener solo letras y el largo debe estar entre 3 y 50 caracteres.    
-                    </div>                          
-                  </FormHelperText>
-                  )}                
+                  
               </Grid>
             <Grid item xs={12} md={12} spacing={1.1} container >
               <Grid item xs={6} md={6}>
