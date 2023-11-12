@@ -1,14 +1,10 @@
 import * as React from 'react';
-import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
@@ -16,22 +12,23 @@ import "./Register.css"
 import Paper from '@mui/material/Paper';
 import MenuItem from '@mui/material/MenuItem';
 import Agent from '../../app/api/agent';
-import { useRef, useState, useEffect, useContext } from "react";
-import DeleteIcon from '@mui/icons-material/Delete';
-import IconButton from '@mui/material/IconButton';
-import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import HelpIcon from '@mui/icons-material/Help';
-import { styled } from '@mui/material/styles';
+import { useState, useEffect, useContext } from "react";
 import FormHelperText from '@mui/material/FormHelperText';
-import { faCheck, faTimes, faInfoCircle } from "@fortawesome/free-solid-svg-icons";
+import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { AuthContext } from '../../app/context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { startCase } from 'lodash';
+import Alert from '@mui/material/Alert';
+import Fade from '@mui/material/Fade';
 
 
-// TODO remove, this demo shouldn't need to reset the theme.
+const rutRegex = /^(\d{1,3}(\.\d{3})*-\d|(\d{1,3}(\.\d{3})*-[Kk]))$/;
+const pwdRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{10,16}$/;
+const emailRegex = /^([A-Z]+|[a-z]+)+[.]([A-Z]+|[a-z]+)+[0-9]*(@(.+[.])*ucn[.]cl){1}$/;
+const nameRegex = /^[a-zA-Z]{3,50}$/;
+const flNameRegex = /^[a-zA-Z]{3,30}$/;
+
 const defaultTheme = createTheme();
 
 export default function SignUp() {
@@ -60,7 +57,30 @@ export default function SignUp() {
             setAuthenticated(true);
             navigate("/");
         })
-        .catch(err => console.log(err));
+        .catch((err)=>{
+          console.log(err);
+          
+          if (!err?.response) {
+            setChecked(true);
+            setErrorType('general');
+          } else if (err.response?.status === 400) {
+            const errorData = err.response.data;
+            if (errorData?.detail === 'RUT already in use') {
+              setChecked(true);
+              setErrorType('rut');
+            } else if (errorData?.detail === 'Email already in use') {
+              setChecked(true);
+              setErrorType('email');
+            } else {
+              setChecked(true);
+              setErrorType('general');
+            }
+          } else {
+            setChecked(true);
+            setErrorType('general');
+          }
+        
+        })
   };
   
     useEffect(() => {
@@ -76,13 +96,7 @@ export default function SignUp() {
             console.error('Error loading careers:', error);
         }
     }, []);
-    
-  const rutRegex = /^(\d{1,3}(\.\d{3})*-\d|(\d{1,3}(\.\d{3})*-[Kk]))$/;
-  const pwdRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{10,16}$/;
-  const nameRegex = /^[a-zA-Z]{3,50}$/;
-  const flNameRegex = /^[a-zA-Z]{3,30}$/;
-  
-
+      
 
   const [name, setName] = useState('');
   const [validName, setValidName] = useState(false);
@@ -95,6 +109,10 @@ export default function SignUp() {
   const [lastName, setLastName] = useState('');
   const [validLastName, setValidLastName] = useState(false);
   const [lastNameFocus, setLastNameFocus] = useState(false);
+
+  const [email, setEmail] = useState('');
+  const [validEmail, setValidEmail] = useState(false);
+  const [emailFocus, setEmailFocus] = useState(false);
 
   const [rut, setRut] = useState('');
   const [validRut, setValidRut] = useState(false);
@@ -110,6 +128,9 @@ export default function SignUp() {
 
   const [career, setCareer] = useState('');
   const [careers, setCareers] = useState([]);
+
+  const [checked, setChecked] = React.useState(false);
+  const [errorType, setErrorType] = useState<null | 'rut' | 'email' | 'general'>(null);
 
   useEffect(() => {
     setValidPwd(pwdRegex.test(pwd));
@@ -131,6 +152,10 @@ useEffect(() => {
 useEffect(() => {
   setValidLastName(flNameRegex.test(lastName));
 }, [lastName])
+
+useEffect(() => {
+  setValidEmail(emailRegex.test(email));
+}, [email])
 
 
 return (
@@ -175,8 +200,23 @@ return (
 
           <Grid container spacing={1.1} justifyContent="flex-end" >
               <Grid item xs={12} >
+              {checked && (
+                  <Fade in={checked}>
+                      <Alert severity="error" sx={{
+                        width: '89.5%',
+                        ml: 3,
+                        mr: 3,
+                        mb: 1,
+                        textAlign: 'center',
+                      }}>
+                        {errorType === 'rut' && 'El RUT ya está registrado'}
+                        {errorType === 'email' && 'El correo electrónico ya está registrado'}
+                        {errorType === 'general' && 'Ocurrio un error, intente nuevamente'}
+                      </Alert>
+                    </Fade>
+                )}
                   <TextField
-                  
+                  helperText={!validName && nameFocus ? "Debe contener entre 3 y 50 caracteres, solo letras." : ""}
                   aria-describedby="namenote"
                   onChange={(e) => setName(e.target.value)}
                   aria-invalid={validName ? "false" : "true"}
@@ -201,7 +241,7 @@ return (
                       width:'89.5%',
                       ml:3,
                       mr:3,
-                      boxShadow:'0px 2px 2px rgba(0, 0, 0, 0.2)',                                              
+                      boxShadow: ((!validName && !nameFocus)|| validName ) ? '0px 2px 2px rgba(0, 0, 0, 0.2)' : 'none',                                             
                   }}
                   
                   />
@@ -210,6 +250,7 @@ return (
             <Grid item xs={12} md={12} spacing={1.1} container >
               <Grid item xs={6} md={6}>
                 <TextField
+                  helperText={!validFirstName && firstNameFocus ? "Debe contener entre 3 y 30 caracteres, solo letras." : ""}
                   aria-describedby="flNote"
                   onChange={(e) => setFirstName(e.target.value)}
                   aria-invalid={validFirstName ? "false" : "true"}
@@ -233,13 +274,14 @@ return (
                 }}
                   sx={{
                     ml:3,
-                    boxShadow:'0px 2px 2px rgba(0, 0, 0, 0.2)', 
+                    boxShadow: ((!validFirstName && !firstNameFocus)|| validFirstName ) ? '0px 2px 2px rgba(0, 0, 0, 0.2)' : 'none',
                   }}
                 />
                 
               </Grid>
               <Grid item xs={6} md={6}>
                 <TextField
+                  helperText={!validLastName && lastNameFocus ? "Debe contener entre 3 y 30 caracteres, solo letras." : ""}
                   required
                   onChange={(e) => setLastName(e.target.value)}
                   aria-invalid={validLastName ? "false" : "true"}
@@ -263,23 +305,12 @@ return (
                 }}
                   sx={{
                     mr:3,
-                    boxShadow:'0px 2px 2px rgba(0, 0, 0, 0.2)',
+                    boxShadow: ((!validLastName && !lastNameFocus)|| validLastName ) ? '0px 2px 2px rgba(0, 0, 0, 0.2)' : 'none',
                   }}
                 />
                   
               </Grid>
-                {(firstNameFocus || lastNameFocus) && (
-                  <FormHelperText id="flNote" className={!validFirstName||!validLastName ? "instructions" : "offscreen"} sx={{
-                    ml:4, mr:3, 
-                    }}>
-                    
-                    <div>
-                          <FontAwesomeIcon icon={faInfoCircle} style={{ marginRight:'5px'  }}  />
-                          Debe contener entre 3 y 30 caracteres, solo letras.      
-                    </div>
-                         
-                  </FormHelperText>
-                )}
+
             </Grid>
             <Grid item xs={12} >
               
@@ -308,7 +339,7 @@ return (
                     width:'89.5%',
                     ml:3,
                     mr:3,
-                    boxShadow:'0px 2px 2px rgba(0, 0, 0, 0.2)',  
+                    boxShadow: !validRut ? '0px 2px 2px rgba(0, 0, 0, 0.2)' : 'none',
                   }}
                   />
                   {rutFocus && (
@@ -325,12 +356,18 @@ return (
               </Grid>
             <Grid item xs={12}>
               <TextField
+                error={!validEmail && emailFocus}
+                aria-invalid={validEmail ? "false" : "true"}
+                onFocus={() => setEmailFocus(true)}
+                onBlur={() => setEmailFocus(false)}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
                 id="email"
                 label="Correo electrónico"
                 name="email"
                 variant='filled'
-                autoComplete="email"
+                autoComplete="off"
                 size='small'
                 InputLabelProps={{
                   sx: {
@@ -345,6 +382,18 @@ return (
                   boxShadow:'0px 2px 2px rgba(0, 0, 0, 0.2)',                  
               }}
               />
+              {emailFocus && (
+                  <FormHelperText id="emailNote" className={!validEmail ? "instructions" : "offscreen"} sx={{
+                    ml:3, mr:3,
+                  }}>
+                    
+                    <div>
+                          <FontAwesomeIcon icon={faInfoCircle} style={{ marginRight: '5px' }}  />
+                          El correo debe ser del dominio ucn.      
+                    </div>
+                         
+                  </FormHelperText>
+                )}
             </Grid>
             <Grid item xs={12} >
                   <TextField
@@ -473,7 +522,7 @@ return (
             style={{ backgroundColor: '#1C478F', width:'89%', height:50}}
             variant="contained"
             sx={{ mt: 2, mb: 2, fontFamily: 'Raleway, sans-serif', fontSize: '20px', fontWeight: 300,textTransform: 'none'}}
-            disabled={!validPwd || !validMatch || !validRut || !validName || !validFirstName || !validLastName ? true : false}
+            disabled={!validPwd || !validMatch || !validRut || !validName || !validFirstName || !validLastName || !validEmail ? true : false}
           >
           Registrarme
           </Button>     
