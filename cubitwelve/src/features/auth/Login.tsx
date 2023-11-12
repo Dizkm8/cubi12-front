@@ -79,7 +79,9 @@ export default function LogIn() {
     const sendData =(email: string, password: string) => {
         Agent.Auth.login({email, password})
         .then((data)=>{
-          setAuthenticated(true);   
+          Agent.token = data;
+          localStorage.setItem("token", data);
+          setAuthenticated(true);
           navigate("/")
         })
         .catch((err)=>{

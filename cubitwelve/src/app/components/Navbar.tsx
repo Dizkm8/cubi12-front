@@ -13,16 +13,29 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 // @ts-ignore
 import Cubi12Logo from "../static/images/cubi12.svg";
-import { primaryBlueColor } from "../static/colors";
+import { primaryBlueColor, primaryRedColor } from "../static/colors";
 import { Link } from 'react-router-dom';
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
+import Agent from "../api/agent";
 
 const Navbar = () => {
+  useEffect(() => {
+    if (localStorage.getItem("token")) {
+      Agent.Auth.profile()
+          .then(response => {
+            setLoggedName(response.name + " " + response.firstLastName);
+          })
+          .catch(error => { console.error("Error loading user:", error); });
+    }
+  }, []);
+
+  const [loggedName, setLoggedName] = useState("");
+
   const { authenticated, setAuthenticated } = useContext(AuthContext);
 
   const pages = authenticated ? ["Inicio", "Malla Interactiva", "Mi Progreso"] : ["Inicio", "Malla Interactiva"];
-  const settings = authenticated ? ["Mis datos", "Cerrar Sesión"] : ["Invitado", "Iniciar Sesión"];
+  const settings = authenticated ? [loggedName, "Mis datos", "Cerrar Sesión"] : ["Invitado", "Iniciar Sesión"];
 
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null
@@ -44,6 +57,13 @@ const Navbar = () => {
 
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
+  };
+
+  const handleLogout = () => {
+    Agent.token = "";
+    localStorage.removeItem("token");
+    setAuthenticated(false);
+    handleCloseUserMenu();
   };
 
   return (
@@ -156,10 +176,13 @@ const Navbar = () => {
                 key={setting}
                 style={{ textDecoration: "none", color: setting === 'Invitado' ? 'gray' : 'inherit', }}
                 to={setting === "Iniciar Sesión" ? "/login" : setting === "Mis datos" ? "/edit-profile" : setting === "Cerrar Sesión" ? "/" : "#"}
-                onClick={() => { if (setting === "Cerrar Sesión") { setAuthenticated(false); } }} 
+                onClick={() => { if (setting === "Cerrar Sesión") { handleLogout() } }}
               >
-                <MenuItem key={setting} onClick={handleCloseUserMenu} disabled={setting === "Invitado"}>
-                  <Typography key={setting} style={{ textAlign: 'center' }}>{setting}</Typography>
+                <MenuItem key={setting} onClick={handleCloseUserMenu} disabled={setting !== "Iniciar Sesión" && setting !== "Cerrar Sesión" && setting !== "Mis datos"}>
+                  <Typography key={setting} style={{ 
+                    color: setting === "Cerrar Sesión" ? primaryRedColor : setting === "Mis datos" ? primaryBlueColor : "inherit", 
+                    textAlign: 'center' 
+                  }}>{setting}</Typography>
                 </MenuItem>
               </Link>
             ))}

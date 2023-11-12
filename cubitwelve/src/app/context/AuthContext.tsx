@@ -1,5 +1,6 @@
-import { ReactNode, createContext, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { ReactNode, createContext, useState, useEffect } from "react";
+import Agent from "../api/agent";
+//cimport { useNavigate } from "react-router-dom";
 
 type Props = {
     children?: ReactNode;
@@ -20,7 +21,14 @@ const AuthContext = createContext<AuthContext>(initialValue);
 const AuthProvider = ({ children }: Props) => {
     const [authenticated, setAuthenticated] = useState(initialValue.authenticated);
 
-    const navigate = useNavigate();
+    useEffect(() => {
+        // Verificar la existencia del token al cargar la aplicación
+        const storedToken = localStorage.getItem("token");
+        if (storedToken) { // Asignar el token al agente
+            Agent.token = storedToken; // Limpiar el token en el agente
+            setAuthenticated(true);
+        }
+    }, []);
 
     return (
         <AuthContext.Provider value={{ authenticated, setAuthenticated }}>
@@ -29,4 +37,4 @@ const AuthProvider = ({ children }: Props) => {
     );
 };
 
-export {AuthContext, AuthProvider};
+export { AuthContext, AuthProvider };

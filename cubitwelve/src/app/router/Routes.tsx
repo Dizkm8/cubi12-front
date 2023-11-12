@@ -19,7 +19,7 @@ const PrivateRoutes = () => {
 }
 
 const Routes = (props: Props) => {
-  const { authenticated } = useContext(AuthContext);
+  //const { authenticated } = useContext(AuthContext);
   const location = useLocation();
   const views = ["/", "/edit-profile", "/interactive-mesh", "/my-progress"]
   return(
