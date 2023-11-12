@@ -6,7 +6,8 @@ import EditProfile from "../../features/home/EditProfile";
 import Register from "../../features/auth/Register";
 import Login from "../../features/auth/Login";
 import Navbar from "../components/Navbar"
-import HomePage from "../../features/home/Homepage";
+import HomePage from "../../features/home/HomePage";
+
 
 type Props = {};
 
