@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
@@ -22,9 +22,9 @@ import useEnhancedEffect from '@mui/material/utils/useEnhancedEffect';
 const defaultTheme = createTheme();
 
 const pwdRegex : RegExp = /^.+$/;
-const emailRegex : RegExp = /^([A-Z]+|[a-z]+)+[.]([A-Z]+|[a-z]+)+[0-9]*(@alumnos[.]ucn[.]cl){1}$/;
+const emailRegex : RegExp = /^([A-Z]+|[a-z]+)+[.]([A-Z]+|[a-z]+)+[0-9]*(@.+[.]ucn[.]cl){1}$/;
 
-export default function SignUp() {
+export default function LogIn() {
   const {authenticated,setAuthenticated} = useContext(AuthContext);
   const navigate = useNavigate();
 
@@ -91,6 +91,7 @@ export default function SignUp() {
 
 
   return (
+  <div data-testing="LogIn" className='s'>
     <Paper style={{
         backgroundImage: 'url(/background.jpg)',
         backgroundSize: 'cover', 
@@ -243,5 +244,6 @@ export default function SignUp() {
       </Container>
     </ThemeProvider>
     </Paper>
+   </div> 
   );
 }
