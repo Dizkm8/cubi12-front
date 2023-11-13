@@ -1,22 +1,21 @@
 import { ReactNode, createContext, useState, useEffect } from "react";
 import Agent from "../api/agent";
-//cimport { useNavigate } from "react-router-dom";
 
 type Props = {
     children?: ReactNode;
 };
 
-interface AuthContext {
+interface AuthContextProps {
     authenticated: boolean;
     setAuthenticated: (newState: boolean) => void;
 }
 
-const initialValue: AuthContext = {
+const initialValue: AuthContextProps = {
     authenticated: false,
     setAuthenticated: () => {},
 };
 
-const AuthContext = createContext<AuthContext>(initialValue);
+const AuthContext = createContext<AuthContextProps>(initialValue);
 
 const AuthProvider = ({ children }: Props) => {
     const [authenticated, setAuthenticated] = useState(initialValue.authenticated);
