@@ -6,6 +6,8 @@ definitions:
          memory: 3072
 pipelines:
   # Only want to build and deploy on specific branches
+  # Should be a good option to build images in lower branch
+  # But it costs time of pipelines
   # default:
   #   - parallel:
   #       - step:
@@ -23,7 +25,7 @@ pipelines:
   #           script:
   #             - hadolint Dockerfile
   branches:
-    dev:
+    main:
       - step:
           name: Build and Test
           script:
