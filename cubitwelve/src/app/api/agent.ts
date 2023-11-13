@@ -1,6 +1,6 @@
 import axios, {AxiosResponse} from "axios";
 
-const API_PORT = 5000;
+const API_PORT = 80;
 let token = localStorage.getItem("token");
 axios.defaults.baseURL = `http://localhost:${API_PORT}/api/`;
 axios.defaults.withCredentials = true;
