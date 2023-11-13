@@ -1,8 +1,10 @@
 import axios, {AxiosResponse} from "axios";
 
-const API_PORT = 80;
 let token = localStorage.getItem("token");
-axios.defaults.baseURL = `http://localhost:${API_PORT}/api/`;
+
+// const API_PORT = 80;
+// axios.defaults.baseURL = `http://localhost:${API_PORT}/api/`;
+axios.defaults.baseURL = process.env.REACT_APP_API_URL
 axios.defaults.withCredentials = true;
 axios.interceptors.request.use
 (config => {
@@ -20,11 +22,11 @@ const requests = {
 }
 
 const Auth = {
-    register : (form: any) => requests.post("auth/register", form).then(response => token = response.token), // TODO: Fix if needed
-    login : (form: any) => requests.post("auth/login", form).then(response => token = response.token), // TODO: Fix if needed
-    updatePassword : (form: any) => requests.put("auth/update-password", form), // TODO: Fix if needed
-    updateProfile: (form: any) => requests.put("users/update-profile", form), // TODO: Fix if needed
-    profile: () => requests.get("users/profile"), // TODO: Fix if needed
+    register : (form: any) => requests.post("auth/register", form).then(response => token = response.token),
+    login : (form: any) => requests.post("auth/login", form).then(response => token = response.token),
+    updatePassword : (form: any) => requests.put("auth/update-password", form),
+    updateProfile: (form: any) => requests.put("users/update-profile", form),
+    profile: () => requests.get("users/profile"),
 }
 
 const agent = { Auth, requests, token };
