@@ -21,8 +21,14 @@ Follow these steps to get the project up and running on your local machine:
    ```bash
    cd frontend
    ```
+3. Inside the folder exists a file called *.env.development* change their name to *.env* 
 
-3. Install project dependencies using npm.
+    **Note:** Change the value to match the API url, otherwise transactions will not work
+    ```bash
+    REACT_APP_API_URL=http://localhost:5000/api/
+    ```
+
+4. Install project dependencies using npm.
    ```bash
    npm install
    ```
