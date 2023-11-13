@@ -11,7 +11,7 @@ pipelines:
             name: Build and Test
             script:
               - IMAGE_NAME=$BITBUCKET_REPO_SLUG
-              - docker build . --file Dockerfile --tag ${IMAGE_NAME} --build-arg REACT_APP_API_URL=${PROD_API_URL}
+              - docker build . --file Dockerfile --tag ${IMAGE_NAME} --build-arg backend_url=${PROD_API_URL}
             services:
               - docker
             caches:
@@ -27,7 +27,7 @@ pipelines:
           name: Build and Test
           script:
             - IMAGE_NAME=$BITBUCKET_REPO_SLUG
-            - docker build . --file Dockerfile --tag ${IMAGE_NAME} --build-arg REACT_APP_API_URL=${PROD_API_URL}
+            - docker build . --file Dockerfile --tag ${IMAGE_NAME} --build-arg backend_url=${PROD_API_URL}
             - docker save ${IMAGE_NAME} --output "${IMAGE_NAME}.tar"
           services:
             - docker
