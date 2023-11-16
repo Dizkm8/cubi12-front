@@ -285,17 +285,18 @@ const EditProfile = () => {
         alignItems="center">
             <Box
                 sx={{
-                    marginTop: "4%",
+                    marginTop: "2%",
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
                 }}
             >
                 <Paper elevation={3} style={{ 
-                    padding: "1%", 
+                    padding: tab === "info" ? "1%" : "1.6%", 
                     border: `1px solid ${primaryBlueColor}`, 
                     borderRadius: "8px", 
-                    width: tab === "password" ? "64.5%" : "" && isSmallScreen ? "80%" : "40%", 
+                    width: tab === "password" && !isSmallScreen ? "64.5%" : tab === "info" && !isSmallScreen ? "40%" : "" &&
+                    tab && isSmallScreen ? "60%" : "", 
                     height: "fit-content" 
                 }}>
                     {/* Title */}
