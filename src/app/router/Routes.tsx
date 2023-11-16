@@ -32,9 +32,9 @@ const Routes = (props: Props) => {
         }
       >
         <Route path="/" element={<HomePage />} />
+        <Route path="/interactive-mesh" element={<HomePage />} />
         <Route element={<PrivateRoutes />}>
           <Route path="/edit-profile" element={<EditProfile />} />
-          <Route path="/interactive-mesh" element={<EditProfile />} />
           <Route path="/my-progress" element={<EditProfile />} />
         </Route>
       </Route>

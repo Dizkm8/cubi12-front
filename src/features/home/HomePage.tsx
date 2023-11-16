@@ -15,7 +15,7 @@ const HomePage = () => {
       <Typography variant="h3" component="h1" style ={{ marginBottom: '2rem' }} noWrap>
         ¡Bienvenido a Cubi12!
       </Typography>
-      <img alt="Cubi12Logo" src={Cubi12Logo} height="500" />
+      <img alt="Cubi12Logo" src={Cubi12Logo} height="300" />
       <Typography 
         variant="h3" 
         component="h2" 
