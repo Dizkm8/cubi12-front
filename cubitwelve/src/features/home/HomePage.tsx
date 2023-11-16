@@ -1,4 +1,5 @@
 import { Grid, Typography } from "@mui/material";
+import React from "react";
 // @ts-ignore
 import Cubi12Logo from "../../app/static/images/cubi12.svg";
 

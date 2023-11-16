@@ -15,20 +15,11 @@ import MenuItem from "@mui/material/MenuItem";
 import Cubi12Logo from "../static/images/cubi12.svg";
 import { primaryBlueColor, primaryRedColor } from "../static/colors";
 import { Link } from 'react-router-dom';
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, MouseEvent } from "react";
 import { AuthContext } from "../context/AuthContext";
 import Agent from "../api/agent";
 
 const Navbar = () => {
-  useEffect(() => {
-    if (localStorage.getItem("token")) {
-      Agent.Auth.profile()
-          .then(response => {
-            setLoggedName(response.name + " " + response.firstLastName);
-          })
-          .catch(error => { console.error("Error loading user:", error); });
-    }
-  }, []);
 
   const [loggedName, setLoggedName] = useState("");
 
@@ -37,17 +28,13 @@ const Navbar = () => {
   const pages = authenticated ? ["Inicio", "Malla Interactiva", "Mi Progreso"] : ["Inicio", "Malla Interactiva"];
   const settings = authenticated ? [loggedName, "Mis datos", "Cerrar Sesión"] : ["Invitado", "Iniciar Sesión"];
 
-  const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
-    null
-  );
-  const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
-    null
-  );
+  const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
+  const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
 
-  const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
+  const handleOpenNavMenu = (event: MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
   };
-  const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
+  const handleOpenUserMenu = (event: MouseEvent<HTMLElement>) => {
     setAnchorElUser(event.currentTarget);
   };
 
@@ -65,6 +52,17 @@ const Navbar = () => {
     setAuthenticated(false);
     handleCloseUserMenu();
   };
+  
+  useEffect(() => {
+    if (localStorage.getItem("token")) {
+      Agent.Auth.profile()
+          .then(response => {
+
+            setLoggedName(response.name.split(" ")[0] + " " + response.firstLastName);
+          })
+          .catch(error => { console.error("Error loading user:", error); });
+    }
+  }, []);
 
   return (
     <AppBar position="static" sx={{ backgroundColor: primaryBlueColor }}>
