@@ -2,9 +2,8 @@ import { styled } from "@mui/material/styles";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
 import { Box, Typography, useMediaQuery } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import agent from "../../app/api/agent";
-import { debounce } from "lodash";
 
 interface Subject {
   id: number;
@@ -15,6 +14,7 @@ interface Subject {
   semester: number;
 }
 
+// TODO: Implement unused interface
 interface SubjectRelationship {
   id: number;
   subjectCode: string;
@@ -56,9 +56,7 @@ const getStyleByPhraseSize = (phrase: string, isLargeScreen: boolean) => {
 
 const InteractiveMesh = () => {
   const [subjects, setSubjects] = useState<Subject[]>([]);
-  const [subjectRelationships, setSubjectRelationships] = useState<
-    SubjectRelationship[]
-  >([]);
+  const subjectRelationships = useRef<any>({});
   const [subjectStyles, setSubjectStyles] = useState<{
     [key: string]: React.CSSProperties;
   }>({});
@@ -66,40 +64,40 @@ const InteractiveMesh = () => {
   const isLargeScreen = useMediaQuery("(min-width:1600px)");
 
   const handleMouseOverSubject = (event: any, subjectCode: string) => {
+    const subjectPreRequisites = subjectRelationships.current[subjectCode];
+    if (!subjectPreRequisites) return;
+
     const updatedStyles = { ...subjectStyles };
-    subjectRelationships.forEach((sr) => {
-      if (sr.subjectCode === subjectCode) {
-        updatedStyles[sr.preSubjectCode] = { backgroundColor: "#FFDE9A" };
-        console.log(updatedStyles[sr.preSubjectCode]);
-      }
+    subjectPreRequisites.forEach((preReqCodes: string) => {
+      updatedStyles[preReqCodes] = { backgroundColor: "#FFDE9A" };
     });
+
     setSubjectStyles(updatedStyles);
   };
 
-  const handleMouseOutSubject = (subjectCode: string) => {
+  const handleMouseExitSubject = (subjectCode: string) => {
+    const subjectPreRequisites = subjectRelationships.current[subjectCode];
+    if (!subjectPreRequisites) return;
+
     const updatedStyles = { ...subjectStyles };
-    subjectRelationships.forEach((sr) => {
-      if (sr.subjectCode === subjectCode) {
-        updatedStyles[sr.preSubjectCode] = { backgroundColor: "#FFF" };
-      }
+    subjectPreRequisites.forEach((preReqCodes: string) => {
+      updatedStyles[preReqCodes] = {};
     });
+
     setSubjectStyles(updatedStyles);
   };
-
-  const debouncedHandleMouseOver = debounce(handleMouseOverSubject, 150);
-  const debouncedHandleMouseExit = debounce(handleMouseOutSubject, 150);
 
   const mapSubjects = (
     subjects: Subject[],
     semester: number,
     isLargeScreen: boolean
   ) => {
-    const mappedSubjects = subjects.map((subject) => {
+    return subjects.map((subject) => {
       if (subject.semester === semester) {
         return (
           <Paper
-            onMouseOver={(e) => debouncedHandleMouseOver(e, subject.code)}
-            onMouseOut={() => debouncedHandleMouseExit(subject.code)}
+            onMouseOver={(e) => handleMouseOverSubject(e, subject.code)}
+            onMouseOut={() => handleMouseExitSubject(subject.code)}
             elevation={3}
             sx={{
               ...subjectStyles[subject.code],
@@ -113,7 +111,6 @@ const InteractiveMesh = () => {
       }
       return null;
     });
-    return mappedSubjects;
   };
 
   useEffect(() => {
@@ -127,7 +124,7 @@ const InteractiveMesh = () => {
   useEffect(() => {
     agent.Subjects.relationships()
       .then((res) => {
-        setSubjectRelationships(res);
+        subjectRelationships.current = res;
       })
       .catch((err) => console.log(err));
   }, []);
