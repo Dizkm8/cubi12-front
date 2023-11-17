@@ -29,6 +29,11 @@ const Auth = {
     profile: () => requests.get("users/profile"),
 }
 
-const agent = { Auth, requests, token };
+const Subjects = {
+    list: () => requests.get("subjects"),
+    relationships: () => requests.get("subjects/relationships"),
+}
+
+const agent = { Auth, requests, Subjects, token };
 
 export default agent;
