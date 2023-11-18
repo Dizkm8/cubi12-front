@@ -8,7 +8,7 @@ const style = {
   justifyContent: "center",
   alignItems: "center",
   textAlign: "center",
-  height: "8vh",
+  height: "10vh",
   width: "100%",
   margin: "1rem 0",
   padding: "0.5rem",
@@ -19,7 +19,7 @@ const style = {
   },
 };
 
-const getStyleByPhraseSize = (
+const getFontSizeByLength = (
   currentStyle: any,
   phrase: string,
   isLargeScreen: boolean
@@ -28,16 +28,33 @@ const getStyleByPhraseSize = (
     if (phrase.length > 40) return { ...currentStyle, fontSize: "0.8rem" };
     return currentStyle;
   }
-  if (phrase.length > 30) return { ...currentStyle, fontSize: "0.7rem" };
-  else if (phrase.length > 25) return { ...currentStyle, fontSize: "0.8rem" };
+  if (phrase.length > 40) return { ...currentStyle, fontSize: "0.6rem" };
+  if (phrase.length > 35) return { ...currentStyle, fontSize: "0.7rem" };
+  else if (phrase.length > 30) return { ...currentStyle, fontSize: "0.8rem" };
   else if (phrase.length > 20) return { ...currentStyle, fontSize: "0.9rem" };
   else return currentStyle;
 };
 
+const selectStyle = (
+  name: string,
+  isLargeScreen: boolean,
+  isPreReq: boolean,
+  isPostReq: boolean
+) => {
+  let backgroundColor = "#FFFFFF";
+  if (isPostReq) backgroundColor = "#93FFC0";
+  if (isPreReq) backgroundColor = "#FFDE9A";
+
+  return {
+    ...getFontSizeByLength(style, name, isLargeScreen),
+    backgroundColor,
+  };
+};
+
 interface Props {
   subject: Subject;
-  onMouseOver: (e: any, code: string) => void;
-  onMouseExit: (code: string) => void;
+  onMouseOver: (code: string) => void;
+  onMouseExit: () => void;
   isLargeScreen: boolean;
 }
 
@@ -49,24 +66,22 @@ const SubjectCard = ({
 }: Props) => {
   const { code, name } = subject;
 
-  const { codes } = useSubjectCodeContext();
+  const { preReqCodes, postReqCodes } = useSubjectCodeContext();
 
-  const [isHovered, setIsHovered] = useState(false);
+  const [isPreReq, setIsPreReq] = useState(false);
+  const [isPostReq, setIsPostReq] = useState(false);
 
   useEffect(() => {
-    setIsHovered(codes.includes(code));
-  }, [codes, code]);
+    setIsPreReq(preReqCodes.includes(code));
+    setIsPostReq(postReqCodes.includes(code));
+  }, [preReqCodes, postReqCodes, code]);
 
   return (
     <Paper
-      onMouseOver={(e) => onMouseOver(e, code)}
-      onMouseOut={() => onMouseExit(name)}
+      onMouseOver={() => onMouseOver(code)}
+      onMouseOut={() => onMouseExit()}
       elevation={3}
-      sx={getStyleByPhraseSize(
-        isHovered ?  { ...style, backgroundColor: "#FFDE9A" } : {...style, backgroundColor: "#FFFFFF" },
-        name,
-        isLargeScreen
-      )}
+      sx={selectStyle(name, isLargeScreen, isPreReq, isPostReq)}
     >
       {name}
     </Paper>
