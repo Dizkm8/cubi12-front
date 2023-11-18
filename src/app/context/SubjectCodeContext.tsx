@@ -1,21 +1,24 @@
 import React, { createContext, useContext, useState, ReactNode, Dispatch, SetStateAction } from 'react';
 
 interface CodeContextProps {
-  codes: string[];
-  setCodes: Dispatch<SetStateAction<string[]>>;
+  preReqCodes: string[];
+  setPreReqCodes: Dispatch<SetStateAction<string[]>>;
+  postReqCodes: string[];
+  setPostReqCodes: Dispatch<SetStateAction<string[]>>;
 }
 
 const SubjectCodeContext = createContext<CodeContextProps | undefined>(undefined);
 
-interface CodeProviderProps {
+interface SubjectCodeProviderProps {
   children: ReactNode;
 }
 
-export const CodeProvider: React.FC<CodeProviderProps> = ({ children }) => {
-  const [codes, setCodes] = useState<string[]>([]);
+export const SubjectCodeProvider: React.FC<SubjectCodeProviderProps> = ({ children }) => {
+  const [preReqCodes, setPreReqCodes] = useState<string[]>([]);
+  const [postReqCodes, setPostReqCodes] = useState<string[]>([]);
 
   return (
-    <SubjectCodeContext.Provider value={{ codes, setCodes }}>
+    <SubjectCodeContext.Provider value={{ preReqCodes, setPreReqCodes, postReqCodes, setPostReqCodes }}>
       {children}
     </SubjectCodeContext.Provider>
   );

@@ -2,7 +2,7 @@ import { CssBaseline, } from "@mui/material";
 import { BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "../context/AuthContext";
 import Routes from "../router/Routes";
-import { CodeProvider } from "../context/SubjectCodeContext";
+import { SubjectCodeProvider } from "../context/SubjectCodeContext";
 
 function App() {
   return (
@@ -10,9 +10,9 @@ function App() {
       <CssBaseline />
       <BrowserRouter>
         <AuthProvider>
-          <CodeProvider>
+          <SubjectCodeProvider>
             <Routes />
-          </CodeProvider>
+          </SubjectCodeProvider>
         </AuthProvider>
       </BrowserRouter>
     </>

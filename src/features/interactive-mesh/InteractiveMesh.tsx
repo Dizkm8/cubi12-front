@@ -1,13 +1,15 @@
 import { styled } from "@mui/material/styles";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
-import { Box, Typography, useMediaQuery } from "@mui/material";
+import { Box, Skeleton, Typography, useMediaQuery } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import agent from "../../app/api/agent";
 import SubjectCard from "./SubjectCard";
 import { Subject } from "../../app/models/Subject";
 import { useSubjectCodeContext } from "../../app/context/SubjectCodeContext";
 import { PreRequisite } from "../../app/models/PreRequisite";
+import { PostRequisite } from "../../app/models/PostRequisite";
+import { subjectsCapitalize } from "../../app/utils/StringUtils";
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: "#1C478F",
@@ -16,39 +18,70 @@ const Item = styled(Paper)(({ theme }) => ({
   textAlign: "center",
 }));
 
+const numerals = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"];
+
+const romanNumeral = (numeral: number) => {
+  return numerals[numeral - 1];
+};
+
 const InteractiveMesh = () => {
   const [subjects, setSubjects] = useState<Subject[]>([]);
-  const subjectRelationships = useRef<PreRequisite>({});
+  const preRequisites = useRef<PreRequisite>({});
+  const PostRequisites = useRef<PostRequisite>({});
+  const [loading, setLoading] = useState<boolean>(false);
 
-  const { setCodes } = useSubjectCodeContext();
+  const { setPreReqCodes, setPostReqCodes } = useSubjectCodeContext();
 
   const isLargeScreen = useMediaQuery("(min-width:1600px)");
 
   useEffect(() => {
+    setLoading(true);
     agent.Subjects.list()
-      .then((res) => {
+      .then((res: Subject[]) => {
+        res.forEach((s) => (s.name = subjectsCapitalize(s.name)));
         setSubjects(res);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.log(err))
+      .finally(() => setLoading(false));
   }, []);
 
   useEffect(() => {
     agent.Subjects.preRequisites()
       .then((res) => {
-        subjectRelationships.current = res;
+        preRequisites.current = res;
       })
       .catch((err) => console.log(err));
   }, []);
 
-  const handleMouseOverSubject = (event: any, subjectCode: string) => {
-    const subjectPreRequisites = subjectRelationships.current[subjectCode];
-    if (!subjectPreRequisites) return;
+  useEffect(() => {
+    agent.Subjects.postRequisites()
+      .then((res) => {
+        PostRequisites.current = res;
+      })
+      .catch((err) => console.log(err));
+  }, []);
 
-    setCodes(subjectPreRequisites);
+  const setPreRequisitesColors = (subjectPreRequisites: string[]) => {
+    if (!subjectPreRequisites) return;
+    setPreReqCodes(subjectPreRequisites);
   };
 
-  const handleMouseExitSubject = (subjectCode: string) => {
-    setCodes([]);
+  const setPostRequisitesColors = (subjectPostRequisites: string[]) => {
+    if (!subjectPostRequisites) return;
+    setPostReqCodes(subjectPostRequisites);
+  };
+
+  const handleMouseOverSubject = (subjectCode: string) => {
+    const subjectPreRequisites = preRequisites.current[subjectCode];
+    setPreRequisitesColors(subjectPreRequisites);
+
+    const subjectPostRequisites = PostRequisites.current[subjectCode];
+    setPostRequisitesColors(subjectPostRequisites);
+  };
+
+  const handleMouseExitSubject = () => {
+    setPreReqCodes([]);
+    setPostReqCodes([]);
   };
 
   const mapSubjectsBySemester = (
@@ -72,52 +105,31 @@ const InteractiveMesh = () => {
       return null;
     });
 
+  const mapSubjectsBySemesterSkeleton = (amount: number) => {
+    return Array.from({ length: amount }).map((_, index) => (
+      <Skeleton
+        variant="rectangular"
+        sx={{ width: "100%", height: "10vh", margin: "0.5rem 0" }}
+      />
+    ));
+  };
+
   return (
-    <Box sx={{ flexGrow: 1, padding: "0 3rem 0", marginTop: "1.5rem" }}>
+    <Box sx={{ flexGrow: 1, padding: "0 1rem 0", marginTop: "1.5rem" }}>
       <Typography variant="h3" component="h1">
         Malla Interactiva
       </Typography>
-      <Grid container spacing={2} sx={{ marginTop: "0.1rem" }}>
-        <Grid item xs>
-          <Item>I</Item>
-          {mapSubjectsBySemester(subjects, 1, isLargeScreen)}
-        </Grid>
-        <Grid item xs>
-          <Item>II</Item>
-          {mapSubjectsBySemester(subjects, 2, isLargeScreen)}
-        </Grid>
-        <Grid item xs>
-          <Item>III</Item>
-          {mapSubjectsBySemester(subjects, 3, isLargeScreen)}
-        </Grid>
-        <Grid item xs>
-          <Item>IV</Item>
-          {mapSubjectsBySemester(subjects, 4, isLargeScreen)}
-        </Grid>
-        <Grid item xs>
-          <Item>V</Item>
-          {mapSubjectsBySemester(subjects, 5, isLargeScreen)}
-        </Grid>
-        <Grid item xs>
-          <Item>VI</Item>
-          {mapSubjectsBySemester(subjects, 6, isLargeScreen)}
-        </Grid>
-        <Grid item xs>
-          <Item>VII</Item>
-          {mapSubjectsBySemester(subjects, 7, isLargeScreen)}
-        </Grid>
-        <Grid item xs>
-          <Item>VIII</Item>
-          {mapSubjectsBySemester(subjects, 8, isLargeScreen)}
-        </Grid>
-        <Grid item xs>
-          <Item>XI</Item>
-          {mapSubjectsBySemester(subjects, 9, isLargeScreen)}
-        </Grid>
-        <Grid item xs>
-          <Item>X</Item>
-          {mapSubjectsBySemester(subjects, 10, isLargeScreen)}
-        </Grid>
+      <Grid container spacing={2} sx={{ margin: "0.1rem 0 1rem" }}>
+        <Grid item xs={1} />
+        {Array.from({ length: 10 }).map((_, index) => (
+          <Grid item xs={12} md={3} lg={1} key={index}>
+            <Item>{romanNumeral(index + 1)}</Item>
+            {loading
+              ? mapSubjectsBySemesterSkeleton(6)
+              : mapSubjectsBySemester(subjects, index + 1, isLargeScreen)}
+          </Grid>
+        ))}
+        <Grid item xs={1} />
       </Grid>
     </Box>
   );
