@@ -1,7 +1,7 @@
 import { styled } from "@mui/material/styles";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
-import { Box, Typography, useMediaQuery } from "@mui/material";
+import { Box, Skeleton, Typography, useMediaQuery } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import agent from "../../app/api/agent";
 import SubjectCard from "./SubjectCard";
@@ -28,18 +28,21 @@ const InteractiveMesh = () => {
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const preRequisites = useRef<PreRequisite>({});
   const PostRequisites = useRef<PostRequisite>({});
+  const [loading, setLoading] = useState<boolean>(false);
 
   const { setPreReqCodes, setPostReqCodes } = useSubjectCodeContext();
 
   const isLargeScreen = useMediaQuery("(min-width:1600px)");
 
   useEffect(() => {
+    setLoading(true);
     agent.Subjects.list()
       .then((res: Subject[]) => {
         res.forEach((s) => (s.name = subjectsCapitalize(s.name)));
         setSubjects(res);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.log(err))
+      .finally(() => setLoading(false));
   }, []);
 
   useEffect(() => {
@@ -102,6 +105,15 @@ const InteractiveMesh = () => {
       return null;
     });
 
+  const mapSubjectsBySemesterSkeleton = (amount: number) => {
+    return Array.from({ length: amount }).map((_, index) => (
+      <Skeleton
+        variant="rectangular"
+        sx={{ width: "100%", height: "10vh", margin: "0.5rem 0" }}
+      />
+    ));
+  };
+
   return (
     <Box sx={{ flexGrow: 1, padding: "0 1rem 0", marginTop: "1.5rem" }}>
       <Typography variant="h3" component="h1">
@@ -112,7 +124,9 @@ const InteractiveMesh = () => {
         {Array.from({ length: 10 }).map((_, index) => (
           <Grid item xs={12} md={3} lg={1} key={index}>
             <Item>{romanNumeral(index + 1)}</Item>
-            {mapSubjectsBySemester(subjects, index + 1, isLargeScreen)}
+            {loading
+              ? mapSubjectsBySemesterSkeleton(6)
+              : mapSubjectsBySemester(subjects, index + 1, isLargeScreen)}
           </Grid>
         ))}
         <Grid item xs={1} />
