@@ -11,6 +11,7 @@ import { useSubjectCodeContext } from "../../app/context/SubjectCodeContext";
 import { PreRequisite } from "../../app/models/PreRequisite";
 import { PostRequisite } from "../../app/models/PostRequisite";
 import { subjectsCapitalize } from "../../app/utils/StringUtils";
+import GenerateTabTitle from "../../app/utils/TitleGenerator";
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: "#1C478F",
@@ -26,6 +27,8 @@ const romanNumeral = (numeral: number) => {
 };
 
 const InteractiveMesh = () => {
+  document.title = GenerateTabTitle("Malla Interactiva");
+
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const preRequisites = useRef<PreRequisite>({});
   const PostRequisites = useRef<PostRequisite>({});
@@ -117,8 +120,15 @@ const InteractiveMesh = () => {
 
   return (
     <Box sx={{ flexGrow: 1, padding: "0 1rem 0", marginTop: "1.5rem" }}>
-      <Grid container alignItems="center" justifyContent="space-between" style={{marginLeft: "9%", width: "84%" }}>
-        <Typography variant="h3" component="span">Malla Interactiva</Typography>
+      <Grid
+        container
+        alignItems="center"
+        justifyContent="space-between"
+        style={{ marginLeft: "9%", width: "84%" }}
+      >
+        <Typography variant="h3" component="span">
+          Malla Interactiva
+        </Typography>
       </Grid>
       <Grid container spacing={2} sx={{ margin: "0.1rem 0 1rem" }}>
         <Grid item xs={1} />

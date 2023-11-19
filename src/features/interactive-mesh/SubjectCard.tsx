@@ -3,7 +3,7 @@ import { Paper } from "@mui/material";
 import { Subject } from "../../app/models/Subject";
 import { useSubjectCodeContext } from "../../app/context/SubjectCodeContext";
 import { useEffect, useState } from "react";
-import { primaryGrayColor, secondaryGreenColor, secondaryYellowColor } from "../../app/static/colors";
+import Colors from "../../app/static/colors";
 
 const style = {
   display: "flex",
@@ -17,7 +17,7 @@ const style = {
   fontSize: "1rem",
   backgroundColor: "#FFF",
   "&:hover": {
-    backgroundColor: primaryGrayColor,
+    backgroundColor: Colors.primaryGray,
   },
 };
 
@@ -44,8 +44,8 @@ const selectStyle = (
   isPostReq: boolean
 ) => {
   let backgroundColor = "#FFFFFF";
-  if (isPostReq) backgroundColor = secondaryGreenColor;
-  if (isPreReq) backgroundColor = secondaryYellowColor;
+  if (isPostReq) backgroundColor = Colors.secondaryGreen;
+  if (isPreReq) backgroundColor = Colors.secondaryYellow;
 
   return {
     ...getFontSizeByLength(style, name, isLargeScreen),

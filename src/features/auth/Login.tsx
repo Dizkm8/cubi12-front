@@ -17,15 +17,17 @@ import { useNavigate } from "react-router-dom";
 import Alert from "@mui/material/Alert";
 import Fade from "@mui/material/Fade";
 import useMediaQuery from "@mui/material/useMediaQuery";
-
+import GenerateTabTitle from "../../app/utils/TitleGenerator";
 
 const defaultTheme = createTheme();
 
 const pwdRegex: RegExp = /^.+$/;
 const emailRegex: RegExp =
-/^([A-Z]+|[a-z]+)+[.]([A-Z]+|[a-z]+)+[0-9]*(@(.+[.])*ucn[.]cl){1}$/;
+  /^([A-Z]+|[a-z]+)+[.]([A-Z]+|[a-z]+)+[0-9]*(@(.+[.])*ucn[.]cl){1}$/;
 
-export default function LogIn() {
+
+const LogIn = () => {
+  document.title = GenerateTabTitle("Iniciar Sesión");
   const { setAuthenticated } = useContext(AuthContext);
   const navigate = useNavigate();
 
@@ -42,7 +44,6 @@ export default function LogIn() {
   const [disabled, setDisabled] = React.useState(true);
 
   const isMobile = useMediaQuery(defaultTheme.breakpoints.down("sm"));
-
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -124,7 +125,7 @@ export default function LogIn() {
                 alignItems: "center",
                 boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.5)",
                 height: "100%",
-                width: isMobile ? "100%" : 450, 
+                width: isMobile ? "100%" : 450,
                 mb: 3,
                 backgroundColor: "#F5F5F5",
               }}
@@ -145,8 +146,8 @@ export default function LogIn() {
                         severity="error"
                         sx={{
                           width: "89%",
-                          ml:3,
-                          mr:3,
+                          ml: 3,
+                          mr: 3,
                           textAlign: "center",
                         }}
                       >
@@ -156,7 +157,7 @@ export default function LogIn() {
                   )}
                 </Grid>
 
-                <Grid item xs={12} >
+                <Grid item xs={12}>
                   <TextField
                     required
                     id="email"
@@ -177,8 +178,8 @@ export default function LogIn() {
                     }}
                     sx={{
                       width: "89%",
-                      ml:3,
-                      mr:3,
+                      ml: 3,
+                      mr: 3,
                       boxShadow: !emailError
                         ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
                         : "none",
@@ -208,16 +209,16 @@ export default function LogIn() {
                     }}
                     sx={{
                       width: "89%",
-                      ml:3,
-                      mr:3,
-                      mb:1,
+                      ml: 3,
+                      mr: 3,
+                      mb: 1,
                       boxShadow: !pwdError
                         ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
                         : "none",
                     }}
                   />
                 </Grid>
-                <Grid item >
+                <Grid item>
                   <Typography
                     variant="body2"
                     color="textPrimary"
@@ -246,9 +247,9 @@ export default function LogIn() {
                     }}
                     variant="contained"
                     sx={{
-                      mt:1,
-                      ml:3,
-                      mr:3,
+                      mt: 1,
+                      ml: 3,
+                      mr: 3,
                       fontFamily: "Raleway, sans-serif",
                       fontSize: "20px",
                       fontWeight: 300,
@@ -259,7 +260,7 @@ export default function LogIn() {
                     Ingresar
                   </Button>
                 </Grid>
-                <Grid item xs={12}> 
+                <Grid item xs={12}>
                   <Button
                     href="/"
                     type="submit"
@@ -272,8 +273,8 @@ export default function LogIn() {
                     }}
                     variant="contained"
                     sx={{
-                      ml:3,
-                      mr:3,
+                      ml: 3,
+                      mr: 3,
                       mb: 3,
                       fontFamily: "Raleway, sans-serif",
                       fontSize: "20px",
@@ -293,3 +294,4 @@ export default function LogIn() {
   );
 }
 
+export default LogIn;

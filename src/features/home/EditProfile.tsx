@@ -1,7 +1,6 @@
 import React from "react";
 import { Paper, Typography, Grid, TextField, Button, MenuItem, Box, FormHelperText, Dialog, DialogTitle, 
     DialogContent, DialogActions, useMediaQuery, useTheme } from "@mui/material";
-import { primaryBlueColor, primaryGrayColor, primaryOrangeColor, primaryRedColor } from "../../app/static/colors";
 import { SyntheticEvent, useRef, useState, useEffect, useContext } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
@@ -9,6 +8,8 @@ import Agent from "../../app/api/agent";
 import { startCase } from "lodash";
 import { AuthContext } from "../../app/context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import Colors from "../../app/static/colors";
+import GenerateTabTitle from "../../app/utils/TitleGenerator";
 
 // Regex for password and names
 const pwdRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{10,16}$/;
@@ -20,6 +21,7 @@ const invalidNames = "Debe contener mínimo 3 letras, sin caracteres especiales 
 const updateSuccess = "Actualización exitosa";
 
 const EditProfile = () => {
+    document.title = GenerateTabTitle("Editar Perfil");
     const theme = useTheme();
     const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -295,7 +297,7 @@ const EditProfile = () => {
             >
                 <Paper elevation={3} style={{ 
                     padding: tab === "info" ? "1%" : "1.6%", 
-                    border: `1px solid ${primaryBlueColor}`, 
+                    border: `1px solid ${Colors.primaryBlue}`, 
                     borderRadius: "8px", 
                     width: tab === "password" && !isSmallScreen ? "64.5%" : tab === "info" && !isSmallScreen ? "40%" : "" &&
                     tab && isSmallScreen ? "60%" : "", 
@@ -488,7 +490,7 @@ const EditProfile = () => {
                                             variant="outlined"
                                             color="secondary"
                                             style={{
-                                                color: `${primaryRedColor}`,
+                                                color: `${Colors.primaryRed}`,
                                                 marginRight: isSmallScreen ? "0" : "16px",
                                                 marginBottom: isSmallScreen ? "16px" : "0",
                                                 transform: "scale(1.05)",
@@ -509,7 +511,7 @@ const EditProfile = () => {
                                             style={{
                                                 transform: "scale(1.05)",
                                                 color: "black",
-                                                backgroundColor: validName && validFirstLastName && validSecondLastName && differentNames ? `${primaryOrangeColor}` : `${primaryGrayColor}`,
+                                                backgroundColor: validName && validFirstLastName && validSecondLastName && differentNames ? `${Colors.primaryOrange}` : `${Colors.primaryGray}`,
                                                 boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.2)",
                                                 fontFamily: "Raleway, sans-serif",
                                                 fontSize: "85%",
@@ -628,7 +630,7 @@ const EditProfile = () => {
                                             variant="outlined"
                                             color="secondary"
                                             style={{
-                                                color: `${primaryRedColor}`,
+                                                color: `${Colors.primaryRed}`,
                                                 marginRight: isSmallScreen ? "0" : "16px",
                                                 marginBottom: isSmallScreen ? "16px" : "0",
                                                 transform: "scale(1.05)",
@@ -649,7 +651,7 @@ const EditProfile = () => {
                                             style={{
                                                 transform: "scale(1.05)",
                                                 color: "black",
-                                                backgroundColor: validPwd && validMatchPwd ? `${primaryOrangeColor}` : `${primaryGrayColor}`,
+                                                backgroundColor: validPwd && validMatchPwd ? `${Colors.primaryOrange}` : `${Colors.primaryGray}`,
                                                 boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.2)",
                                                 fontFamily: "Raleway, sans-serif",
                                                 fontSize: "85%",

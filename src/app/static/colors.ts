@@ -1,11 +1,22 @@
-export const primaryBlueColor = "#1C478F";
- 
-export const primaryOrangeColor = "#F7B52C"; 
+const primaryBlue = "#1C478F";
 
-export const primaryGrayColor = "#C3C3C3 "; 
+const primaryOrange = "#F7B52C";
 
-export const primaryRedColor = "#D90000";
+const primaryGray = "#C3C3C3 ";
 
-export const secondaryGreenColor = "#93FFC0";
+const primaryRed = "#D90000";
 
-export const secondaryYellowColor = "#FFDE9A";
+const secondaryGreen = "#93FFC0";
+
+const secondaryYellow = "#FFDE9A";
+
+const Colors = {
+  primaryBlue,
+  primaryOrange,
+  primaryGray,
+  primaryRed,
+  secondaryGreen,
+  secondaryYellow,
+};
+
+export default Colors;

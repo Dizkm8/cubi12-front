@@ -2,25 +2,32 @@ import { Grid, Typography } from "@mui/material";
 import React from "react";
 // @ts-ignore
 import Cubi12Logo from "../../app/static/images/cubi12.svg";
+import GenerateTabTitle from "../../app/utils/TitleGenerator";
 
 const HomePage = () => {
+  document.title = GenerateTabTitle("Inicio");
   return (
     <Grid
       container
       direction="column"
       justifyContent="center"
       alignItems="center"
-      style={{ height: '100%', marginTop: '4rem' }}
+      style={{ height: "100%", marginTop: "4rem" }}
     >
-      <Typography variant="h3" component="h1" style ={{ marginBottom: '2rem' }} noWrap>
+      <Typography
+        variant="h3"
+        component="h1"
+        style={{ marginBottom: "2rem" }}
+        noWrap
+      >
         ¡Bienvenido a Cubi12!
       </Typography>
       <img alt="Cubi12Logo" src={Cubi12Logo} height="300" />
-      <Typography 
-        variant="h3" 
-        component="h2" 
-        sx={{ fontWeight: 600 }} 
-        style ={{ marginTop: '2rem', marginBottom: '4rem' }} 
+      <Typography
+        variant="h3"
+        component="h2"
+        sx={{ fontWeight: 600 }}
+        style={{ marginTop: "2rem", marginBottom: "4rem" }}
       >
         Estudia - Compara - Aprende
       </Typography>

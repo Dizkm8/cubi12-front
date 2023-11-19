@@ -13,11 +13,11 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 // @ts-ignore
 import Cubi12Logo from "../static/images/cubi12.svg";
-import { primaryBlueColor, primaryRedColor } from "../static/colors";
 import { Link } from 'react-router-dom';
 import { useContext, useEffect, useState, MouseEvent } from "react";
 import { AuthContext } from "../context/AuthContext";
 import Agent from "../api/agent";
+import Colors from "../static/colors";
 
 const Navbar = () => {
 
@@ -65,7 +65,7 @@ const Navbar = () => {
   }, []);
 
   return (
-    <AppBar position="static" sx={{ backgroundColor: primaryBlueColor }}>
+    <AppBar position="static" sx={{ backgroundColor: Colors.primaryBlue }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <Avatar
@@ -178,7 +178,7 @@ const Navbar = () => {
               >
                 <MenuItem key={setting} onClick={handleCloseUserMenu} disabled={setting !== "Iniciar Sesión" && setting !== "Cerrar Sesión" && setting !== "Mis datos"}>
                   <Typography key={setting} style={{ 
-                    color: setting === "Cerrar Sesión" ? primaryRedColor : setting === "Mis datos" ? primaryBlueColor : "inherit", 
+                    color: setting === "Cerrar Sesión" ? Colors.primaryRed : setting === "Mis datos" ? Colors.primaryBlue : "inherit", 
                     textAlign: 'center' 
                   }}>{setting}</Typography>
                 </MenuItem>
