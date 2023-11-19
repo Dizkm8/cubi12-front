@@ -7,6 +7,7 @@ import Login from "../../features/auth/Login";
 import Navbar from "../components/Navbar";
 import HomePage from "../../features/home/HomePage";
 import InteractiveMesh from "../../features/interactive-mesh/InteractiveMesh";
+import MyProgress from "../../features/interactive-mesh/MyProgress";
 
 type Props = {};
 
@@ -36,7 +37,7 @@ const Routes = (props: Props) => {
         <Route path="/interactive-mesh" element={<InteractiveMesh />} />
         <Route element={<PrivateRoutes />}>
           <Route path="/edit-profile" element={<EditProfile />} />
-          <Route path="/my-progress" element={<HomePage />} />
+          <Route path="/my-progress" element={<MyProgress />} />
         </Route>
       </Route>
       <Route path="/register" element={<Register />} />

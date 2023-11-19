@@ -70,6 +70,75 @@ const EditProfile = () => {
     // User state
     const [user, setUser] = useState({name: "", firstLastName: "", secondLastName: "", rut: "", email: "", career: { id: "", name: "" }});
 
+    
+    
+    // Load user data
+    useEffect(() => {
+        Agent.Auth.profile()
+            .then(response => {
+                setUser(response);
+                setName(response.name);
+                setFirstLastName(response.firstLastName);
+                setSecondLastName(response.secondLastName);
+                setRut(response.rut);
+                setEmail(response.email);
+                setCareer(startCase(response.career.name));
+            })
+            .catch(error => { console.error("Error loading user:", error); });
+    }, []);
+
+    // Check if names are valid
+    useEffect(() => {
+        if (name === user.name && firstLastName === user.firstLastName && secondLastName === user.secondLastName) {
+            setDifferentNames(false);
+        } else{
+            setDifferentNames(true);
+            setSuccess(false);
+        }
+
+        if (namesRegex.test(name)) {
+            setValidName(true);
+        } else {
+            setValidName(false);
+        }
+
+        if (namesRegex.test(firstLastName)) {
+            setValidFirstLastName(true);
+        } else {
+            setValidFirstLastName(false);
+        }
+
+        if (namesRegex.test(secondLastName)) {
+            setValidSecondLastName(true);
+        } else {
+            setValidSecondLastName(false);
+        }
+
+    }, [name, firstLastName, secondLastName, user.name, user.firstLastName, user.secondLastName]);
+
+    // Check if password is valid
+    useEffect(() => {
+        if (pwdRegex.test(pwd)) {
+            setValidPwd(true);
+        } else {
+            setValidPwd(false);
+        }
+
+        if(pwd === matchPwd) {
+            setValidMatchPwd(true);
+        } else {
+            setValidMatchPwd(false);
+        }
+    }, [pwd, matchPwd]);
+
+    // Update URL
+    useEffect(() => {
+        const getUrl = new URL(window.location.href);
+        getUrl.searchParams.set('tab', tab);
+        window.history.pushState({}, '', getUrl.href);
+        setSuccess(false);
+    }, [tab]);
+    
     // Clear inputs
     const clearInputs = (names: boolean, password: boolean, cancel: boolean) => {
         // Clear name inputs
@@ -210,73 +279,6 @@ const EditProfile = () => {
             }
         }
     };
-    
-    // Load user data
-    useEffect(() => {
-        Agent.Auth.profile()
-            .then(response => {
-                setUser(response);
-                setName(response.name);
-                setFirstLastName(response.firstLastName);
-                setSecondLastName(response.secondLastName);
-                setRut(response.rut);
-                setEmail(response.email);
-                setCareer(startCase(response.career.name));
-            })
-            .catch(error => { console.error("Error loading user:", error); });
-    }, []);
-
-    // Check if names are valid
-    useEffect(() => {
-        if (name === user.name && firstLastName === user.firstLastName && secondLastName === user.secondLastName) {
-            setDifferentNames(false);
-        } else{
-            setDifferentNames(true);
-            setSuccess(false);
-        }
-
-        if (namesRegex.test(name)) {
-            setValidName(true);
-        } else {
-            setValidName(false);
-        }
-
-        if (namesRegex.test(firstLastName)) {
-            setValidFirstLastName(true);
-        } else {
-            setValidFirstLastName(false);
-        }
-
-        if (namesRegex.test(secondLastName)) {
-            setValidSecondLastName(true);
-        } else {
-            setValidSecondLastName(false);
-        }
-
-    }, [name, firstLastName, secondLastName, user.name, user.firstLastName, user.secondLastName]);
-
-    // Check if password is valid
-    useEffect(() => {
-        if (pwdRegex.test(pwd)) {
-            setValidPwd(true);
-        } else {
-            setValidPwd(false);
-        }
-
-        if(pwd === matchPwd) {
-            setValidMatchPwd(true);
-        } else {
-            setValidMatchPwd(false);
-        }
-    }, [pwd, matchPwd]);
-
-    // Update URL
-    useEffect(() => {
-        const getUrl = new URL(window.location.href);
-        getUrl.searchParams.set('tab', tab);
-        window.history.pushState({}, '', getUrl.href);
-        setSuccess(false);
-    }, [tab]);
 
     return (
         <Grid container
