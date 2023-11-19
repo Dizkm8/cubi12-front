@@ -2,8 +2,6 @@ import axios, { AxiosResponse } from "axios";
 
 let token = localStorage.getItem("token");
 
-// const API_PORT = 80;
-// axios.defaults.baseURL = `http://localhost:${API_PORT}/api/`;
 axios.defaults.baseURL = process.env.REACT_APP_API_URL;
 axios.defaults.withCredentials = true;
 axios.interceptors.request.use((config) => {

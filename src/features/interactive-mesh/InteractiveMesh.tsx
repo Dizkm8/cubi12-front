@@ -1,3 +1,4 @@
+import React from "react";
 import { styled } from "@mui/material/styles";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
@@ -116,9 +117,9 @@ const InteractiveMesh = () => {
 
   return (
     <Box sx={{ flexGrow: 1, padding: "0 1rem 0", marginTop: "1.5rem" }}>
-      <Typography variant="h3" component="h1">
-        Malla Interactiva
-      </Typography>
+      <Grid container alignItems="center" justifyContent="space-between" style={{marginLeft: "9%", width: "84%" }}>
+        <Typography variant="h3" component="span">Malla Interactiva</Typography>
+      </Grid>
       <Grid container spacing={2} sx={{ margin: "0.1rem 0 1rem" }}>
         <Grid item xs={1} />
         {Array.from({ length: 10 }).map((_, index) => (
