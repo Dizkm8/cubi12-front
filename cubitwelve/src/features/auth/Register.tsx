@@ -1,5 +1,4 @@
 import * as React from "react";
-import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
 import Link from "@mui/material/Link";
@@ -12,7 +11,7 @@ import "./Register.css";
 import Paper from "@mui/material/Paper";
 import MenuItem from "@mui/material/MenuItem";
 import Agent from "../../app/api/agent";
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, FormEvent } from "react";
 import FormHelperText from "@mui/material/FormHelperText";
 import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -35,7 +34,7 @@ const defaultTheme = createTheme();
 export default function SignUp() {
   const { authenticated, setAuthenticated } = useContext(AuthContext);
   const navigate = useNavigate();
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const name: string = data.get("name")?.toString() ?? "";
@@ -129,38 +128,38 @@ export default function SignUp() {
     }
   }, []);
 
-  const [name, setName] = useState("");
-  const [validName, setValidName] = useState(false);
-  const [nameFocus, setNameFocus] = useState(false);
+  const [name, setName] = useState<string>("");
+  const [validName, setValidName] = useState<boolean>(false);
+  const [nameFocus, setNameFocus] = useState<boolean>(false);
 
-  const [firstName, setFirstName] = useState("");
-  const [validFirstName, setValidFirstName] = useState(false);
-  const [firstNameFocus, setFirstNameFocus] = useState(false);
+  const [firstName, setFirstName] = useState<string>("");
+  const [validFirstName, setValidFirstName] = useState<boolean>(false);
+  const [firstNameFocus, setFirstNameFocus] = useState<boolean>(false);
 
-  const [lastName, setLastName] = useState("");
-  const [validLastName, setValidLastName] = useState(false);
-  const [lastNameFocus, setLastNameFocus] = useState(false);
+  const [lastName, setLastName] = useState<string>("");
+  const [validLastName, setValidLastName] = useState<boolean>(false);
+  const [lastNameFocus, setLastNameFocus] = useState<boolean>(false);
 
-  const [email, setEmail] = useState("");
-  const [validEmail, setValidEmail] = useState(false);
-  const [emailFocus, setEmailFocus] = useState(false);
+  const [email, setEmail] = useState<string>("");
+  const [validEmail, setValidEmail] = useState<boolean>(false);
+  const [emailFocus, setEmailFocus] = useState<boolean>(false);
 
-  const [rut, setRut] = useState("");
-  const [validRut, setValidRut] = useState(false);
-  const [rutFocus, setRutFocus] = useState(false);
+  const [rut, setRut] = useState<string>("");
+  const [validRut, setValidRut] = useState<boolean>(false);
+  const [rutFocus, setRutFocus] = useState<boolean>(false);
 
-  const [pwd, setPwd] = useState("");
-  const [validPwd, setValidPwd] = useState(false);
-  const [pwdFocus, setPwdFocus] = useState(false);
+  const [pwd, setPwd] = useState<string>("");
+  const [validPwd, setValidPwd] = useState<boolean>(false);
+  const [pwdFocus, setPwdFocus] = useState<boolean>(false);
 
   const [matchPwd, setMatchPwd] = useState("");
-  const [validMatch, setValidMatch] = useState(false);
-  const [matchFocus, setMatchFocus] = useState(false);
+  const [validMatch, setValidMatch] = useState<boolean>(false);
+  const [matchFocus, setMatchFocus] = useState<boolean>(false);
 
-  const [career, setCareer] = useState("");
+  const [career, setCareer] = useState<string>("");
   const [careers, setCareers] = useState([]);
 
-  const [checked, setChecked] = React.useState(false);
+  const [checked, setChecked] = React.useState<boolean>(false);
   const [errorType, setErrorType] = useState<
     null | "rut" | "email" | "general"
   >(null);

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FormEvent } from 'react';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
@@ -31,8 +31,8 @@ export default function LogIn() {
   const [pwd, setPwd] = useState<string>('');
   const[email,setemail] = useState<string>('');
 
-  const [validPwd, setValidPwd] = useState(false);
-  const [validEmail, setValidEmail] = useState(false);
+  const [validPwd, setValidPwd] = useState<boolean>(false);
+  const [validEmail, setValidEmail] = useState<boolean>(false);
   
   const [emailError,setEmailError] = useState<boolean>(false);
   const [pwdError,setPwdError] = useState<boolean>(false);
@@ -40,14 +40,14 @@ export default function LogIn() {
   const emailErrorMsg:string = "Ingrese un correo electrónico válido";
   const pwdErrorMsg:string = "El campo esta vacío";
 
-  const [checked, setChecked] = React.useState(false);
-  const [disabled, setDisabled] = React.useState(true);
+  const [checked, setChecked] = useState<boolean>(false);
+  const [disabled, setDisabled] = useState<boolean>(true);
 
   const handleChange = () => {
     setChecked((prev) => !prev);
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const Email: string = data.get("email")?.toString() ?? "";
