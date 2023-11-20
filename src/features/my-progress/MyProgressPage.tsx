@@ -12,7 +12,6 @@ import {
 import { Box, Skeleton, Typography, useMediaQuery } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import agent from "../../app/api/agent";
-import SubjectCard from "./SubjectCard";
 import { Subject } from "../../app/models/Subject";
 import { useSubjectCodeContext } from "../../app/context/SubjectCodeContext";
 import { PreRequisite } from "../../app/models/PreRequisite";
@@ -25,6 +24,7 @@ import SquareOutlinedIcon from "@mui/icons-material/SquareOutlined";
 import NearMeIcon from "@mui/icons-material/NearMe";
 import Colors from "../../app/static/colors";
 import GenerateTabTitle from "../../app/utils/TitleGenerator";
+import ProgressCard from "./ProgressCard";
 
 // Item style
 const Item = styled(Paper)(({ theme }) => ({
@@ -138,33 +138,6 @@ const MyProgressPage = () => {
       .catch((err) => console.log(err));
   }, []);
 
-  // Set pre-requisites colors
-  const setPreRequisitesColors = (subjectPreRequisites: string[]) => {
-    if (!subjectPreRequisites) return;
-    setPreReqCodes(subjectPreRequisites);
-  };
-
-  // Set post-requisites colors
-  const setPostRequisitesColors = (subjectPostRequisites: string[]) => {
-    if (!subjectPostRequisites) return;
-    setPostReqCodes(subjectPostRequisites);
-  };
-
-  // Handle mouse over subject
-  const handleMouseOverSubject = (subjectCode: string) => {
-    const subjectPreRequisites = preRequisites.current[subjectCode];
-    setPreRequisitesColors(subjectPreRequisites);
-
-    const subjectPostRequisites = PostRequisites.current[subjectCode];
-    setPostRequisitesColors(subjectPostRequisites);
-  };
-
-  // Handle mouse exit subject
-  const handleMouseExitSubject = () => {
-    setPreReqCodes([]);
-    setPostReqCodes([]);
-  };
-
   // Map subjects by semester
   const mapSubjectsBySemester = (
     subjects: Subject[],
@@ -174,11 +147,9 @@ const MyProgressPage = () => {
     subjects.map((subject) => {
       if (subject.semester === semester) {
         const mappedSubject = (
-          <SubjectCard
+          <ProgressCard
             key={subject.code}
             subject={subject}
-            onMouseOver={handleMouseOverSubject}
-            onMouseExit={handleMouseExitSubject}
             isLargeScreen={isLargeScreen}
           />
         );

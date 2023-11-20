@@ -1,8 +1,7 @@
 import React from "react";
 import { Paper } from "@mui/material";
 import { Subject } from "../../app/models/Subject";
-import { useSubjectCodeContext } from "../../app/context/SubjectCodeContext";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Colors from "../../app/static/colors";
 
 const style = {
@@ -16,9 +15,6 @@ const style = {
   padding: "0.5rem",
   fontSize: "1rem",
   backgroundColor: "#FFF",
-  "&:hover": {
-    backgroundColor: Colors.primaryGray,
-  },
 };
 
 const getFontSizeByLength = (
@@ -40,13 +36,8 @@ const getFontSizeByLength = (
 const selectStyle = (
   name: string,
   isLargeScreen: boolean,
-  isPreReq: boolean,
-  isPostReq: boolean
+  backgroundColor: string
 ) => {
-  let backgroundColor = "#FFFFFF";
-  if (isPostReq) backgroundColor = Colors.secondaryGreen;
-  if (isPreReq) backgroundColor = Colors.secondaryYellow;
-
   return {
     ...getFontSizeByLength(style, name, isLargeScreen),
     backgroundColor,
@@ -55,40 +46,55 @@ const selectStyle = (
 
 interface Props {
   subject: Subject;
-  onMouseOver: (code: string) => void;
-  onMouseExit: () => void;
   isLargeScreen: boolean;
 }
 
-const SubjectCard = ({
-  subject,
-  isLargeScreen,
-  onMouseOver,
-  onMouseExit,
-}: Props) => {
+const ProgressCard = ({ subject, isLargeScreen }: Props) => {
   const { code, name } = subject;
 
-  const { preReqCodes, postReqCodes } = useSubjectCodeContext();
+  const [backgroundColor, setBackgroundColor] = useState<string>(Colors.white);
 
-  const [isPreReq, setIsPreReq] = useState(false);
-  const [isPostReq, setIsPostReq] = useState(false);
+  const handleMouseOut = () => {
+    if (
+      backgroundColor === Colors.secondaryYellow ||
+      backgroundColor === Colors.secondaryGreen
+    )
+      return;
+    setBackgroundColor(Colors.white);
+  };
 
-  useEffect(() => {
-    setIsPreReq(preReqCodes.includes(code));
-    setIsPostReq(postReqCodes.includes(code));
-  }, [preReqCodes, postReqCodes, code]);
+  const handleMouseOver = () => {
+    if (
+      backgroundColor === Colors.secondaryYellow ||
+      backgroundColor === Colors.secondaryGreen
+    )
+      return;
+    setBackgroundColor(Colors.primaryGray);
+  };
+
+  const handleOnClick = () => {
+    if (backgroundColor === Colors.secondaryGreen) {
+      setBackgroundColor(Colors.white);
+    }
+    if (
+      backgroundColor === Colors.primaryGray ||
+      backgroundColor === Colors.white
+    ) {
+      setBackgroundColor(Colors.secondaryGreen);
+    }
+  };
 
   return (
     <Paper
-      onMouseOver={() => onMouseOver(code)}
-      onMouseOut={() => onMouseExit()}
-      onClick={() => console.log("Hello World")}
+      onMouseOver={() => handleMouseOver()}
+      onMouseOut={() => handleMouseOut()}
+      onClick={() => handleOnClick()}
       elevation={3}
-      sx={selectStyle(name, isLargeScreen, isPreReq, isPostReq)}
+      sx={selectStyle(name, isLargeScreen, backgroundColor)}
     >
       {name}
     </Paper>
   );
 };
 
-export default SubjectCard;
+export default ProgressCard;

@@ -6,7 +6,7 @@ import Register from "../../features/auth/Register";
 import Login from "../../features/auth/Login";
 import Navbar from "../components/Navbar";
 import HomePage from "../../features/home/HomePage";
-import MyProgressPage from '../../features/interactive-mesh/MyProgressPage';
+import MyProgressPage from '../../features/my-progress/MyProgressPage';
 import InteractiveMeshPage from '../../features/interactive-mesh/InteractiveMeshPage';
 
 type Props = {};
