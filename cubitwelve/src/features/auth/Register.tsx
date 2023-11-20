@@ -187,7 +187,7 @@ return (
           backgroundColor: '#F5F5F5',    
        }}>
   
-           <Typography component="h1" variant="h5" className='font-title' sx={{marginBottom:1, mt:3,  fontSize: '2rem', // Tamaño de texto predeterminado
+           <Typography component="h1" variant="h5" className='font-title' sx={{marginBottom:1, mt:3,  fontSize: '2rem', 
             [defaultTheme.breakpoints.down('md')]: {
               fontSize: '1.5rem', 
             },
@@ -199,7 +199,7 @@ return (
            </Typography>
 
           <Grid container spacing={1.1} justifyContent="flex-end" >
-              <Grid item xs={12} >
+              <Grid item xs={12} container >
               {checked && (
                   <Fade in={checked}>
                       <Alert severity="error" sx={{
@@ -235,6 +235,7 @@ return (
                       sx: {
                         fontSize: '14px',
                         fontFamily: 'Raleway',
+                        
                       }
                   }}
                   sx={{   
@@ -247,10 +248,11 @@ return (
                   />
                   
               </Grid>
-            <Grid item xs={12} md={12} spacing={1.1} container >
-              <Grid item xs={6} md={6}>
+            <Grid item xs={12} spacing={1.1} container  >
+              
+              <Grid item xs={6} md={6}  >
                 <TextField
-                  helperText={!validFirstName && firstNameFocus ? "Debe contener entre 3 y 30 caracteres, solo letras." : ""}
+                  helperText={!validFirstName && firstNameFocus ? "Debe contener entre 3 y 30 caracteres, solo letras." : null}
                   aria-describedby="flNote"
                   onChange={(e) => setFirstName(e.target.value)}
                   aria-invalid={validFirstName ? "false" : "true"}
@@ -258,7 +260,7 @@ return (
                   onBlur={() => setFirstNameFocus(false)}
                   value={firstName}
                   error={!validFirstName && firstNameFocus} 
-                  autoComplete="off"
+                  autoComplete="off"  
                   name="firstName"
                   required
                   variant='filled'                  
@@ -274,14 +276,15 @@ return (
                 }}
                   sx={{
                     ml:3,
-                    boxShadow: ((!validFirstName && !firstNameFocus)|| validFirstName ) ? '0px 2px 2px rgba(0, 0, 0, 0.2)' : 'none',
+                    boxShadow: ((!validFirstName && !firstNameFocus) || validFirstName ) ? '0px 2px 2px rgba(0, 0, 0, 0.2)' : 'none',
                   }}
                 />
                 
               </Grid>
-              <Grid item xs={6} md={6}>
+              <Grid item xs={6} md={6} container>
+                
                 <TextField
-                  helperText={!validLastName && lastNameFocus ? "Debe contener entre 3 y 30 caracteres, solo letras." : ""}
+                  helperText={(!validLastName && lastNameFocus) ? "Debe contener entre 3 y 30 caracteres, solo letras." : null}
                   required
                   onChange={(e) => setLastName(e.target.value)}
                   aria-invalid={validLastName ? "false" : "true"}
@@ -300,19 +303,21 @@ return (
                     sx: {
                       fontSize: '14px',
                       fontFamily: 'Raleway',
-                      width:'100%'                        
+                                          
                     }
                 }}
                   sx={{
+                    width:'89.5%',
                     mr:3,
-                    boxShadow: ((!validLastName && !lastNameFocus)|| validLastName ) ? '0px 2px 2px rgba(0, 0, 0, 0.2)' : 'none',
+                    // boxShadow: ((!validLastName && !lastNameFocus)|| validLastName )? '0px 2px 2px rgba(0, 0, 0, 0.2)' : 'none',
+                    boxShadow: ((!validLastName&&lastNameFocus) || firstNameFocus) ? 'none' : '0px 2px 2px rgba(0, 0, 0, 0.2)',
                   }}
                 />
                   
               </Grid>
 
             </Grid>
-            <Grid item xs={12} >
+            <Grid item xs={12} container >
               
                   <TextField
                   required
@@ -354,7 +359,7 @@ return (
                   )}
                    
               </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={12} container>
               <TextField
                 error={!validEmail && emailFocus}
                 aria-invalid={validEmail ? "false" : "true"}
@@ -395,7 +400,7 @@ return (
                   </FormHelperText>
                 )}
             </Grid>
-            <Grid item xs={12} >
+            <Grid item xs={12} container >
                   <TextField
                   required
                   onChange={(e) => setCareer(e.target.value)}
@@ -415,6 +420,7 @@ return (
                   sx={{
                       width:'89.5%',
                       ml:3,
+                      mr:3,
                       boxShadow:'0px 2px 2px rgba(0, 0, 0, 0.2)',                
                   }}
                   >
@@ -427,7 +433,7 @@ return (
                   </TextField>              
               </Grid>
                   
-            <Grid item xs={12}>      
+            <Grid item xs={12} container>      
               <TextField    
                 required
                 fullWidth
@@ -454,6 +460,7 @@ return (
               sx={{
                   width:'89.5%',
                   ml:3,
+                  mr:3,
                   boxShadow:'0px 2px 2px rgba(0, 0, 0, 0.2)',                 
               }}      
               />      
@@ -470,7 +477,7 @@ return (
                   </FormHelperText>
                 )}
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={12} container>
                   <TextField
                   required
                   onChange={(e) => setMatchPwd(e.target.value)}
@@ -496,12 +503,23 @@ return (
                       width:'89.5%',
                       ml:3,
                       mb:1,
+                      mr:3,
                       boxShadow:'0px 2px 2px rgba(0, 0, 0, 0.2)',         
                   }}
                   />
               </Grid>
               <Grid item>
-              <Typography variant="body2" color="textPrimary" textAlign="right" >
+              <Typography variant="body2" color="textPrimary" textAlign="right" sx={{
+                            [defaultTheme.breakpoints.down('md')]: {
+                              fontSize: '0.8rem',
+                              
+                               
+                            },
+                            [defaultTheme.breakpoints.down('sm')]: {
+                              fontSize: '0.7rem',
+                              ml:3,
+                            },  
+              }}>
                   ¿Ya tienes cuenta?{' '}
                   <Link
                       marginRight={3}
@@ -519,7 +537,7 @@ return (
           </Grid>
           <Button
             type="submit"
-            style={{ backgroundColor: '#1C478F', width:'89%', height:50}}
+            style={{ backgroundColor: '#1C478F', width:'89.5%', height:50}}
             variant="contained"
             sx={{ mt: 2, mb: 2, fontFamily: 'Raleway, sans-serif', fontSize: '20px', fontWeight: 300,textTransform: 'none'}}
             disabled={!validPwd || !validMatch || !validRut || !validName || !validFirstName || !validLastName || !validEmail ? true : false}
