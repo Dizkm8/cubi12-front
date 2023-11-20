@@ -112,6 +112,7 @@ const InteractiveMeshPage = () => {
   const mapSubjectsBySemesterSkeleton = (amount: number) => {
     return Array.from({ length: amount }).map((_, index) => (
       <Skeleton
+        key={index}
         variant="rectangular"
         sx={{ width: "100%", height: "10vh", margin: "0.5rem 0" }}
       />
