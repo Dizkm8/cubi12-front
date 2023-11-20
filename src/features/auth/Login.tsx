@@ -57,7 +57,7 @@ const LogIn = () => {
     } else {
       setDisabled(false);
     }
-  });
+  }, [emailError, pwdError, email, pwd]);
 
   const handleFieldChange = (event: any) => {
     const { name, value } = event.target;
