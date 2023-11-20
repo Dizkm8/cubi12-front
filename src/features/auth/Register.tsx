@@ -32,7 +32,7 @@ const defaultTheme = createTheme();
 
 export default function SignUp() {
   document.title = GenerateTabTitle("Regístrate");
-  const { authenticated, setAuthenticated } = useContext(AuthContext);
+  const { setAuthenticated } = useContext(AuthContext);
   const navigate = useNavigate();
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
