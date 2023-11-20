@@ -73,7 +73,7 @@ const subjectsState = [
   },
 ];
 
-const MyProgress = () => {
+const MyProgressPage = () => {
   document.title = GenerateTabTitle("Mi Progreso");
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const preRequisites = useRef<PreRequisite>({});
@@ -199,6 +199,7 @@ const MyProgress = () => {
   const mapSubjectsBySemesterSkeleton = (amount: number) => {
     return Array.from({ length: amount }).map((_, index) => (
       <Skeleton
+        key={index}
         variant="rectangular"
         sx={{ width: "100%", height: "10vh", margin: "0.5rem 0" }}
       />
@@ -353,4 +354,4 @@ const MyProgress = () => {
   );
 };
 
-export default MyProgress;
+export default MyProgressPage;

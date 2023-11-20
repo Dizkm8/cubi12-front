@@ -6,8 +6,8 @@ import Register from "../../features/auth/Register";
 import Login from "../../features/auth/Login";
 import Navbar from "../components/Navbar";
 import HomePage from "../../features/home/HomePage";
-import InteractiveMesh from "../../features/interactive-mesh/InteractiveMesh";
-import MyProgress from "../../features/interactive-mesh/MyProgress";
+import MyProgressPage from '../../features/interactive-mesh/MyProgressPage';
+import InteractiveMeshPage from '../../features/interactive-mesh/InteractiveMeshPage';
 
 type Props = {};
 
@@ -34,10 +34,10 @@ const Routes = (props: Props) => {
         }
       >
         <Route path="/" element={<HomePage />} />
-        <Route path="/interactive-mesh" element={<InteractiveMesh />} />
+        <Route path="/interactive-mesh" element={<InteractiveMeshPage />} />
         <Route element={<PrivateRoutes />}>
           <Route path="/edit-profile" element={<EditProfile />} />
-          <Route path="/my-progress" element={<MyProgress />} />
+          <Route path="/my-progress" element={<MyProgressPage />} />
         </Route>
       </Route>
       <Route path="/register" element={<Register />} />

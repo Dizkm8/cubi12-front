@@ -26,7 +26,7 @@ const romanNumeral = (numeral: number) => {
   return numerals[numeral - 1];
 };
 
-const InteractiveMesh = () => {
+const InteractiveMeshPage = () => {
   document.title = GenerateTabTitle("Malla Interactiva");
 
   const [subjects, setSubjects] = useState<Subject[]>([]);
@@ -146,4 +146,4 @@ const InteractiveMesh = () => {
   );
 };
 
-export default InteractiveMesh;
+export default InteractiveMeshPage;
