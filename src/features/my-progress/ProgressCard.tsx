@@ -4,6 +4,7 @@ import { Subject } from "../../app/models/Subject";
 import { useState } from "react";
 import Colors from "../../app/static/colors";
 
+// subject style
 const style = {
   display: "flex",
   justifyContent: "center",
@@ -17,6 +18,7 @@ const style = {
   backgroundColor: "#FFF",
 };
 
+// subject fontsize
 const getFontSizeByLength = (
   currentStyle: any,
   phrase: string,
@@ -49,7 +51,9 @@ interface Props {
   isLargeScreen: boolean;
 }
 
-const ProgressCard = ({ subject, isLargeScreen }: Props) => {
+export const addSubject: string[] = [];
+
+export const ProgressCard = ({ subject, isLargeScreen }: Props) => {
   const { code, name } = subject;
 
   const [backgroundColor, setBackgroundColor] = useState<string>(Colors.white);
@@ -72,15 +76,23 @@ const ProgressCard = ({ subject, isLargeScreen }: Props) => {
     setBackgroundColor(Colors.primaryGray);
   };
 
+  // if user click on subject, change color
   const handleOnClick = () => {
+    // if user click on green subject, change to white
     if (backgroundColor === Colors.secondaryGreen) {
       setBackgroundColor(Colors.white);
+      const index = addSubject.indexOf(code);
+      if (index > -1) {
+        addSubject.splice(index, 1);
+      }
     }
+    // if user click on subject default, change to green
     if (
       backgroundColor === Colors.primaryGray ||
       backgroundColor === Colors.white
     ) {
       setBackgroundColor(Colors.secondaryGreen);
+      addSubject.push(code);
     }
   };
 

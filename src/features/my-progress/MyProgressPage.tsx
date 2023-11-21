@@ -24,7 +24,8 @@ import SquareOutlinedIcon from "@mui/icons-material/SquareOutlined";
 import NearMeIcon from "@mui/icons-material/NearMe";
 import Colors from "../../app/static/colors";
 import GenerateTabTitle from "../../app/utils/TitleGenerator";
-import ProgressCard from "./ProgressCard";
+import ProgressCard, { addSubject } from "./ProgressCard";
+import { add } from "lodash";
 
 // Item style
 const Item = styled(Paper)(({ theme }) => ({
@@ -37,10 +38,12 @@ const Item = styled(Paper)(({ theme }) => ({
 // Semester roman numerals for items
 const numerals = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"];
 
+// Semester roman numeral generator
 const romanNumeral = (numeral: number) => {
   return numerals[numeral - 1];
 };
 
+// Subjects state
 const subjectsState = [
   {
     type: "Asignaturas aprobadas",
@@ -166,6 +169,16 @@ const MyProgressPage = () => {
     setHelpDialogOpen(false);
   };
 
+  const saveSubjects = () => {
+    console.log("Saving subjects...");
+    console.log(addSubject);
+  };
+
+  const cancelSubjects = () => {
+    console.log("Canceling subjects...");
+    
+  };
+
   // Map subjects by semester skeleton
   const mapSubjectsBySemesterSkeleton = (amount: number) => {
     return Array.from({ length: amount }).map((_, index) => (
@@ -201,6 +214,7 @@ const MyProgressPage = () => {
           onClick={openHelpDialog}
         />
       </Grid>
+      {/* Interactive Mesh Skeleton */}
       <Grid container spacing={2} sx={{ margin: "0.1rem 0 1rem" }}>
         <Grid item xs={1} />
         {Array.from({ length: 10 }).map((_, index) => (
@@ -213,6 +227,7 @@ const MyProgressPage = () => {
         ))}
         <Grid item xs={1} />
       </Grid>
+      {/* Subject types bottom info */}
       <Grid
         container
         alignItems="center"
@@ -242,6 +257,7 @@ const MyProgressPage = () => {
             fontSize: "85%",
             marginLeft: "auto",
           }}
+          onClick={cancelSubjects}
         >
           Cancelar
         </Button>
@@ -260,10 +276,12 @@ const MyProgressPage = () => {
             fontFamily: "Raleway, sans-serif",
             fontSize: "85%",
           }}
+          onClick={saveSubjects}
         >
           Guardar
         </Button>
       </Grid>
+      {/* Subject types pop-up info */}
       <Dialog open={helpDialogOpen} onClose={closeHelpDialog}>
         <DialogTitle
           style={{
