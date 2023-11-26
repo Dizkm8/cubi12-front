@@ -1,23 +1,36 @@
 import React from "react";
-import { Paper, Typography, Grid, TextField, Button, MenuItem, Box, FormHelperText } from "@mui/material";
-import { primaryBlueColor, primaryOrangeColor, primaryRedColor } from "../../app/static/colors";
-import { SyntheticEvent, useRef, useState, useEffect } from "react";
+import { Paper, Typography, Grid, TextField, Button, MenuItem, Box, FormHelperText, Dialog, DialogTitle, 
+    DialogContent, DialogActions, useMediaQuery, useTheme } from "@mui/material";
+import { SyntheticEvent, useRef, useState, useEffect, useContext } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import Agent from "../../app/api/agent";
 import { startCase } from "lodash";
+import { AuthContext } from "../../app/context/AuthContext";
+import { useNavigate } from "react-router-dom";
+import Colors from "../../app/static/colors";
+import GenerateTabTitle from "../../app/utils/TitleGenerator";
 
 // Regex for password and names
 const pwdRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{10,16}$/;
 const namesRegex = /^[A-Za-záéíóúüñÁÉÍÓÚÜÑ\s]{3,50}$/;
 
 // Messages
-const nothingUpdate = "Nada que actualizar";
-const invalidPwd = "Contraseña(s) inválida(s)";
-const invalidNames = "Nombre(s) inválido(s)";
+const invalidPwd = "Contraseña inválida";
+const invalidNames = "Debe contener mínimo 3 letras, sin caracteres especiales o números";
 const updateSuccess = "Actualización exitosa";
 
-export default function EditProfile() {
+const EditProfile = () => {
+    document.title = GenerateTabTitle("Editar Perfil");
+    const theme = useTheme();
+    const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
+
+    // Get authenticated state from context
+    const { setAuthenticated } = useContext(AuthContext);
+
+    // Navigate hook
+    const navigate = useNavigate();
+
     // Error message reference
     const errorRef = useRef<HTMLInputElement>(null);
 
@@ -36,18 +49,30 @@ export default function EditProfile() {
     const [pwd, setPwd] = useState("");
     const [matchPwd, setMatchPwd] = useState("");
 
+    // Valid names state
+    const [validName, setValidName] = useState(false);
+    const [validFirstLastName, setValidFirstLastName] = useState(false);
+    const [validSecondLastName, setValidSecondLastName] = useState(false);
+
     // Valid password state
+    const [validCurrentPwd, setCurrentValidPwd] = useState(true);
     const[validPwd, setValidPwd] = useState(false);
     const [validMatchPwd, setValidMatchPwd] = useState(false);
 
-    // Error message state
-    const [message, setMessage] = useState("");
+    // Success message state
+    const [success, setSuccess] = useState(false);
+    const [changePasswordSuccess, setChangePasswordSuccess] = useState(false);
+
+    // Different names state
+    const [differentNames, setDifferentNames] = useState(false);
 
     // Tab state
     const [tab, setTab] = useState("info");
 
     // User state
     const [user, setUser] = useState({name: "", firstLastName: "", secondLastName: "", rut: "", email: "", career: { id: "", name: "" }});
+
+    
     
     // Load user data
     useEffect(() => {
@@ -63,6 +88,35 @@ export default function EditProfile() {
             })
             .catch(error => { console.error("Error loading user:", error); });
     }, []);
+
+    // Check if names are valid
+    useEffect(() => {
+        if (name === user.name && firstLastName === user.firstLastName && secondLastName === user.secondLastName) {
+            setDifferentNames(false);
+        } else{
+            setDifferentNames(true);
+            setSuccess(false);
+        }
+
+        if (namesRegex.test(name)) {
+            setValidName(true);
+        } else {
+            setValidName(false);
+        }
+
+        if (namesRegex.test(firstLastName)) {
+            setValidFirstLastName(true);
+        } else {
+            setValidFirstLastName(false);
+        }
+
+        if (namesRegex.test(secondLastName)) {
+            setValidSecondLastName(true);
+        } else {
+            setValidSecondLastName(false);
+        }
+
+    }, [name, firstLastName, secondLastName, user.name, user.firstLastName, user.secondLastName]);
 
     // Check if password is valid
     useEffect(() => {
@@ -81,17 +135,14 @@ export default function EditProfile() {
 
     // Update URL
     useEffect(() => {
-        setMessage("");
         const getUrl = new URL(window.location.href);
         getUrl.searchParams.set('tab', tab);
         window.history.pushState({}, '', getUrl.href);
-    }, [tab])
-
+        setSuccess(false);
+    }, [tab]);
+    
     // Clear inputs
     const clearInputs = (names: boolean, password: boolean, cancel: boolean) => {
-        // Clear error message
-        setMessage("");
-
         // Clear name inputs
         if (names) {
             if(!cancel) {
@@ -121,7 +172,9 @@ export default function EditProfile() {
                 user.name = name;
                 user.firstLastName = firstLastName;
                 user.secondLastName = secondLastName;
-                setMessage(updateSuccess);
+                setSuccess(true);
+                setDifferentNames(false);
+
             })
             .catch(error => {
                 console.error("Error updating profile:", error);
@@ -134,33 +187,36 @@ export default function EditProfile() {
         Agent.Auth.updatePassword({password, currentPassword, repeatedPassword})
             .then(response => { 
                 console.log("Password updated successfully!");
-                setMessage(updateSuccess);
+                setChangePasswordSuccess(true);
             })
             .catch(error => {
                 console.error("Error updating password:", error);
-                setMessage(invalidPwd);
+                setCurrentValidPwd(false);
             });
     }
+
+    const handleCloseDialog = () => {
+        setChangePasswordSuccess(false);
+        Agent.token = "";
+        localStorage.setItem("token", "");
+        setAuthenticated(false);
+        navigate("/");
+    };
 
     // Handle my info submit
     const handleSubmitMyInfo = async (e: SyntheticEvent) => {
         // Prevent default submit action
         e.preventDefault();
 
-        // Clear error message
-        setMessage("");
         // Check if inputs are empty
         if ((!name && !firstLastName && !secondLastName)) {
-            setMessage(nothingUpdate);
             return;
         } else if (name === user.name && firstLastName === user.firstLastName && secondLastName === user.secondLastName) {
-            setMessage(nothingUpdate);
             return;
         }
 
         // Check if inputs are valids
         if (!namesRegex.test(name) || !namesRegex.test(firstLastName) || !namesRegex.test(secondLastName)) {
-            setMessage(invalidNames);
             return;
         }
 
@@ -190,19 +246,14 @@ export default function EditProfile() {
         // Prevent default submit action
         e.preventDefault();
 
-         // Clear error message
-        setMessage("");
-
         // Check if inputs are empty
         if (!pwd) {
             clearInputs(false, true, false);
-            setMessage(nothingUpdate);
             return;
         } 
         // Check if passwords match or its valid
         else if (!pwdRegex.test(pwd) || !pwdRegex.test(currentPwd) ||pwd !== matchPwd || !currentPwd) {
             clearInputs(false, true, false);
-            setMessage(invalidPwd);
             return;
         }
     
@@ -235,8 +286,7 @@ export default function EditProfile() {
         <Grid container
         direction="column"
         justifyContent="center"
-        alignItems="center"
-        gap="2rem">
+        alignItems="center">
             <Box
                 sx={{
                     marginTop: "2%",
@@ -245,13 +295,20 @@ export default function EditProfile() {
                     alignItems: "center",
                 }}
             >
-                <Paper elevation={3} style={{ padding: "40px", border: `1px solid ${primaryBlueColor}`, borderRadius: "8px", width: "70vh", height: "fit-content" }}>
+                <Paper elevation={3} style={{ 
+                    padding: tab === "info" ? "1%" : "1.6%", 
+                    border: `1px solid ${Colors.primaryBlue}`, 
+                    borderRadius: "8px", 
+                    width: tab === "password" && !isSmallScreen ? "64.5%" : tab === "info" && !isSmallScreen ? "40%" : "" &&
+                    tab && isSmallScreen ? "60%" : "", 
+                    height: "fit-content" 
+                }}>
                     {/* Title */}
-                    <Grid container>
+                    <Grid container style={{ padding: isSmallScreen ? "row" : "column",}}>
                         {/* My info title */}
                         <Grid item style={{ marginLeft: "5%", marginRight: "10%" }}>
                             <Typography
-                                fontSize={38}
+                                fontSize={"180%"}
                                 color={tab === "info" ? "black" : "#626262"}
                                 variant="h5"
                                 style={{ cursor: "pointer" }}
@@ -260,12 +317,12 @@ export default function EditProfile() {
                             </Typography>
                         </Grid>
                         {/* Password title */}
-                        <Grid item style={{ marginLeft: "5%", marginRight: "10%" }}>
+                        <Grid item style={{ marginRight: "5%" }}>
                             <Typography
-                                fontSize={38}
+                                fontSize={"180%"}
                                 color={tab === "password" ? "black" : "#626262"}
                                 variant="h5"
-                                style={{ cursor: "pointer" }}
+                                style={{ cursor: "pointer", marginLeft: isSmallScreen ? "10%" : "" }}
                                 onClick={() => setTab("password") }
                             >Contraseña
                             </Typography>
@@ -273,14 +330,14 @@ export default function EditProfile() {
                     </Grid>
                     {/* My info page */}
                     {tab === "info" && (
-                        <Box component="form" noValidate onSubmit={handleSubmitMyInfo} sx={{ mt: 3 }}>
-                            <Grid container spacing={4} sx={{ marginTop: "5px" }}>
+                        <Box component="form" noValidate onSubmit={handleSubmitMyInfo}>
+                            <Grid container spacing={2} sx={{ padding: "2vh", width: "100%", height: "100%" }}>
                                 {/* Name input */}
                                 <Grid item xs={12} sm={6}>
                                     <Typography
                                         style={{
                                             marginRight: "100%",
-                                            fontSize: 18,
+                                            fontSize: "85%",
                                             fontFamily: "Raleway, sans-serif"
                                         }}
                                     >
@@ -290,6 +347,8 @@ export default function EditProfile() {
                                     id="name"
                                     name="name"
                                     value={name}
+                                    error={!validName}
+                                    helperText={!validName ? invalidNames : ""}
                                     required
                                     fullWidth
                                     onChange={(e) => setName(e.target.value)}
@@ -300,7 +359,7 @@ export default function EditProfile() {
                                     <Typography
                                         style={{
                                             marginRight: "100%",
-                                            fontSize: 18,
+                                            fontSize: "85%",
                                             fontFamily: "Raleway, sans-serif"
                                         }}
                                     >
@@ -321,7 +380,7 @@ export default function EditProfile() {
                                     <Typography
                                         style={{
                                             marginRight: "100%",
-                                            fontSize: 18,
+                                            fontSize: "85%",
                                             fontFamily: "Raleway, sans-serif"
                                         }}
                                     >
@@ -332,6 +391,8 @@ export default function EditProfile() {
                                     name="firstLastName"
                                     value={firstLastName}
                                     label=""
+                                    error={!validFirstLastName}
+                                    helperText={!validFirstLastName ? invalidNames : ""}
                                     required
                                     fullWidth
                                     onChange={(e) => setFirstLastName(e.target.value)}
@@ -342,7 +403,7 @@ export default function EditProfile() {
                                     <Typography
                                         style={{
                                             marginRight: "100%",
-                                            fontSize: 18,
+                                            fontSize: "85%",
                                             fontFamily: "Raleway, sans-serif"
                                         }}
                                     >
@@ -353,6 +414,8 @@ export default function EditProfile() {
                                     name="secondLastName"
                                     value={secondLastName}
                                     label=""
+                                    error={!validSecondLastName}
+                                    helperText={!validSecondLastName ? invalidNames : ""}
                                     required
                                     fullWidth
                                     onChange={(e) => setSecondLastName(e.target.value)}
@@ -363,7 +426,7 @@ export default function EditProfile() {
                                     <Typography
                                         style={{
                                             marginRight: "100%",
-                                            fontSize: 18,
+                                            fontSize: "85%",
                                             fontFamily: "Raleway, sans-serif"
                                         }}
                                     >
@@ -384,7 +447,7 @@ export default function EditProfile() {
                                     <Typography
                                         style={{
                                             marginRight: "100%",
-                                            fontSize: 18,
+                                            fontSize: "85%",
                                             fontFamily: "Raleway, sans-serif"
                                         }}
                                     >
@@ -397,6 +460,7 @@ export default function EditProfile() {
                                         label=""
                                         select
                                         fullWidth
+                                        disabled
                                         onChange={(e) => setCareer(e.target.value)}
                                         >
                                         {<MenuItem value={career}>
@@ -406,25 +470,33 @@ export default function EditProfile() {
                                 </Grid>
                                 {/* Buttons */}
                                 <Grid item xs={12}>
-                                    {/* Error message */}
-                                    {message && (
+                                    {/* Success message */}
+                                    {success && (
                                         <Typography color="error" style={{ marginBottom: "16px", textAlign: "right" }}>
-                                            {message}
+                                            {updateSuccess}
                                         </Typography>
                                     )}
-                                    <Box sx={{ display: "flex", marginTop: "2%", marginBottom: "2%", justifyContent: "flex-end" }}>
+                                    <Box sx={{ 
+                                        marginLeft: "2%",
+                                        display: "flex", 
+                                        flexDirection: isSmallScreen ? "column" : "row",
+                                        marginTop: "2%", 
+                                        marginBottom: "2%", 
+                                        justifyContent: "flex-end" 
+                                    }}>
                                         {/* Cancel button */}
                                         <Button
                                             name="cancel-button"
                                             variant="outlined"
                                             color="secondary"
                                             style={{
-                                                color: `${primaryRedColor}`,
-                                                marginRight: "16px",
+                                                color: `${Colors.primaryRed}`,
+                                                marginRight: isSmallScreen ? "0" : "16px",
+                                                marginBottom: isSmallScreen ? "16px" : "0",
                                                 transform: "scale(1.05)",
                                                 boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.2)",
                                                 fontFamily: "Raleway, sans-serif",
-                                                fontSize: "1rem",
+                                                fontSize: "85%",
                                             }}
                                             onClick={() => { clearInputs(true, false, true) }}
                                         >Cancelar
@@ -435,13 +507,14 @@ export default function EditProfile() {
                                             type="submit"
                                             variant="contained"
                                             color="warning"
+                                            disabled={!validName || !validFirstLastName || !validSecondLastName || !differentNames}
                                             style={{
                                                 transform: "scale(1.05)",
                                                 color: "black",
-                                                backgroundColor: `${primaryOrangeColor}`,
+                                                backgroundColor: validName && validFirstLastName && validSecondLastName && differentNames ? `${Colors.primaryOrange}` : `${Colors.primaryGray}`,
                                                 boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.2)",
                                                 fontFamily: "Raleway, sans-serif",
-                                                fontSize: "1rem",
+                                                fontSize: "85%",
                                             }}
                                         >Guardar
                                         </Button>
@@ -452,14 +525,14 @@ export default function EditProfile() {
                     )}
                     {/* Password page */}
                     {tab === "password" && (
-                        <Box component="form" noValidate onSubmit={handleSubmitPassword} sx={{ mt: 3 }}>
-                            <Grid container spacing={6} sx={{ marginTop: "5px" }}>
+                        <Box component="form" noValidate onSubmit={handleSubmitPassword}>
+                            <Grid container spacing={2} sx={{ padding: "2vh", width: "100%", height: "100%" }}>
                                 {/* Password input */}
                                 <Grid item xs={12}>
                                     <Typography
                                         style={{
                                             marginRight: "100%",
-                                            fontSize: 18,
+                                            fontSize: "85%",
                                             fontFamily: "Raleway, sans-serif"
                                         }}
                                     >
@@ -471,6 +544,7 @@ export default function EditProfile() {
                                         type="password"
                                         value={ currentPwd }
                                         label=""
+                                        helperText={!validCurrentPwd ? invalidPwd : ""}
                                         required
                                         fullWidth
                                         onChange={(e) => [setCurrentPwd(e.target.value)]}
@@ -481,7 +555,7 @@ export default function EditProfile() {
                                     <Typography
                                         style={{
                                             marginRight: "100%",
-                                            fontSize: 18,
+                                            fontSize: "85%",
                                             fontFamily: "Raleway, sans-serif"
                                         }}
                                     >
@@ -510,7 +584,7 @@ export default function EditProfile() {
                                     <Typography
                                         style={{
                                             marginRight: "100%",
-                                            fontSize: 18,
+                                            fontSize: "85%",
                                             fontFamily: "Raleway, sans-serif"
                                         }}
                                     >
@@ -536,25 +610,33 @@ export default function EditProfile() {
                                 </Grid>
                                 {/* Buttons */}
                                 <Grid item xs={12}>
-                                    {/* Error message */}
-                                    {message && (
+                                    {/* Success message */}
+                                    {success && (
                                         <Typography color="error" style={{ marginBottom: "16px", textAlign: "right" }}>
-                                            {message}
+                                            {updateSuccess}
                                         </Typography>
                                     )}
-                                    <Box sx={{ display: "flex", marginTop: "2%", marginBottom: "2%", justifyContent: "flex-end" }}>
+                                    <Box sx={{ 
+                                        marginLeft: "2%",
+                                        display: "flex", 
+                                        flexDirection: isSmallScreen ? "column" : "row",
+                                        marginTop: "2%", 
+                                        marginBottom: "2%", 
+                                        justifyContent: "flex-end" 
+                                    }}>
                                         {/* Cancel button */}
                                         <Button
                                             name="cancel-button"
                                             variant="outlined"
                                             color="secondary"
                                             style={{
-                                                color: `${primaryRedColor}`,
-                                                marginRight: "16px",
+                                                color: `${Colors.primaryRed}`,
+                                                marginRight: isSmallScreen ? "0" : "16px",
+                                                marginBottom: isSmallScreen ? "16px" : "0",
                                                 transform: "scale(1.05)",
                                                 boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.2)",
                                                 fontFamily: "Raleway, sans-serif",
-                                                fontSize: ""
+                                                fontSize: "85%",
                                             }}
                                             onClick={() => { clearInputs(false, true, true) }}
                                         >Cancelar
@@ -565,13 +647,14 @@ export default function EditProfile() {
                                             type="submit"
                                             variant="contained"
                                             color= "warning"
+                                            disabled={!validPwd || !validMatchPwd}
                                             style={{
                                                 transform: "scale(1.05)",
                                                 color: "black",
-                                                backgroundColor: `${primaryOrangeColor}`,
+                                                backgroundColor: validPwd && validMatchPwd ? `${Colors.primaryOrange}` : `${Colors.primaryGray}`,
                                                 boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.2)",
                                                 fontFamily: "Raleway, sans-serif",
-                                                fontSize: "1rem"
+                                                fontSize: "85%",
                                             }}
                                         >Actualizar
                                         </Button>
@@ -582,6 +665,22 @@ export default function EditProfile() {
                     )}
                 </Paper>
             </Box>
+            {/* Successful Password Change Dialog */}
+            <Dialog open={changePasswordSuccess} onClose={handleCloseDialog}>
+                <DialogTitle>Cambio de Contraseña Exitoso</DialogTitle>
+                <DialogContent>
+                    <Typography>
+                        Tu contraseña se ha cambiado exitosamente. Se cerrará la sesión.
+                    </Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseDialog} color="primary">
+                        Cerrar Sesión
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Grid>
     );
 }
+
+export default EditProfile;

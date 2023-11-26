@@ -1,10 +1,13 @@
+import React from 'react';
 import { useLocation } from "react-router-dom";
 import { Routes as Router, Navigate, Outlet, Route } from "react-router-dom";
 import EditProfile from "../../features/home/EditProfile";
 import Register from "../../features/auth/Register";
 import Login from "../../features/auth/Login";
-import Navbar from "../components/Navbar"
+import Navbar from "../components/Navbar";
 import HomePage from "../../features/home/HomePage";
+import MyProgressPage from '../../features/my-progress/MyProgressPage';
+import InteractiveMeshPage from '../../features/interactive-mesh/InteractiveMeshPage';
 
 type Props = {};
 
@@ -14,14 +17,14 @@ const PrivateRoutes = () => {
     return <Navigate to="/" replace />;
   }
   return <Outlet />;
-}
+};
 
 const Routes = (props: Props) => {
   const location = useLocation();
-  const views = ["/", "/edit-profile", "/interactive-mesh", "/my-progress"]
-  return(
+  const views = ["/", "/edit-profile", "/interactive-mesh", "/my-progress"];
+  return (
     <Router>
-      <Route 
+      <Route
         path="/"
         element={
           <div>
@@ -31,10 +34,10 @@ const Routes = (props: Props) => {
         }
       >
         <Route path="/" element={<HomePage />} />
+        <Route path="/interactive-mesh" element={<InteractiveMeshPage />} />
         <Route element={<PrivateRoutes />}>
           <Route path="/edit-profile" element={<EditProfile />} />
-          <Route path="/interactive-mesh" element={<EditProfile />} />
-          <Route path="/my-progress" element={<EditProfile />} />
+          <Route path="/my-progress" element={<MyProgressPage />} />
         </Route>
       </Route>
       <Route path="/register" element={<Register />} />
