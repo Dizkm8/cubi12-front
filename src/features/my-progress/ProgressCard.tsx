@@ -35,6 +35,7 @@ const getFontSizeByLength = (
   else return currentStyle;
 };
 
+// subject style
 const selectStyle = (
   name: string,
   isLargeScreen: boolean,
@@ -49,50 +50,55 @@ const selectStyle = (
 interface Props {
   subject: Subject;
   isLargeScreen: boolean;
+  backgroundColorButton: string;
 }
 
-export const addSubject: string[] = [];
+export const addSubject: object[] = [];
 
-export const ProgressCard = ({ subject, isLargeScreen }: Props) => {
+export const ProgressCard = ({ subject, isLargeScreen, backgroundColorButton }: Props) => {
   const { code, name } = subject;
 
-  const [backgroundColor, setBackgroundColor] = useState<string>(Colors.white);
+  const [backgroundColor, setBackgroundColor] = useState<string>(backgroundColorButton);
 
+  // if user hover on subject, change color
   const handleMouseOut = () => {
     if (
       backgroundColor === Colors.secondaryYellow ||
+      backgroundColor === Colors.primaryGray ||
       backgroundColor === Colors.secondaryGreen
     )
       return;
     setBackgroundColor(Colors.white);
   };
 
+  // if user hover out subject, change color
   const handleMouseOver = () => {
     if (
       backgroundColor === Colors.secondaryYellow ||
+      backgroundColor === Colors.primaryGray ||
       backgroundColor === Colors.secondaryGreen
     )
       return;
-    setBackgroundColor(Colors.primaryGray);
+    setBackgroundColor(Colors.secondarySkyblue);
   };
 
   // if user click on subject, change color
   const handleOnClick = () => {
     // if user click on green subject, change to white
-    if (backgroundColor === Colors.secondaryGreen) {
+    if (backgroundColor === Colors.primaryGray) {
       setBackgroundColor(Colors.white);
-      const index = addSubject.indexOf(code);
-      if (index > -1) {
-        addSubject.splice(index, 1);
-      }
+      // remove subject from array
+      addSubject.splice(addSubject.findIndex((e: any) => e.subjectCode === code), 1);
     }
+    
     // if user click on subject default, change to green
     if (
-      backgroundColor === Colors.primaryGray ||
+      backgroundColor === Colors.secondarySkyblue ||
       backgroundColor === Colors.white
     ) {
-      setBackgroundColor(Colors.secondaryGreen);
-      addSubject.push(code);
+      setBackgroundColor(Colors.primaryGray);
+      // add subject to array
+      addSubject.push({ subjectCode: code, isAdded: true});
     }
   };
 
