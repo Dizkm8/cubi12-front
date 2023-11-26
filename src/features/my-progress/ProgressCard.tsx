@@ -3,6 +3,7 @@ import { Paper } from "@mui/material";
 import { Subject } from "../../app/models/Subject";
 import { useState } from "react";
 import Colors from "../../app/static/colors";
+import { approvedSubjects } from "./MyProgressPage";
 
 // subject style
 const style = {
@@ -53,7 +54,7 @@ interface Props {
   backgroundColorButton: string;
 }
 
-export const addSubject: string[] = [];
+export const modifySubject: object[] = [];
 
 export const ProgressCard = ({ subject, isLargeScreen, backgroundColorButton }: Props) => {
   const { code, name } = subject;
@@ -64,7 +65,8 @@ export const ProgressCard = ({ subject, isLargeScreen, backgroundColorButton }: 
   const handleMouseOut = () => {
     if (
       backgroundColor === Colors.secondaryYellow ||
-      backgroundColor === Colors.primaryGray
+      backgroundColor === Colors.primaryGray ||
+      backgroundColor === Colors.secondaryGreen
     )
       return;
     setBackgroundColor(Colors.white);
@@ -74,7 +76,8 @@ export const ProgressCard = ({ subject, isLargeScreen, backgroundColorButton }: 
   const handleMouseOver = () => {
     if (
       backgroundColor === Colors.secondaryYellow ||
-      backgroundColor === Colors.primaryGray
+      backgroundColor === Colors.primaryGray ||
+      backgroundColor === Colors.secondaryGreen
     )
       return;
     setBackgroundColor(Colors.secondarySkyblue);
@@ -85,10 +88,12 @@ export const ProgressCard = ({ subject, isLargeScreen, backgroundColorButton }: 
     // if user click on green subject, change to white
     if (backgroundColor === Colors.primaryGray) {
       setBackgroundColor(Colors.white);
-      const index = addSubject.indexOf(code);
-      if (index > -1) {
-        // remove subject from array
-        addSubject.splice(index, 1);
+      // if subject is in approved subjects array, add subject to delete on array
+      if(approvedSubjects.includes(code)) {
+        modifySubject.push({ subjectCode: code, isAdded: false});
+      }
+      else {
+        modifySubject.splice(modifySubject.findIndex((e: any) => e.subjectCode === code), 1);
       }
     }
     
@@ -99,7 +104,12 @@ export const ProgressCard = ({ subject, isLargeScreen, backgroundColorButton }: 
     ) {
       setBackgroundColor(Colors.primaryGray);
       // add subject to array
-      addSubject.push(code);
+      if(!approvedSubjects.includes(code)) {
+        modifySubject.push({ subjectCode: code, isAdded: true});
+      }
+      else {
+        modifySubject.splice(modifySubject.findIndex((e: any) => e.subjectCode === code), 1);
+      }
     }
   };
 

@@ -24,7 +24,8 @@ import SquareOutlinedIcon from "@mui/icons-material/SquareOutlined";
 import NearMeIcon from "@mui/icons-material/NearMe";
 import Colors from "../../app/static/colors";
 import GenerateTabTitle from "../../app/utils/TitleGenerator";
-import ProgressCard, { addSubject } from "./ProgressCard";
+import ProgressCard, { modifySubject } from "./ProgressCard";
+import { forEach } from "lodash";
 
 // Item style
 const Item = styled(Paper)(({ theme }) => ({
@@ -75,6 +76,8 @@ const subjectsState = [
   },
 ];
 
+export const approvedSubjects = ["iaf-001", "cal-001", "alg-001"];
+
 const MyProgressPage = () => {
   document.title = GenerateTabTitle("Mi Progreso");
   const [subjects, setSubjects] = useState<Subject[]>([]);
@@ -82,7 +85,7 @@ const MyProgressPage = () => {
   const PostRequisites = useRef<PostRequisite>({});
   const [loading, setLoading] = useState<boolean>(false);
 
-  const { setPreReqCodes, setPostReqCodes } = useSubjectCodeContext();
+  const { preReqCodes, postReqCodes } = useSubjectCodeContext();
 
   const isLargeScreen = useMediaQuery("(min-width:1600px)");
 
@@ -138,6 +141,20 @@ const MyProgressPage = () => {
       .catch((err) => console.log(err));
   }, []);
 
+  // Validate if subject has pre-requisites
+  const hasPreReq = (subjectCode: string) => {
+    let hasPreReq = true;
+    const preReq = preRequisites.current[subjectCode];
+    if (!preReq && !approvedSubjects.includes(subjectCode)) hasPreReq = false;
+    else if (preReq) {
+      forEach(preReq, (value) => {
+        if (!approvedSubjects.includes(value)) hasPreReq = false;
+      });
+    }
+
+    return hasPreReq;
+  };
+
   // Map subjects by semester
   const mapSubjectsBySemester = (
     subjects: Subject[],
@@ -151,7 +168,11 @@ const MyProgressPage = () => {
             key={subject.code}
             subject={subject}
             isLargeScreen={isLargeScreen}
-            backgroundColorButton={ addSubject.includes(subject.code) ? Colors.primaryGray : Colors.white }
+            backgroundColorButton={ 
+              approvedSubjects.includes(subject.code) ? Colors.primaryGray : 
+              hasPreReq(subject.code) ? Colors.secondaryGreen :
+              Colors.white
+            }
           />
         );
         return mappedSubject;
@@ -169,14 +190,14 @@ const MyProgressPage = () => {
 
   const saveSubjects = () => {
     console.log("Saving subjects...");
-    console.log(addSubject);
+    console.log(modifySubject);
   };
 
   const cancelSubjects = () => {
     console.log("Canceling subjects...");
     // Delete all subjects from array
-    addSubject.splice(0, addSubject.length);
-    console.log(addSubject);
+    modifySubject.splice(0, modifySubject.length);
+    console.log(modifySubject);
   };
 
   // Map subjects by semester skeleton
