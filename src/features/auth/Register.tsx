@@ -25,7 +25,7 @@ import { LoadingButton } from '@mui/lab';
 
 const rutRegex = /^(\d{1,3}(\.\d{3})*-\d|(\d{1,3}(\.\d{3})*-[Kk]))$/;
 const pwdRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{10,16}$/;
-const emailRegex = /^([A-Z]+|[a-z]+)+[.]([A-Z]+|[a-z]+)+[0-9]*(@(.+[.])*ucn[.]cl){1}$/;
+const emailRegex = /^[a-zA-Z]+(?:\.[a-zA-Z]+)?\d*?@(?:([a-zA-Z]+\.)+)?\ucn\.cl$/;
 const nameRegex = /^[a-zA-Z]{3,50}$/;
 const flNameRegex = /^[a-zA-Z]{3,30}$/;
 
@@ -206,7 +206,7 @@ return (
            </Typography>
 
           <Grid container spacing={1.1} justifyContent="flex-end" >
-              <Grid item xs={12} >
+              <Grid item xs={12}  container>
               {checked && (
                   <Fade in={checked}>
                       <Alert severity="error" sx={{
@@ -255,7 +255,7 @@ return (
                   
               </Grid>
             <Grid item xs={12} md={12} spacing={1.1} container >
-              <Grid item xs={6} md={6}>
+              <Grid item xs={6} md={6} container>
                 <TextField
                   helperText={!validFirstName && firstNameFocus ? "Debe contener entre 3 y 30 caracteres, solo letras." : ""}
                   aria-describedby="flNote"
@@ -281,12 +281,13 @@ return (
                 }}
                   sx={{
                     ml:3,
-                    boxShadow: ((!validFirstName && !firstNameFocus)|| validFirstName ) ? '0px 2px 2px rgba(0, 0, 0, 0.2)' : 'none',
+                    //boxShadow: ((!validFirstName && !firstNameFocus)|| validFirstName ) ? '0px 2px 2px rgba(0, 0, 0, 0.2)' : 'none',
+                    boxShadow: ((!validFirstName&&firstNameFocus) || lastNameFocus) ? 'none' : '0px 2px 2px rgba(0, 0, 0, 0.2)',
                   }}
                 />
                 
               </Grid>
-              <Grid item xs={6} md={6}>
+              <Grid item xs={6} md={6} container>
                 <TextField
                   helperText={!validLastName && lastNameFocus ? "Debe contener entre 3 y 30 caracteres, solo letras." : ""}
                   required
@@ -312,14 +313,15 @@ return (
                 }}
                   sx={{
                     mr:3,
-                    boxShadow: ((!validLastName && !lastNameFocus)|| validLastName ) ? '0px 2px 2px rgba(0, 0, 0, 0.2)' : 'none',
+                    //boxShadow: ((!validLastName && !lastNameFocus)|| validLastName ) ? '0px 2px 2px rgba(0, 0, 0, 0.2)' : 'none',
+                    boxShadow: ((!validLastName&&lastNameFocus) || firstNameFocus) ? 'none' : '0px 2px 2px rgba(0, 0, 0, 0.2)',
                   }}
                 />
                   
               </Grid>
 
             </Grid>
-            <Grid item xs={12} >
+            <Grid item xs={12} container >
               
                   <TextField
                   required
@@ -361,7 +363,7 @@ return (
                   )}
                    
               </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={12} container>
               <TextField
                 error={!validEmail && emailFocus}
                 aria-invalid={validEmail ? "false" : "true"}
@@ -402,7 +404,7 @@ return (
                   </FormHelperText>
                 )}
             </Grid>
-            <Grid item xs={12} >
+            <Grid item xs={12} container >
                   <TextField
                   required
                   onChange={(e) => setCareer(e.target.value)}
@@ -422,6 +424,7 @@ return (
                   sx={{
                       width:'89.5%',
                       ml:3,
+                      mr:3,
                       boxShadow:'0px 2px 2px rgba(0, 0, 0, 0.2)',                
                   }}
                   >
@@ -434,7 +437,7 @@ return (
                   </TextField>              
               </Grid>
                   
-            <Grid item xs={12}>      
+            <Grid item xs={12} container>      
               <TextField    
                 required
                 fullWidth
@@ -461,6 +464,7 @@ return (
               sx={{
                   width:'89.5%',
                   ml:3,
+                  mr:3,
                   boxShadow:'0px 2px 2px rgba(0, 0, 0, 0.2)',                 
               }}      
               />      
@@ -477,7 +481,7 @@ return (
                   </FormHelperText>
                 )}
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={12} container>
                   <TextField
                   required
                   onChange={(e) => setMatchPwd(e.target.value)}
@@ -503,12 +507,24 @@ return (
                       width:'89.5%',
                       ml:3,
                       mb:1,
+                      mr:3,
                       boxShadow:'0px 2px 2px rgba(0, 0, 0, 0.2)',         
                   }}
                   />
               </Grid>
               <Grid item>
-              <Typography variant="body2" color="textPrimary" textAlign="right" >
+              <Typography variant="body2" color="textPrimary" textAlign="right" sx={{
+                            [defaultTheme.breakpoints.down('md')]: {
+                              fontSize: '0.8rem',
+                              
+                               
+                            },
+                            [defaultTheme.breakpoints.down('sm')]: {
+                              fontSize: '0.7rem',
+                              ml:3,
+                              mr:3,
+                            },  
+              }}>
                   ¿Ya tienes cuenta?{' '}
                   <Link
                       marginRight={3}

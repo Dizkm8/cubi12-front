@@ -16,12 +16,13 @@ import Alert from "@mui/material/Alert";
 import Fade from "@mui/material/Fade";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import GenerateTabTitle from "../../app/utils/TitleGenerator";
+import { LoadingButton } from '@mui/lab';
 
 const defaultTheme = createTheme();
 
 const pwdRegex: RegExp = /^.+$/;
 const emailRegex: RegExp =
-  /^([A-Z]+|[a-z]+)+[.]([A-Z]+|[a-z]+)+[0-9]*(@(.+[.])*ucn[.]cl){1}$/;
+/^[a-zA-Z]+(?:\.[a-zA-Z]+)?\d*?@(?:([a-zA-Z]+\.)+)?\ucn\.cl$/;
 
 
 const LogIn = () => {
@@ -42,6 +43,8 @@ const LogIn = () => {
   const [disabled, setDisabled] = React.useState(true);
 
   const isMobile = useMediaQuery(defaultTheme.breakpoints.down("sm"));
+
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -72,6 +75,7 @@ const LogIn = () => {
     }
   };
   const sendData = (email: string, password: string) => {
+    setLoading(true);
     Agent.Auth.login({ email, password })
       .then((data) => {
         Agent.token = data;
@@ -82,7 +86,11 @@ const LogIn = () => {
       .catch((err) => {
         console.log(err);
         setChecked(true);
+      })
+      .finally(()=>{
+        setLoading(false);
       });
+
   };
 
   return (
@@ -234,7 +242,8 @@ const LogIn = () => {
                   </Typography>
                 </Grid>
                 <Grid item xs={12}>
-                  <Button
+                  <LoadingButton
+                    loading={loading}
                     type="submit"
                     style={{
                       backgroundColor: "#1C478F",
@@ -254,7 +263,7 @@ const LogIn = () => {
                     disabled={disabled}
                   >
                     Ingresar
-                  </Button>
+                  </LoadingButton>
                 </Grid>
                 <Grid item xs={12}>
                   <Button
