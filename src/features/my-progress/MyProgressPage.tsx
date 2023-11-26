@@ -25,7 +25,6 @@ import NearMeIcon from "@mui/icons-material/NearMe";
 import Colors from "../../app/static/colors";
 import GenerateTabTitle from "../../app/utils/TitleGenerator";
 import ProgressCard, { addSubject } from "./ProgressCard";
-import { add } from "lodash";
 
 // Item style
 const Item = styled(Paper)(({ theme }) => ({
@@ -100,15 +99,13 @@ const MyProgressPage = () => {
 
   // Load user data
   useEffect(() => {
-    if (localStorage.getItem("token")) {
-      Agent.Auth.profile()
-        .then((response) => {
-          setUser(response);
-        })
-        .catch((error) => {
-          console.error("Error loading user:", error);
-        });
-    }
+    Agent.Auth.profile()
+    .then((response) => {
+      setUser(response);
+    })
+    .catch((error) => {
+      console.error("Error loading user:", error);
+    });
   }, []);
 
   // Load subjects
@@ -154,6 +151,7 @@ const MyProgressPage = () => {
             key={subject.code}
             subject={subject}
             isLargeScreen={isLargeScreen}
+            backgroundColorButton={ addSubject.includes(subject.code) ? Colors.primaryGray : Colors.white }
           />
         );
         return mappedSubject;
@@ -176,7 +174,9 @@ const MyProgressPage = () => {
 
   const cancelSubjects = () => {
     console.log("Canceling subjects...");
-    
+    // Delete all subjects from array
+    addSubject.splice(0, addSubject.length);
+    console.log(addSubject);
   };
 
   // Map subjects by semester skeleton
@@ -192,12 +192,14 @@ const MyProgressPage = () => {
 
   return (
     <Box sx={{ flexGrow: 1, padding: "0 1rem 0", marginTop: "1.5rem" }}>
+      {/* My Progress */}
       <Grid
         container
         alignItems="center"
         justifyContent="space-between"
         style={{ marginLeft: "9%", width: "84%" }}
       >
+        {/* Title */}
         <Typography variant="h3" component="span">
           ¡Hola{" "}
           <Typography
@@ -214,7 +216,7 @@ const MyProgressPage = () => {
           onClick={openHelpDialog}
         />
       </Grid>
-      {/* Interactive Mesh Skeleton */}
+      {/* My Progress Mesh */}
       <Grid container spacing={2} sx={{ margin: "0.1rem 0 1rem" }}>
         <Grid item xs={1} />
         {Array.from({ length: 10 }).map((_, index) => (

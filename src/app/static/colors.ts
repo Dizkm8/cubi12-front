@@ -10,6 +10,8 @@ const secondaryGreen = "#93FFC0";
 
 const secondaryYellow = "#FFDE9A";
 
+const secondarySkyblue = "#2CC5E0";
+
 const white = "#FFFFFF";
 
 const black = "#000000";
@@ -21,6 +23,7 @@ const Colors = {
   primaryRed,
   secondaryGreen,
   secondaryYellow,
+  secondarySkyblue,
   white
 };
 
