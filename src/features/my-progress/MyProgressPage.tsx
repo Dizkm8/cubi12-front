@@ -76,7 +76,7 @@ const subjectsState = [
   },
 ];
 
-export const approvedSubjects = ["iaf-001", "cal-001", "alg-001"];
+export const approvedSubjects = ["iaf-001", "cal-001", "alg-001", "ing-001", "iue-001", "fge-001", "pii-001"];
 
 const MyProgressPage = () => {
   document.title = GenerateTabTitle("Mi Progreso");
@@ -190,7 +190,7 @@ const MyProgressPage = () => {
 
   const saveSubjects = () => {
     console.log("Saving subjects...");
-    console.log(modifySubject);
+    console.log(JSON.stringify(modifySubject, null, 2));
   };
 
   const cancelSubjects = () => {

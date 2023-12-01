@@ -82,7 +82,6 @@ const SubjectCard = ({
     <Paper
       onMouseOver={() => onMouseOver(code)}
       onMouseOut={() => onMouseExit()}
-      onClick={() => console.log("Hello World")}
       elevation={3}
       sx={selectStyle(name, isLargeScreen, isPreReq, isPostReq)}
     >
