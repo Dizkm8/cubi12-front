@@ -62,7 +62,7 @@ const subjectsState = [
   {
     type: "Asignaturas fuera de proyección",
     description:
-      "Aquellas asignaturas que puedes cursar pero que, probablemente, no pruebas inscribir por dispersión",
+      "Aquellas asignaturas que puedes cursar pero que, probablemente, no puedas inscribir por dispersión",
     icon: (
       <SquareIcon style={{ fontSize: "200%", color: Colors.secondaryYellow }} />
     ),
@@ -70,7 +70,7 @@ const subjectsState = [
   {
     type: "Asignaturas no cursadas",
     description:
-      "Aquellas asignaturas que aun no cursas y que, probablemente, todavía no puedes cursar",
+      "Aquellas asignaturas que aún no cursas y que, probablemente, todavía no puedes cursar",
     icon: <SquareOutlinedIcon style={{ fontSize: "200%", color: "#000" }} />,
   },
 ];
@@ -155,6 +155,21 @@ const MyProgressPage = () => {
     return hasPreReq;
   };
 
+  // Validate if subject is out of projection
+  const isOutOfProjection = (subjectCode: string) => {
+    let isOutOfProjection = false;
+    const postReq = PostRequisites.current[subjectCode];
+    if (!postReq && !approvedSubjects.includes(subjectCode))
+      isOutOfProjection = true;
+    else if (postReq) {
+      forEach(postReq, (value) => {
+        if (approvedSubjects.includes(value)) isOutOfProjection = true;
+      });
+    }
+
+    return isOutOfProjection;
+  };
+
   // Map subjects by semester
   const mapSubjectsBySemester = (
     subjects: Subject[],
@@ -195,18 +210,23 @@ const MyProgressPage = () => {
     const newSubjects = modifySubject.filter((subject: any) => subject.isAdded)
     .map((subject: any) => subject.subjectCode)
     .filter((subjectCode: string) => !approvedSubjects.includes(subjectCode)); // Exclude subject codes that are already in approvedSubjects
-    
-    
     // Add newSubjects to approvedSubjects
     approvedSubjects = approvedSubjects.concat(newSubjects);
-    console.log(approvedSubjects);
+    setLoading(true);
+    agent.Subjects.list()
+      .then((res: Subject[]) => {
+        res.forEach((s) => (s.name = subjectsCapitalize(s.name)));
+        setSubjects(res);
+      })
+      .catch((err) => console.log(err))
+      .finally(() => setLoading(false));
   };
 
   const cancelSubjects = () => {
     console.log("Canceling subjects...");
     // Delete all subjects from array
     modifySubject.splice(0, modifySubject.length);
-    console.log(modifySubject);
+    console.log(subjects);
   };
 
   // Map subjects by semester skeleton
@@ -246,7 +266,7 @@ const MyProgressPage = () => {
           onClick={openHelpDialog}
         />
       </Grid>
-      {/* Subject types bottom info */}
+      {/* Subject types top info */}
       <Grid
         container
         alignItems="center"

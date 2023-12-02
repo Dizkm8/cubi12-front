@@ -177,7 +177,7 @@ const InteractiveMeshPage = () => {
           onClick={openHelpDialog}
         />
       </Grid>
-      {/* Subject types bottom info */}
+      {/* Subject types top info */}
       <Grid
         container
         alignItems="center"

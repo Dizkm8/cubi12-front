@@ -100,7 +100,8 @@ export const ProgressCard = ({ subject, isLargeScreen, backgroundColorButton }: 
     // if user click on subject default, change to green
     if (
       backgroundColor === Colors.secondarySkyblue ||
-      backgroundColor === Colors.white
+      backgroundColor === Colors.white ||
+      backgroundColor === Colors.secondaryGreen
     ) {
       setBackgroundColor(Colors.primaryGray);
       // add subject to array
