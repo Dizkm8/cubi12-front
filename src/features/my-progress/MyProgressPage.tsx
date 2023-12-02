@@ -12,7 +12,7 @@ import {
 import { Box, Skeleton, Typography, useMediaQuery } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import agent from "../../app/api/agent";
-import { Subject } from "../../app/models/Subject";
+import { Subject } from '../../app/models/Subject';
 import { useSubjectCodeContext } from "../../app/context/SubjectCodeContext";
 import { PreRequisite } from "../../app/models/PreRequisite";
 import { PostRequisite } from "../../app/models/PostRequisite";
@@ -76,7 +76,7 @@ const subjectsState = [
   },
 ];
 
-const approvedSubjects = ["iaf-001", "cal-001", "alg-001"];
+let approvedSubjects = ["iaf-001", "cal-001", "alg-001"];
 
 const MyProgressPage = () => {
   document.title = GenerateTabTitle("Mi Progreso");
@@ -84,6 +84,7 @@ const MyProgressPage = () => {
   const preRequisites = useRef<PreRequisite>({});
   const PostRequisites = useRef<PostRequisite>({});
   const [loading, setLoading] = useState<boolean>(false);
+  const semester = useState<number>(1)[0];
 
   const { preReqCodes, postReqCodes } = useSubjectCodeContext();
 
@@ -99,6 +100,8 @@ const MyProgressPage = () => {
   });
 
   const [helpDialogOpen, setHelpDialogOpen] = useState(false);
+
+  const [refreshKey, setRefreshKey] = useState(0);
 
   // Validate if subject has pre-requisites
   const hasPreReq = (subjectCode: string) => {
@@ -192,6 +195,18 @@ const MyProgressPage = () => {
   const saveSubjects = () => {
     console.log("Saving subjects...");
     console.log(addSubject);
+      // Map addSubject to an array of subject codes
+  const newSubjects = addSubject.filter((subject: any) => subject.isAdded)
+  .map((subject: any) => subject.subjectCode)
+  .filter((subjectCode: string) => !approvedSubjects.includes(subjectCode)); // Exclude subject codes that are already in approvedSubjects
+  
+  
+  // Add newSubjects to approvedSubjects
+  approvedSubjects = approvedSubjects.concat(newSubjects);
+
+  console.log(approvedSubjects);
+  
+  
   };
 
   const cancelSubjects = () => {

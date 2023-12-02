@@ -60,7 +60,6 @@ export default function SignUp() {
         })
         .catch((err)=>{
           console.log(err);
-          
           if (!err?.response) {
             setChecked(true);
             setErrorType('general');
