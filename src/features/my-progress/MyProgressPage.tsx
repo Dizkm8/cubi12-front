@@ -76,7 +76,6 @@ const subjectsState = [
   },
 ];
 
-let approvedSubjects = ["iaf-001", "cal-001", "alg-001"];
 
 const MyProgressPage = () => {
   document.title = GenerateTabTitle("Mi Progreso");
@@ -102,6 +101,7 @@ const MyProgressPage = () => {
   const [helpDialogOpen, setHelpDialogOpen] = useState(false);
 
   const [refreshKey, setRefreshKey] = useState(0);
+  const [approvedSubjects, setApprovedSubjects] = useState<string[]>(["iaf-001", "cal-001", "alg-001","est-001"]);
 
   // Validate if subject has pre-requisites
   const hasPreReq = (subjectCode: string) => {
@@ -111,7 +111,7 @@ const MyProgressPage = () => {
     else if (preReq) {
       forEach(preReq, (value) => {
         if (!approvedSubjects.includes(value)) hasPreReq = false;
-        console.log(subjectCode, preReq, value, hasPreReq);
+        //console.log(subjectCode, preReq, value, hasPreReq);
       });
     }
 
@@ -202,9 +202,11 @@ const MyProgressPage = () => {
   
   
   // Add newSubjects to approvedSubjects
-  approvedSubjects = approvedSubjects.concat(newSubjects);
+  setApprovedSubjects([...approvedSubjects, ...newSubjects]);
 
   console.log(approvedSubjects);
+
+  setRefreshKey(oldKey => oldKey + 1);
   
   
   };
@@ -228,7 +230,7 @@ const MyProgressPage = () => {
   };
 
   return (
-    <Box sx={{ flexGrow: 1, padding: "0 1rem 0", marginTop: "1.5rem" }}>
+    <Box key={refreshKey }sx={{ flexGrow: 1, padding: "0 1rem 0", marginTop: "1.5rem" }}>
       {/* My Progress */}
       <Grid
         container

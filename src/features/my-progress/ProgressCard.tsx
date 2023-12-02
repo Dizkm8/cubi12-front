@@ -53,12 +53,13 @@ interface Props {
   backgroundColorButton: string;
 }
 
-export const addSubject: object[] = [];
+export let addSubject: object[] = [];
 
 export const ProgressCard = ({ subject, isLargeScreen, backgroundColorButton }: Props) => {
   const { code, name } = subject;
-
+  
   const [backgroundColor, setBackgroundColor] = useState<string>(backgroundColorButton);
+  const [addSubjectTest, setAddSubject] = useState<object[]>([]);
 
   // if user hover on subject, change color
   const handleMouseOut = () => {
@@ -88,7 +89,7 @@ export const ProgressCard = ({ subject, isLargeScreen, backgroundColorButton }: 
     if (backgroundColor === Colors.primaryGray) {
       setBackgroundColor(Colors.white);
       // remove subject from array
-      addSubject.splice(addSubject.findIndex((e: any) => e.subjectCode === code), 1);
+      setAddSubject(prevSubjects => prevSubjects.filter((e: any) => e.subjectCode !== code));
     }
     
     // if user click on subject default, change to green
@@ -98,9 +99,13 @@ export const ProgressCard = ({ subject, isLargeScreen, backgroundColorButton }: 
     ) {
       setBackgroundColor(Colors.primaryGray);
       // add subject to array
-      addSubject.push({ subjectCode: code, isAdded: true});
+      if (!addSubject.some((e: any) => e.subjectCode === code)) {
+        setAddSubject(prevSubjects => [...prevSubjects, { subjectCode: code, isAdded: true }]);
+      }
     }
   };
+
+  addSubject = addSubjectTest;
 
   return (
     <Paper
