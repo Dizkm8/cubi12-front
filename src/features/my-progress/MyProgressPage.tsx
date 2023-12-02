@@ -75,7 +75,7 @@ const subjectsState = [
   },
 ];
 
-export const approvedSubjects = ["iaf-001", "cal-001", "alg-001", "ing-001", "iue-001", "fge-001", "pii-001"];
+export let approvedSubjects = ["iaf-001", "cal-001", "alg-001", "ing-001", "iue-001", "fge-001", "pii-001"];
 
 const MyProgressPage = () => {
   document.title = GenerateTabTitle("Mi Progreso");
@@ -83,6 +83,7 @@ const MyProgressPage = () => {
   const preRequisites = useRef<PreRequisite>({});
   const PostRequisites = useRef<PostRequisite>({});
   const [loading, setLoading] = useState<boolean>(false);
+  const semester = useState<number>(1)[0];
 
   const isLargeScreen = useMediaQuery("(min-width:1600px)");
 
@@ -96,6 +97,8 @@ const MyProgressPage = () => {
   });
 
   const [helpDialogOpen, setHelpDialogOpen] = useState(false);
+
+  const [refreshKey, setRefreshKey] = useState(0);
 
   // Load user data
   useEffect(() => {
@@ -188,6 +191,15 @@ const MyProgressPage = () => {
   const saveSubjects = () => {
     console.log("Saving subjects...");
     console.log(JSON.stringify(modifySubject, null, 2));
+    // Map modifySubject to an array of subject codes
+    const newSubjects = modifySubject.filter((subject: any) => subject.isAdded)
+    .map((subject: any) => subject.subjectCode)
+    .filter((subjectCode: string) => !approvedSubjects.includes(subjectCode)); // Exclude subject codes that are already in approvedSubjects
+    
+    
+    // Add newSubjects to approvedSubjects
+    approvedSubjects = approvedSubjects.concat(newSubjects);
+    console.log(approvedSubjects);
   };
 
   const cancelSubjects = () => {
