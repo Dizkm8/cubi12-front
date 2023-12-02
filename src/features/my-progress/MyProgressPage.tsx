@@ -13,7 +13,6 @@ import { Box, Skeleton, Typography, useMediaQuery } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import agent from "../../app/api/agent";
 import { Subject } from "../../app/models/Subject";
-import { useSubjectCodeContext } from "../../app/context/SubjectCodeContext";
 import { PreRequisite } from "../../app/models/PreRequisite";
 import { PostRequisite } from "../../app/models/PostRequisite";
 import { subjectsCapitalize } from "../../app/utils/StringUtils";
@@ -84,8 +83,6 @@ const MyProgressPage = () => {
   const preRequisites = useRef<PreRequisite>({});
   const PostRequisites = useRef<PostRequisite>({});
   const [loading, setLoading] = useState<boolean>(false);
-
-  const { preReqCodes, postReqCodes } = useSubjectCodeContext();
 
   const isLargeScreen = useMediaQuery("(min-width:1600px)");
 
@@ -237,24 +234,11 @@ const MyProgressPage = () => {
           onClick={openHelpDialog}
         />
       </Grid>
-      {/* My Progress Mesh */}
-      <Grid container spacing={2} sx={{ margin: "0.1rem 0 1rem" }}>
-        <Grid item xs={1} />
-        {Array.from({ length: 10 }).map((_, index) => (
-          <Grid item xs={12} md={3} lg={1} key={index}>
-            <Item>{romanNumeral(index + 1)}</Item>
-            {loading
-              ? mapSubjectsBySemesterSkeleton(6)
-              : mapSubjectsBySemester(subjects, index + 1, isLargeScreen)}
-          </Grid>
-        ))}
-        <Grid item xs={1} />
-      </Grid>
       {/* Subject types bottom info */}
       <Grid
         container
         alignItems="center"
-        style={{ marginLeft: "9%", width: "84%", marginBottom: "2%" }}
+        style={{ marginLeft: "9%", width: "84%", marginTop: "1%" }}
       >
         {subjectsState.map((subjectType, index) => (
           <React.Fragment key={index}>
@@ -303,6 +287,19 @@ const MyProgressPage = () => {
         >
           Guardar
         </Button>
+      </Grid>
+      {/* My Progress Mesh */}
+      <Grid container spacing={2} sx={{ margin: "0.1rem 0 1rem" }}>
+        <Grid item xs={1} />
+        {Array.from({ length: 10 }).map((_, index) => (
+          <Grid item xs={12} md={3} lg={1} key={index}>
+            <Item>{romanNumeral(index + 1)}</Item>
+            {loading
+              ? mapSubjectsBySemesterSkeleton(6)
+              : mapSubjectsBySemester(subjects, index + 1, isLargeScreen)}
+          </Grid>
+        ))}
+        <Grid item xs={1} />
       </Grid>
       {/* Subject types pop-up info */}
       <Dialog open={helpDialogOpen} onClose={closeHelpDialog}>

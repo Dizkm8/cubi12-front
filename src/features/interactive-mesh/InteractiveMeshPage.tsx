@@ -13,9 +13,7 @@ import { PostRequisite } from "../../app/models/PostRequisite";
 import { subjectsCapitalize } from "../../app/utils/StringUtils";
 import GenerateTabTitle from "../../app/utils/TitleGenerator";
 import SquareIcon from "@mui/icons-material/Square";
-import SquareOutlinedIcon from "@mui/icons-material/SquareOutlined";
 import Colors from "../../app/static/colors";
-import NearMeIcon from "@mui/icons-material/NearMe";
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
 import HelpIcon from "@mui/icons-material/Help";
 
@@ -220,7 +218,7 @@ const InteractiveMeshPage = () => {
             fontSize: "250%",
           }}
         >
-          Mi Progreso
+          Malla Interactiva
         </DialogTitle>
         <DialogContent>
           <Typography
