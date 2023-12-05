@@ -212,6 +212,7 @@ const MyProgressPage = () => {
     .filter((subjectCode: string) => !approvedSubjects.includes(subjectCode)); // Exclude subject codes that are already in approvedSubjects
     // Add newSubjects to approvedSubjects
     approvedSubjects = approvedSubjects.concat(newSubjects);
+    console.log(preRequisites);
     setLoading(true);
     agent.Subjects.list()
       .then((res: Subject[]) => {
