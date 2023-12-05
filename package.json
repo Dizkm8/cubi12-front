@@ -26,13 +26,13 @@
     "react-router-dom": "^6.18.0",
     "react-scripts": "5.0.1",
     "styled-components": "^6.1.0",
-    "typescript": "^4.3.5",
+    "typescript": "^4.9.5",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "jest",
+    "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -67,27 +67,6 @@
     "jest-localstorage-mock": "^2.4.26",
     "jest-transform-stub": "^2.0.0",
     "ts-jest": "^29.1.1",
-    "typescript": "^5.2.2"
-  },
-  "jest": {
-    "preset": "ts-jest",
-    "testEnvironment": "node",
-    "testMatch": [
-      "**/*.test.ts",
-      "**/*.test.tsx"
-    ],
-    "transform": {
-      "^.+\\.jsx?$": "babel-jest",
-      "^.+\\.tsx?$": "ts-jest",
-      "\\.(css|less|sass|scss)$": "jest-transform-stub"
-    },
-    "moduleNameMapper": {
-      "~src/(.*)": "<rootDir>/src/$1",
-      "\\.(svg)$": "<rootDir>/src/tests/svgMock.js",
-      "\\.(css)$": "<rootDir>/src/tests/__mocks__/Login.css"
-    }
-  },
-  "setupFilesAfterEnv": [
-    "<rootDir>/src/tests/jest.setup.js"
-  ]
+    "typescript": "^4.9.5"
+  }
 }
