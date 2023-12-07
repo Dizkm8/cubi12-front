@@ -12,6 +12,10 @@ import { PreRequisite } from "../../app/models/PreRequisite";
 import { PostRequisite } from "../../app/models/PostRequisite";
 import { subjectsCapitalize } from "../../app/utils/StringUtils";
 import GenerateTabTitle from "../../app/utils/TitleGenerator";
+import SquareIcon from "@mui/icons-material/Square";
+import Colors from "../../app/static/colors";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
+import HelpIcon from "@mui/icons-material/Help";
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: "#1C478F",
@@ -26,6 +30,32 @@ const romanNumeral = (numeral: number) => {
   return numerals[numeral - 1];
 };
 
+const subjectsState = [
+  {
+    type: "Asignaturas Pre-Requisito",
+    description:
+      "Aquellas asignaturas que debes cursar antes de cursar la asignatura seleccionada",
+    icon: (
+      <SquareIcon style={{ fontSize: "200%", color: Colors.secondaryYellow }} />
+    ),
+  },
+  {
+    type: "Asignatura seleccionada",
+    description: "Aquella asignatura que estas viendo en este momento",
+    icon: (
+      <SquareIcon style={{ fontSize: "200%", color: Colors.primaryGray }} />
+    ),
+  },
+  {
+    type: "Asignaturas Post-Requisito",
+    description:
+      "Aquellas asignaturas que la asignatura seleccionada es requisito para cursarlas",
+    icon: (
+      <SquareIcon style={{ fontSize: "200%", color: Colors.secondaryGreen }} />
+    ),
+  },
+];
+
 const InteractiveMeshPage = () => {
   document.title = GenerateTabTitle("Malla Interactiva");
 
@@ -37,6 +67,8 @@ const InteractiveMeshPage = () => {
   const { setPreReqCodes, setPostReqCodes } = useSubjectCodeContext();
 
   const isLargeScreen = useMediaQuery("(min-width:1600px)");
+
+  const [helpDialogOpen, setHelpDialogOpen] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -64,6 +96,7 @@ const InteractiveMeshPage = () => {
       })
       .catch((err) => console.log(err));
   }, []);
+  
 
   const setPreRequisitesColors = (subjectPreRequisites: string[]) => {
     if (!subjectPreRequisites) return;
@@ -109,6 +142,14 @@ const InteractiveMeshPage = () => {
       return null;
     });
 
+    const openHelpDialog = () => {
+      setHelpDialogOpen(true);
+    };
+  
+    const closeHelpDialog = () => {
+      setHelpDialogOpen(false);
+    };
+
   const mapSubjectsBySemesterSkeleton = (amount: number) => {
     return Array.from({ length: amount }).map((_, index) => (
       <Skeleton
@@ -121,6 +162,7 @@ const InteractiveMeshPage = () => {
 
   return (
     <Box sx={{ flexGrow: 1, padding: "0 1rem 0", marginTop: "1.5rem" }}>
+      {/* Title and subject type info */}
       <Grid
         container
         alignItems="center"
@@ -130,7 +172,31 @@ const InteractiveMeshPage = () => {
         <Typography variant="h3" component="span">
           Malla Interactiva
         </Typography>
+        <HelpIcon
+          style={{ fontSize: "350%", color: Colors.primaryOrange }}
+          onClick={openHelpDialog}
+        />
       </Grid>
+      {/* Subject types top info */}
+      <Grid
+        container
+        alignItems="center"
+        style={{ marginLeft: "9%", width: "84%", marginTop: "1%" }}
+      >
+        {subjectsState.map((subjectType, index) => (
+          <React.Fragment key={index}>
+            {subjectType.icon}
+            <Typography
+              variant="h3"
+              component="span"
+              style={{ fontSize: "100%", marginRight: "2%" }}
+            >
+              {subjectType.type}
+            </Typography>
+          </React.Fragment>
+        ))}
+      </Grid>
+      {/* Interactive Mesh */}
       <Grid container spacing={2} sx={{ margin: "0.1rem 0 1rem" }}>
         <Grid item xs={1} />
         {Array.from({ length: 10 }).map((_, index) => (
@@ -143,6 +209,45 @@ const InteractiveMeshPage = () => {
         ))}
         <Grid item xs={1} />
       </Grid>
+      {/* Subject types pop-up info */}
+      <Dialog open={helpDialogOpen} onClose={closeHelpDialog}>
+        <DialogTitle
+          style={{
+            textAlign: "center",
+            borderBottom: "2px solid black",
+            fontSize: "250%",
+          }}
+        >
+          Malla Interactiva
+        </DialogTitle>
+        <DialogContent>
+          <Typography
+            style={{ paddingTop: "5%", paddingBottom: "2%", fontSize: "160%" }}
+          >
+            El significado de los colores
+          </Typography>
+          {subjectsState.map((subjectType, index) => (
+            <React.Fragment key={index}>
+              <Typography
+                variant="subtitle1"
+                style={{ marginTop: "2%", fontSize: "120%" }}
+              >
+                <Grid container alignItems="center">
+                  {subjectType.icon} {subjectType.type}
+                </Grid>
+                <Typography
+                  style={{ marginTop: "2%", fontSize: "80%", marginLeft: "8%" }}
+                >
+                  {subjectType.description}
+                </Typography>
+              </Typography>
+            </React.Fragment>
+          ))}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeHelpDialog}></Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

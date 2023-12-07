@@ -3,6 +3,7 @@ import { Paper } from "@mui/material";
 import { Subject } from "../../app/models/Subject";
 import { useState } from "react";
 import Colors from "../../app/static/colors";
+import { approvedSubjects } from "./MyProgressPage";
 
 // subject style
 const style = {
@@ -53,13 +54,12 @@ interface Props {
   backgroundColorButton: string;
 }
 
-export let addSubject: object[] = [];
+export const modifySubject: object[] = [];
 
 export const ProgressCard = ({ subject, isLargeScreen, backgroundColorButton }: Props) => {
   const { code, name } = subject;
-  
+
   const [backgroundColor, setBackgroundColor] = useState<string>(backgroundColorButton);
-  const [addSubjectTest, setAddSubject] = useState<object[]>([]);
 
   // if user hover on subject, change color
   const handleMouseOut = () => {
@@ -88,24 +88,31 @@ export const ProgressCard = ({ subject, isLargeScreen, backgroundColorButton }: 
     // if user click on green subject, change to white
     if (backgroundColor === Colors.primaryGray) {
       setBackgroundColor(Colors.white);
-      // remove subject from array
-      setAddSubject(prevSubjects => prevSubjects.filter((e: any) => e.subjectCode !== code));
+      // if subject is in approved subjects array, add subject to delete on array
+      if(approvedSubjects.includes(code)) {
+        modifySubject.push({ subjectCode: code, isAdded: false});
+      }
+      else {
+        modifySubject.splice(modifySubject.findIndex((e: any) => e.subjectCode === code), 1);
+      }
     }
     
     // if user click on subject default, change to green
     if (
       backgroundColor === Colors.secondarySkyblue ||
-      backgroundColor === Colors.white
+      backgroundColor === Colors.white ||
+      backgroundColor === Colors.secondaryGreen
     ) {
       setBackgroundColor(Colors.primaryGray);
       // add subject to array
-      if (!addSubject.some((e: any) => e.subjectCode === code)) {
-        setAddSubject(prevSubjects => [...prevSubjects, { subjectCode: code, isAdded: true }]);
+      if(!approvedSubjects.includes(code)) {
+        modifySubject.push({ subjectCode: code, isAdded: true});
+      }
+      else {
+        modifySubject.splice(modifySubject.findIndex((e: any) => e.subjectCode === code), 1);
       }
     }
   };
-
-  addSubject = addSubjectTest;
 
   return (
     <Paper

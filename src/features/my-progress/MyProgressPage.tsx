@@ -12,8 +12,7 @@ import {
 import { Box, Skeleton, Typography, useMediaQuery } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import agent from "../../app/api/agent";
-import { Subject } from '../../app/models/Subject';
-import { useSubjectCodeContext } from "../../app/context/SubjectCodeContext";
+import { Subject } from "../../app/models/Subject";
 import { PreRequisite } from "../../app/models/PreRequisite";
 import { PostRequisite } from "../../app/models/PostRequisite";
 import { subjectsCapitalize } from "../../app/utils/StringUtils";
@@ -24,7 +23,7 @@ import SquareOutlinedIcon from "@mui/icons-material/SquareOutlined";
 import NearMeIcon from "@mui/icons-material/NearMe";
 import Colors from "../../app/static/colors";
 import GenerateTabTitle from "../../app/utils/TitleGenerator";
-import ProgressCard, { addSubject } from "./ProgressCard";
+import ProgressCard, { modifySubject } from "./ProgressCard";
 import { forEach } from "lodash";
 
 // Item style
@@ -63,7 +62,7 @@ const subjectsState = [
   {
     type: "Asignaturas fuera de proyección",
     description:
-      "Aquellas asignaturas que puedes cursar pero que, probablemente, no pruebas inscribir por dispersión",
+      "Aquellas asignaturas que puedes cursar pero que, probablemente, no puedas inscribir por dispersión",
     icon: (
       <SquareIcon style={{ fontSize: "200%", color: Colors.secondaryYellow }} />
     ),
@@ -71,11 +70,12 @@ const subjectsState = [
   {
     type: "Asignaturas no cursadas",
     description:
-      "Aquellas asignaturas que aun no cursas y que, probablemente, todavía no puedes cursar",
+      "Aquellas asignaturas que aún no cursas y que, probablemente, todavía no puedes cursar",
     icon: <SquareOutlinedIcon style={{ fontSize: "200%", color: "#000" }} />,
   },
 ];
 
+export let approvedSubjects = ["iaf-001", "cal-001", "alg-001", "ing-001", "iue-001", "fge-001", "pii-001"];
 
 const MyProgressPage = () => {
   document.title = GenerateTabTitle("Mi Progreso");
@@ -84,8 +84,6 @@ const MyProgressPage = () => {
   const PostRequisites = useRef<PostRequisite>({});
   const [loading, setLoading] = useState<boolean>(false);
   const semester = useState<number>(1)[0];
-
-  const { preReqCodes, postReqCodes } = useSubjectCodeContext();
 
   const isLargeScreen = useMediaQuery("(min-width:1600px)");
 
@@ -101,22 +99,6 @@ const MyProgressPage = () => {
   const [helpDialogOpen, setHelpDialogOpen] = useState(false);
 
   const [refreshKey, setRefreshKey] = useState(0);
-  const [approvedSubjects, setApprovedSubjects] = useState<string[]>(["iaf-001", "cal-001", "alg-001","est-001"]);
-
-  // Validate if subject has pre-requisites
-  const hasPreReq = (subjectCode: string) => {
-    let hasPreReq = true;
-    const preReq = preRequisites.current[subjectCode];
-    if (!preReq && !approvedSubjects.includes(subjectCode)) hasPreReq = false;
-    else if (preReq) {
-      forEach(preReq, (value) => {
-        if (!approvedSubjects.includes(value)) hasPreReq = false;
-        //console.log(subjectCode, preReq, value, hasPreReq);
-      });
-    }
-
-    return hasPreReq;
-  };
 
   // Load user data
   useEffect(() => {
@@ -159,6 +141,35 @@ const MyProgressPage = () => {
       .catch((err) => console.log(err));
   }, []);
 
+  // Validate if subject has pre-requisites
+  const hasPreReq = (subjectCode: string) => {
+    let hasPreReq = true;
+    const preReq = preRequisites.current[subjectCode];
+    if (!preReq && !approvedSubjects.includes(subjectCode)) hasPreReq = false;
+    else if (preReq) {
+      forEach(preReq, (value) => {
+        if (!approvedSubjects.includes(value)) hasPreReq = false;
+      });
+    }
+
+    return hasPreReq;
+  };
+
+  // Validate if subject is out of projection
+  const isOutOfProjection = (subjectCode: string) => {
+    let isOutOfProjection = false;
+    const postReq = PostRequisites.current[subjectCode];
+    if (!postReq && !approvedSubjects.includes(subjectCode))
+      isOutOfProjection = true;
+    else if (postReq) {
+      forEach(postReq, (value) => {
+        if (approvedSubjects.includes(value)) isOutOfProjection = true;
+      });
+    }
+
+    return isOutOfProjection;
+  };
+
   // Map subjects by semester
   const mapSubjectsBySemester = (
     subjects: Subject[],
@@ -194,28 +205,28 @@ const MyProgressPage = () => {
 
   const saveSubjects = () => {
     console.log("Saving subjects...");
-    console.log(addSubject);
-      // Map addSubject to an array of subject codes
-  const newSubjects = addSubject.filter((subject: any) => subject.isAdded)
-  .map((subject: any) => subject.subjectCode)
-  .filter((subjectCode: string) => !approvedSubjects.includes(subjectCode)); // Exclude subject codes that are already in approvedSubjects
-  
-  
-  // Add newSubjects to approvedSubjects
-  setApprovedSubjects([...approvedSubjects, ...newSubjects]);
-
-  console.log(approvedSubjects);
-
-  setRefreshKey(oldKey => oldKey + 1);
-  
-  
+    console.log(JSON.stringify(modifySubject, null, 2));
+    // Map modifySubject to an array of subject codes
+    const newSubjects = modifySubject.filter((subject: any) => subject.isAdded)
+    .map((subject: any) => subject.subjectCode)
+    .filter((subjectCode: string) => !approvedSubjects.includes(subjectCode)); // Exclude subject codes that are already in approvedSubjects
+    // Add newSubjects to approvedSubjects
+    approvedSubjects = approvedSubjects.concat(newSubjects);
+    setLoading(true);
+    agent.Subjects.list()
+      .then((res: Subject[]) => {
+        res.forEach((s) => (s.name = subjectsCapitalize(s.name)));
+        setSubjects(res);
+      })
+      .catch((err) => console.log(err))
+      .finally(() => setLoading(false));
   };
 
   const cancelSubjects = () => {
     console.log("Canceling subjects...");
     // Delete all subjects from array
-    addSubject.splice(0, addSubject.length);
-    console.log(addSubject);
+    modifySubject.splice(0, modifySubject.length);
+    console.log(subjects);
   };
 
   // Map subjects by semester skeleton
@@ -230,7 +241,7 @@ const MyProgressPage = () => {
   };
 
   return (
-    <Box key={refreshKey }sx={{ flexGrow: 1, padding: "0 1rem 0", marginTop: "1.5rem" }}>
+    <Box sx={{ flexGrow: 1, padding: "0 1rem 0", marginTop: "1.5rem" }}>
       {/* My Progress */}
       <Grid
         container
@@ -255,24 +266,11 @@ const MyProgressPage = () => {
           onClick={openHelpDialog}
         />
       </Grid>
-      {/* My Progress Mesh */}
-      <Grid container spacing={2} sx={{ margin: "0.1rem 0 1rem" }}>
-        <Grid item xs={1} />
-        {Array.from({ length: 10 }).map((_, index) => (
-          <Grid item xs={12} md={3} lg={1} key={index}>
-            <Item>{romanNumeral(index + 1)}</Item>
-            {loading
-              ? mapSubjectsBySemesterSkeleton(6)
-              : mapSubjectsBySemester(subjects, index + 1, isLargeScreen)}
-          </Grid>
-        ))}
-        <Grid item xs={1} />
-      </Grid>
-      {/* Subject types bottom info */}
+      {/* Subject types top info */}
       <Grid
         container
         alignItems="center"
-        style={{ marginLeft: "9%", width: "84%", marginBottom: "2%" }}
+        style={{ marginLeft: "9%", width: "84%", marginTop: "1%" }}
       >
         {subjectsState.map((subjectType, index) => (
           <React.Fragment key={index}>
@@ -321,6 +319,19 @@ const MyProgressPage = () => {
         >
           Guardar
         </Button>
+      </Grid>
+      {/* My Progress Mesh */}
+      <Grid container spacing={2} sx={{ margin: "0.1rem 0 1rem" }}>
+        <Grid item xs={1} />
+        {Array.from({ length: 10 }).map((_, index) => (
+          <Grid item xs={12} md={3} lg={1} key={index}>
+            <Item>{romanNumeral(index + 1)}</Item>
+            {loading
+              ? mapSubjectsBySemesterSkeleton(6)
+              : mapSubjectsBySemester(subjects, index + 1, isLargeScreen)}
+          </Grid>
+        ))}
+        <Grid item xs={1} />
       </Grid>
       {/* Subject types pop-up info */}
       <Dialog open={helpDialogOpen} onClose={closeHelpDialog}>
@@ -385,5 +396,3 @@ const MyProgressPage = () => {
 };
 
 export default MyProgressPage;
-
-
