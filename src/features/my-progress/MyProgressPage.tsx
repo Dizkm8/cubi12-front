@@ -114,8 +114,9 @@ const MyProgressPage = () => {
     Agent.Auth.myProgress()
     .then((response) => {
       console.log(response);
-      setUserApprovedSubjects(['ing-001','ing-002']);
-      approvedSubjects = ['ing-001','ing-002'];
+      const hardcode = ["iaf-001", "cal-001", "alg-001", "ing-001", "iue-001", "fge-001", "pii-001"]
+      setUserApprovedSubjects(hardcode);
+      approvedSubjects = hardcode;
     })
     .catch((error) => {
       console.error("Error loading user approved subjects:", error);
@@ -225,6 +226,8 @@ const MyProgressPage = () => {
       })
       .catch((err) => console.log(err))
       .finally(() => setLoading(false));
+    modifySubject.addSubject = [];
+    modifySubject.deleteSubject = [];
   };
 
   const cancelSubjects = () => {

@@ -94,7 +94,7 @@ export const ProgressCard = ({ subject, isLargeScreen, backgroundColorButton }: 
       setBackgroundColor(Colors.white);
       // if subject is in approved subjects array, add subject to delete on array
       if(approvedSubjects.includes(code)) {
-        modifySubject.addSubject.push(code);
+        modifySubject.deleteSubject.push(code);
       }
       else {
         const index = modifySubject.addSubject.indexOf(code);
