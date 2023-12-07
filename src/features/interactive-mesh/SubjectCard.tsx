@@ -78,6 +78,7 @@ const SubjectCard = ({
     setIsPostReq(postReqCodes.includes(code));
   }, [preReqCodes, postReqCodes, code]);
 
+  console.log('giobvanny: ', {preReqCodes, postReqCodes, code})
   return (
     <Paper
       onMouseOver={() => onMouseOver(code)}
