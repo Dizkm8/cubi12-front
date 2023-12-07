@@ -168,19 +168,7 @@ const MyProgressPage = () => {
   };
 
   // Validate if subject is out of projection
-  const isOutOfProjection = (subjectCode: string) => {
-    let isOutOfProjection = false;
-    const postReq = PostRequisites.current[subjectCode];
-    if (!postReq && !userApprovedSubjects.includes(subjectCode))
-      isOutOfProjection = true;
-    else if (postReq) {
-      forEach(postReq, (value) => {
-        if (userApprovedSubjects.includes(value)) isOutOfProjection = true;
-      });
-    }
-
-    return isOutOfProjection;
-  };
+  
 
   // Map subjects by semester
   const mapSubjectsBySemester = (

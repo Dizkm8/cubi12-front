@@ -1,10 +1,9 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Paper } from "@mui/material";
 import { Subject } from "../../app/models/Subject";
 import { useState } from "react";
 import Colors from "../../app/static/colors";
 import { approvedSubjects } from "./MyProgressPage";
-import { add } from "lodash";
 
 // subject style
 const style = {
