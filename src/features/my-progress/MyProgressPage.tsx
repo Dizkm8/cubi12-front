@@ -75,7 +75,7 @@ const subjectsState = [
   },
 ];
 
-export let approvedSubjects = ["iaf-001", "cal-001", "alg-001", "ing-001", "iue-001", "fge-001", "pii-001"];
+export let approvedSubjects = [] as string[];
 
 const MyProgressPage = () => {
   document.title = GenerateTabTitle("Mi Progreso");
@@ -83,7 +83,7 @@ const MyProgressPage = () => {
   const preRequisites = useRef<PreRequisite>({});
   const PostRequisites = useRef<PostRequisite>({});
   const [loading, setLoading] = useState<boolean>(false);
-  const semester = useState<number>(1)[0];
+  const [userApprovedSubjects, setUserApprovedSubjects] = useState<string[]>([]);
 
   const isLargeScreen = useMediaQuery("(min-width:1600px)");
 
@@ -98,8 +98,6 @@ const MyProgressPage = () => {
 
   const [helpDialogOpen, setHelpDialogOpen] = useState(false);
 
-  const [refreshKey, setRefreshKey] = useState(0);
-
   // Load user data
   useEffect(() => {
     Agent.Auth.profile()
@@ -108,6 +106,19 @@ const MyProgressPage = () => {
     })
     .catch((error) => {
       console.error("Error loading user:", error);
+    });
+  }, []);
+
+  // Load user approved subjects
+  useEffect(() => {
+    Agent.Auth.myProgress()
+    .then((response) => {
+      console.log(response);
+      setUserApprovedSubjects(['ing-001','ing-002']);
+      approvedSubjects = ['ing-001','ing-002'];
+    })
+    .catch((error) => {
+      console.error("Error loading user approved subjects:", error);
     });
   }, []);
 
@@ -145,10 +156,10 @@ const MyProgressPage = () => {
   const hasPreReq = (subjectCode: string) => {
     let hasPreReq = true;
     const preReq = preRequisites.current[subjectCode];
-    if (!preReq && !approvedSubjects.includes(subjectCode)) hasPreReq = false;
+    if (!preReq && !userApprovedSubjects.includes(subjectCode)) hasPreReq = false;
     else if (preReq) {
       forEach(preReq, (value) => {
-        if (!approvedSubjects.includes(value)) hasPreReq = false;
+        if (!userApprovedSubjects.includes(value)) hasPreReq = false;
       });
     }
 
@@ -159,11 +170,11 @@ const MyProgressPage = () => {
   const isOutOfProjection = (subjectCode: string) => {
     let isOutOfProjection = false;
     const postReq = PostRequisites.current[subjectCode];
-    if (!postReq && !approvedSubjects.includes(subjectCode))
+    if (!postReq && !userApprovedSubjects.includes(subjectCode))
       isOutOfProjection = true;
     else if (postReq) {
       forEach(postReq, (value) => {
-        if (approvedSubjects.includes(value)) isOutOfProjection = true;
+        if (userApprovedSubjects.includes(value)) isOutOfProjection = true;
       });
     }
 
@@ -184,7 +195,7 @@ const MyProgressPage = () => {
             subject={subject}
             isLargeScreen={isLargeScreen}
             backgroundColorButton={ 
-              approvedSubjects.includes(subject.code) ? Colors.primaryGray : 
+              userApprovedSubjects.includes(subject.code) ? Colors.primaryGray : 
               hasPreReq(subject.code) ? Colors.secondaryGreen :
               Colors.white
             }
@@ -206,13 +217,6 @@ const MyProgressPage = () => {
   const saveSubjects = () => {
     console.log("Saving subjects...");
     console.log(JSON.stringify(modifySubject, null, 2));
-    // Map modifySubject to an array of subject codes
-    const newSubjects = modifySubject.filter((subject: any) => subject.isAdded)
-    .map((subject: any) => subject.subjectCode)
-    .filter((subjectCode: string) => !approvedSubjects.includes(subjectCode)); // Exclude subject codes that are already in approvedSubjects
-    // Add newSubjects to approvedSubjects
-    approvedSubjects = approvedSubjects.concat(newSubjects);
-    console.log(preRequisites);
     setLoading(true);
     agent.Subjects.list()
       .then((res: Subject[]) => {
@@ -226,8 +230,16 @@ const MyProgressPage = () => {
   const cancelSubjects = () => {
     console.log("Canceling subjects...");
     // Delete all subjects from array
-    modifySubject.splice(0, modifySubject.length);
-    console.log(subjects);
+    modifySubject.addSubject = [];
+    modifySubject.deleteSubject = [];
+    setLoading(true);
+    agent.Subjects.list()
+      .then((res: Subject[]) => {
+        res.forEach((s) => (s.name = subjectsCapitalize(s.name)));
+        setSubjects(res);
+      })
+      .catch((err) => console.log(err))
+      .finally(() => setLoading(false));
   };
 
   // Map subjects by semester skeleton

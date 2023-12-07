@@ -31,6 +31,7 @@ const Auth = {
   updatePassword: (form: any) => requests.put("auth/update-password", form),
   updateProfile: (form: any) => requests.put("users/update-profile", form),
   profile: () => requests.get("users/profile"),
+  myProgress: () => requests.get("users/my-progress"),
 };
 
 const Subjects = {
