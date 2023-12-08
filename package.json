@@ -68,26 +68,5 @@
     "jest-transform-stub": "^2.0.0",
     "ts-jest": "^29.1.1",
     "typescript": "^4.9.5"
-  },
-  "jest": {
-    "preset": "ts-jest",
-    "testEnvironment": "node",
-    "testMatch": [
-      "**/*.test.ts",
-      "**/*.test.tsx"
-    ],
-    "transform": {
-      "^.+\\.jsx?$": "babel-jest",
-      "^.+\\.tsx?$": "ts-jest",
-      "\\.(css|less|sass|scss)$": "jest-transform-stub"
-    },
-    "moduleNameMapper": {
-      "~src/(.*)": "<rootDir>/src/$1",
-      "\\.(svg)$": "<rootDir>/src/tests/svgMock.js",
-      "\\.(css)$": "<rootDir>/src/tests/__mocks__/Login.css"
-    }
-  },
-  "setupFilesAfterEnv": [
-    "<rootDir>/src/tests/jest.setup.js"
-  ]
+  }
 }

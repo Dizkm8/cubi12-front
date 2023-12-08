@@ -54,7 +54,10 @@ interface Props {
   backgroundColorButton: string;
 }
 
-export const modifySubject: object[] = [];
+export const modifySubject = {
+  addSubject: [] as string[],
+  deleteSubject: [] as string[],
+};
 
 export const ProgressCard = ({ subject, isLargeScreen, backgroundColorButton }: Props) => {
   const { code, name } = subject;
@@ -90,10 +93,13 @@ export const ProgressCard = ({ subject, isLargeScreen, backgroundColorButton }: 
       setBackgroundColor(Colors.white);
       // if subject is in approved subjects array, add subject to delete on array
       if(approvedSubjects.includes(code)) {
-        modifySubject.push({ subjectCode: code, isAdded: false});
+        modifySubject.deleteSubject.push(code);
       }
       else {
-        modifySubject.splice(modifySubject.findIndex((e: any) => e.subjectCode === code), 1);
+        const index = modifySubject.addSubject.indexOf(code);
+        if (index !== -1) {
+          modifySubject.addSubject.splice(index, 1);
+        }
       }
     }
     
@@ -106,10 +112,13 @@ export const ProgressCard = ({ subject, isLargeScreen, backgroundColorButton }: 
       setBackgroundColor(Colors.primaryGray);
       // add subject to array
       if(!approvedSubjects.includes(code)) {
-        modifySubject.push({ subjectCode: code, isAdded: true});
+        modifySubject.addSubject.push(code);
       }
       else {
-        modifySubject.splice(modifySubject.findIndex((e: any) => e.subjectCode === code), 1);
+        const index = modifySubject.deleteSubject.indexOf(code);
+        if (index !== -1) {
+          modifySubject.deleteSubject.splice(index, 1);
+        }
       }
     }
   };
