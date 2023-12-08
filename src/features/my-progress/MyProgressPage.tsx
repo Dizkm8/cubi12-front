@@ -167,8 +167,17 @@ const MyProgressPage = () => {
     return hasPreReq;
   };
 
+  const getPreReqLength = (subjectCode: string) => {
+    const preReq = preRequisites.current[subjectCode];
+    return preReq ? preReq.length : 0;
+  };
   // Validate if subject is out of projection
-  
+  let studentLevel = Math.max(...subjects
+    .filter(subject => userApprovedSubjects.includes(subject.code))
+    .map(subject => subject.semester)
+  );
+  console.log('holaaa '+ studentLevel);
+  console.log(subjects.filter(subject => !userApprovedSubjects.includes(subject.code)).map(subject => subject.semester));
 
   // Map subjects by semester
   const mapSubjectsBySemester = (
@@ -178,16 +187,18 @@ const MyProgressPage = () => {
   ) =>
     subjects.map((subject) => {
       if (subject.semester === semester) {
+        
         const mappedSubject = (
           <ProgressCard
             key={subject.code}
             subject={subject}
             isLargeScreen={isLargeScreen}
-            backgroundColorButton={ 
-              userApprovedSubjects.includes(subject.code) ? Colors.primaryGray : 
-              hasPreReq(subject.code) ? Colors.secondaryGreen :
-              Colors.white
-            }
+          backgroundColorButton={ 
+          userApprovedSubjects.includes(subject.code) ? Colors.primaryGray : 
+          ((subject.semester > studentLevel + 2 && hasPreReq(subject.code)) || (subject.semester > studentLevel + 2 && getPreReqLength(subject.code) === 0)) ? Colors.secondaryYellow :
+          hasPreReq(subject.code) ? Colors.secondaryGreen :
+          Colors.white
+        }
           />
         );
         return mappedSubject;
