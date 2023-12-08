@@ -11,14 +11,11 @@ import Paper from "@mui/material/Paper";
 import MenuItem from "@mui/material/MenuItem";
 import Agent from "../../app/api/agent";
 import { useState, useEffect, useContext, FormEvent } from "react";
-import FormHelperText from "@mui/material/FormHelperText";
-import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import { AuthContext } from "../../app/context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { startCase } from "lodash";
 import Alert from "@mui/material/Alert";
 import Fade from "@mui/material/Fade";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { LoadingButton } from "@mui/lab";
 
 const rutRegex = /^(\d{1,3}(\.\d{3})*-\d|(\d{1,3}(\.\d{3})*-[Kk]))$/;
@@ -27,38 +24,39 @@ const emailRegex = /^[a-zA-Z]+(?:\.[a-zA-Z]+)?\d*?@(?:([a-zA-Z]+\.)+)?\ucn\.cl$/
 const nameRegex = /^[a-zA-Z]{3,50}$/;
 const flNameRegex = /^[a-zA-Z]{3,30}$/;
 
+const nameErrorMsg = "Debe contener entre 3 y 50 caracteres, solo letras.";
+const flNameErrorMsg = "Debe contener entre 3 y 30 caracteres, solo letras.";
+const rutErrorMsg = "RUT con puntos y guión (Ej: 12.345.678-9)";
+const emailErrorMsg = "El correo debe ser del dominio ucn.";
+const pwdErrorMsg = "Debe contener al menos 10 caracteres, una mayúscula y un número.";
+const matchPwdErrorMsg = "La contraseña no coincide.";
+
 const defaultTheme = createTheme();
 
 export default function SignUp() {
-  const { authenticated, setAuthenticated } = useContext(AuthContext);
+  const { setAuthenticated } = useContext(AuthContext);
   const navigate = useNavigate();
+  
   const [name, setName] = useState<string>("");
   const [validName, setValidName] = useState<boolean>(false);
-  const [nameFocus, setNameFocus] = useState<boolean>(false);
 
   const [firstName, setFirstName] = useState<string>("");
   const [validFirstName, setValidFirstName] = useState<boolean>(false);
-  const [firstNameFocus, setFirstNameFocus] = useState<boolean>(false);
 
   const [lastName, setLastName] = useState<string>("");
   const [validLastName, setValidLastName] = useState<boolean>(false);
-  const [lastNameFocus, setLastNameFocus] = useState<boolean>(false);
 
   const [email, setEmail] = useState<string>("");
   const [validEmail, setValidEmail] = useState<boolean>(false);
-  const [emailFocus, setEmailFocus] = useState<boolean>(false);
 
   const [rut, setRut] = useState<string>("");
   const [validRut, setValidRut] = useState<boolean>(false);
-  const [rutFocus, setRutFocus] = useState<boolean>(false);
 
   const [pwd, setPwd] = useState<string>("");
   const [validPwd, setValidPwd] = useState<boolean>(false);
-  const [pwdFocus, setPwdFocus] = useState<boolean>(false);
 
   const [matchPwd, setMatchPwd] = useState<string>("");
   const [validMatch, setValidMatch] = useState<boolean>(false);
-  const [matchFocus, setMatchFocus] = useState<boolean>(false);
 
   const [career, setCareer] = useState<string>("");
   const [careers, setCareers] = useState([]);
@@ -94,6 +92,7 @@ export default function SignUp() {
       RepeatedPassword
     );
   };
+
   const sendData = (
     name: string,
     firstLastName: string,
@@ -163,7 +162,6 @@ export default function SignUp() {
     }
   }, []);
 
-  
   useEffect(() => {
     setValidPwd(pwdRegex.test(pwd));
     setValidMatch(pwd === matchPwd);
@@ -274,17 +272,15 @@ export default function SignUp() {
                 )}
                 <TextField
                   helperText={
-                    !validName && nameFocus
-                      ? "Debe contener entre 3 y 50 caracteres, solo letras."
+                    !validName && name.trim() !== ""
+                      ? nameErrorMsg
                       : ""
                   }
                   aria-describedby="namenote"
-                  onChange={(e) => setName(e.target.value)}
-                  aria-invalid={validName ? "false" : "true"}
-                  onFocus={() => setNameFocus(true)}
-                  onBlur={() => setNameFocus(false)}
+                  onChange={(e: { target: { value: React.SetStateAction<string>; }; }) => setName(e.target.value)}
+                  aria-invalid={validName && name.trim() !== ""}
                   value={name}
-                  error={!validName && nameFocus}
+                  error={!validName && name.trim() !== ""}
                   variant="filled"
                   id="name"
                   label="Nombre"
@@ -303,7 +299,7 @@ export default function SignUp() {
                     ml: 3,
                     mr: 3,
                     boxShadow:
-                      (!validName && !nameFocus) || validName
+                      validName
                         ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
                         : "none",
                   }}
@@ -313,17 +309,15 @@ export default function SignUp() {
                 <Grid item xs={6} md={6} container>
                   <TextField
                     helperText={
-                      !validFirstName && firstNameFocus
-                        ? "Debe contener entre 3 y 30 caracteres, solo letras."
+                      !validFirstName && firstName.trim() !== ""
+                        ? flNameErrorMsg
                         : ""
                     }
                     aria-describedby="flNote"
-                    onChange={(e) => setFirstName(e.target.value)}
-                    aria-invalid={validFirstName ? "false" : "true"}
-                    onFocus={() => setFirstNameFocus(true)}
-                    onBlur={() => setFirstNameFocus(false)}
+                    onChange={(e: { target: { value: React.SetStateAction<string>; }; }) => setFirstName(e.target.value)}
+                    aria-invalid={validFirstName && firstName.trim() !== ""}
                     value={firstName}
-                    error={!validFirstName && firstNameFocus}
+                    error={!validFirstName && firstName.trim() !== ""}
                     autoComplete="off"
                     name="firstName"
                     required
@@ -341,26 +335,24 @@ export default function SignUp() {
                     sx={{
                       ml: 3,
                       boxShadow:
-                        (!validFirstName && firstNameFocus) || lastNameFocus
-                          ? "none"
-                          : "0px 2px 2px rgba(0, 0, 0, 0.2)",
+                        validFirstName
+                          ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
+                          : "none",
                     }}
                   />
                 </Grid>
                 <Grid item xs={6} md={6} container>
                   <TextField
                     helperText={
-                      !validLastName && lastNameFocus
-                        ? "Debe contener entre 3 y 30 caracteres, solo letras."
+                      !validLastName && lastName.trim() !== ""
+                        ? flNameErrorMsg
                         : ""
                     }
                     required
-                    onChange={(e) => setLastName(e.target.value)}
-                    aria-invalid={validLastName ? "false" : "true"}
-                    onFocus={() => setLastNameFocus(true)}
-                    onBlur={() => setLastNameFocus(false)}
+                    onChange={(e: { target: { value: React.SetStateAction<string>; }; }) => setLastName(e.target.value)}
+                    aria-invalid={validLastName && lastName.trim() !== ""}
                     value={lastName}
-                    error={!validLastName && lastNameFocus}
+                    error={!validLastName && lastName.trim() !== ""}
                     aria-describedby="flNote"
                     id="lastName"
                     variant="filled"
@@ -378,22 +370,25 @@ export default function SignUp() {
                     sx={{
                       mr: 3,
                       boxShadow:
-                        (!validLastName && lastNameFocus) || firstNameFocus
-                          ? "none"
-                          : "0px 2px 2px rgba(0, 0, 0, 0.2)",
+                        validLastName
+                        ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
+                        : "none",
                     }}
                   />
                 </Grid>
               </Grid>
               <Grid item xs={12} container>
                 <TextField
+                  helperText={
+                    !validRut && rut.trim() !== ""
+                      ? rutErrorMsg
+                      : ""
+                  }
                   required
-                  onChange={(e) => setRut(e.target.value)}
-                  aria-invalid={validRut ? "false" : "true"}
-                  onFocus={() => setRutFocus(true)}
-                  onBlur={() => setRutFocus(false)}
+                  onChange={(e: { target: { value: React.SetStateAction<string>; }; }) => setRut(e.target.value)}
+                  aria-invalid={validRut && rut.trim() !== ""}
                   value={rut}
-                  error={!validRut && rutFocus}
+                  error={!validRut && rut.trim() !== ""}
                   aria-describedby="rutnote"
                   variant="filled"
                   id="rut"
@@ -411,38 +406,24 @@ export default function SignUp() {
                     width: "89.5%",
                     ml: 3,
                     mr: 3,
-                    boxShadow: !validRut
-                      ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
-                      : "none",
+                    boxShadow:
+                      validRut
+                        ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
+                        : "none",
                   }}
                 />
-                {rutFocus && (
-                  <FormHelperText
-                    id="rutnote"
-                    className={!validRut ? "instructions" : "offscreen"}
-                    sx={{
-                      ml: 3,
-                      mr: 3,
-                    }}
-                  >
-                    <div>
-                      <FontAwesomeIcon
-                        icon={faInfoCircle}
-                        style={{ marginRight: "5px" }}
-                      />
-                      RUT con puntos y guión (Ej: 12.345.678-9)
-                    </div>
-                  </FormHelperText>
-                )}
               </Grid>
               <Grid item xs={12} container>
                 <TextField
-                  error={!validEmail && emailFocus}
-                  aria-invalid={validEmail ? "false" : "true"}
-                  onFocus={() => setEmailFocus(true)}
-                  onBlur={() => setEmailFocus(false)}
+                  helperText={
+                    !validEmail && email.trim() !== ""
+                      ? emailErrorMsg
+                      : ""
+                  }
+                  error={!validEmail && email.trim() !== ""}
+                  aria-invalid={validEmail && email.trim() !== ""}
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e: { target: { value: React.SetStateAction<string>; }; }) => setEmail(e.target.value)}
                   required
                   id="email"
                   label="Correo electrónico"
@@ -460,32 +441,17 @@ export default function SignUp() {
                     width: "89.5%",
                     ml: 3,
                     mr: 3,
-                    boxShadow: "0px 2px 2px rgba(0, 0, 0, 0.2)",
+                    boxShadow:
+                    validEmail
+                      ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
+                      : "none",
                   }}
                 />
-                {emailFocus && (
-                  <FormHelperText
-                    id="emailNote"
-                    className={!validEmail ? "instructions" : "offscreen"}
-                    sx={{
-                      ml: 3,
-                      mr: 3,
-                    }}
-                  >
-                    <div>
-                      <FontAwesomeIcon
-                        icon={faInfoCircle}
-                        style={{ marginRight: "5px" }}
-                      />
-                      El correo debe ser del dominio ucn.
-                    </div>
-                  </FormHelperText>
-                )}
               </Grid>
               <Grid item xs={12} container>
                 <TextField
                   required
-                  onChange={(e) => setCareer(e.target.value)}
+                  onChange={(e: { target: { value: React.SetStateAction<string>; }; }) => setCareer(e.target.value)}
                   value={career}
                   id="career"
                   select
@@ -516,14 +482,17 @@ export default function SignUp() {
 
               <Grid item xs={12} container>
                 <TextField
+                  helperText={
+                    !validPwd && pwd.trim() !== ""
+                      ? pwdErrorMsg
+                      : ""
+                  }
                   required
                   fullWidth
-                  aria-invalid={validPwd ? "false" : "true"}
-                  onChange={(e) => setPwd(e.target.value)}
-                  onFocus={() => setPwdFocus(true)}
-                  onBlur={() => setPwdFocus(false)}
+                  aria-invalid={validPwd && pwd.trim() !== ""}
+                  onChange={(e: { target: { value: React.SetStateAction<string>; }; }) => setPwd(e.target.value)}
                   value={pwd}
-                  error={!validPwd && pwdFocus}
+                  error={!validPwd && pwd.trim() !== ""}
                   aria-describedby="pwdnote"
                   name="password"
                   label="Contraseña"
@@ -542,38 +511,25 @@ export default function SignUp() {
                     width: "89.5%",
                     ml: 3,
                     mr: 3,
-                    boxShadow: "0px 2px 2px rgba(0, 0, 0, 0.2)",
+                    boxShadow:
+                    validPwd
+                      ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
+                      : "none",
                   }}
                 />
-                {pwdFocus && (
-                  <FormHelperText
-                    id="pwdnote"
-                    className={!validPwd ? "instructions" : "offscreen"}
-                    sx={{
-                      ml: 3,
-                      mr: 3,
-                    }}
-                  >
-                    <div>
-                      <FontAwesomeIcon
-                        icon={faInfoCircle}
-                        style={{ marginRight: "5px" }}
-                      />
-                      Debe contener al menos 10 caracteres, una mayúscula y un
-                      número.
-                    </div>
-                  </FormHelperText>
-                )}
               </Grid>
               <Grid item xs={12} container>
                 <TextField
+                  helperText={
+                    !validMatch && matchPwd.trim() !== ""
+                      ? matchPwdErrorMsg
+                      : ""
+                  }
                   required
-                  onChange={(e) => setMatchPwd(e.target.value)}
-                  aria-invalid={validMatch ? "false" : "true"}
-                  onFocus={() => setMatchFocus(true)}
-                  onBlur={() => setMatchFocus(false)}
+                  onChange={(e: { target: { value: React.SetStateAction<string>; }; }) => setMatchPwd(e.target.value)}
+                  aria-invalid={validMatch && matchPwd.trim() !== ""}
                   value={matchPwd}
-                  error={!validMatch && matchFocus}
+                  error={!validMatch && matchPwd.trim() !== ""}
                   type="password"
                   id="repeatPassword"
                   label="Repetir contraseña"
@@ -592,7 +548,10 @@ export default function SignUp() {
                     ml: 3,
                     mb: 1,
                     mr: 3,
-                    boxShadow: "0px 2px 2px rgba(0, 0, 0, 0.2)",
+                    boxShadow:
+                    validMatch
+                      ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
+                      : "none",
                   }}
                 />
               </Grid>

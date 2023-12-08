@@ -37,7 +37,7 @@ const LogIn = () => {
   const [pwdError, setPwdError] = useState<boolean>(false);
 
   const emailErrorMsg: string = "Ingrese un correo electrónico válido";
-  const pwdErrorMsg: string = "El campo esta vacío";
+  const pwdErrorMsg: string = "El campo está vacío";
 
   const [checked, setChecked] = useState(false);
   const [disabled, setDisabled] = useState(true);
@@ -94,7 +94,7 @@ const LogIn = () => {
   };
 
   return (
-    <div data-testing="LogIn" className="s">
+    <Grid data-testing="LogIn" className="s">
       <Paper
         style={{
           backgroundImage: "url(/background.jpg)",
@@ -295,7 +295,7 @@ const LogIn = () => {
           </Container>
         </ThemeProvider>
       </Paper>
-    </div>
+    </Grid>
   );
 }
 
