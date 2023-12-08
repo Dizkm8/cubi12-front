@@ -176,8 +176,6 @@ const MyProgressPage = () => {
     .filter(subject => userApprovedSubjects.includes(subject.code))
     .map(subject => subject.semester)
   );
-  console.log('holaaa '+ studentLevel);
-  console.log(subjects.filter(subject => !userApprovedSubjects.includes(subject.code)).map(subject => subject.semester));
 
   // Map subjects by semester
   const mapSubjectsBySemester = (
