@@ -1,4 +1,4 @@
-import React from "react";
+import React, { FormEvent } from "react";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Link from "@mui/material/Link";
@@ -39,14 +39,14 @@ const LogIn = () => {
   const emailErrorMsg: string = "Ingrese un correo electrónico válido";
   const pwdErrorMsg: string = "El campo esta vacío";
 
-  const [checked, setChecked] = React.useState(false);
-  const [disabled, setDisabled] = React.useState(true);
+  const [checked, setChecked] = useState(false);
+  const [disabled, setDisabled] = useState(true);
 
   const isMobile = useMediaQuery(defaultTheme.breakpoints.down("sm"));
 
   const [loading, setLoading] = useState<boolean>(false);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const Email: string = data.get("email")?.toString() ?? "";
