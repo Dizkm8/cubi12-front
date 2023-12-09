@@ -17,6 +17,7 @@ import { startCase } from "lodash";
 import Alert from "@mui/material/Alert";
 import Fade from "@mui/material/Fade";
 import { LoadingButton } from "@mui/lab";
+import Colors from "../../app/static/colors";
 
 const rutRegex = /^(\d{1,3}(\.\d{3})*-\d|(\d{1,3}(\.\d{3})*-[Kk]))$/;
 const pwdRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{10,16}$/;
@@ -218,7 +219,7 @@ export default function SignUp() {
             onSubmit={handleSubmit}
             sx={{
               mt: 3,
-              border: "#000000",
+              border: Colors.black,
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
@@ -226,7 +227,7 @@ export default function SignUp() {
               height: "80%",
               width: "53%",
               mb: 3,
-              backgroundColor: "#F5F5F5",
+              backgroundColor: Colors.secondaryWhite,
             }}
           >
             <Typography
@@ -578,7 +579,7 @@ export default function SignUp() {
                     color="primary"
                     underline="hover"
                     fontWeight="600"
-                    style={{ color: "#edb84c" }}
+                    style={{ color: Colors.primaryOrange }}
                   >
                     Inicia Sesión
                   </Link>
@@ -588,7 +589,7 @@ export default function SignUp() {
             <LoadingButton
               loading={loading}
               type="submit"
-              style={{ backgroundColor: "#1C478F", width: "89%", height: 50 }}
+              style={{ backgroundColor: Colors.primaryBlue, width: "89%", height: 50 }}
               variant="contained"
               sx={{
                 mt: 2,

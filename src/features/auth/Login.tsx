@@ -17,6 +17,7 @@ import Fade from "@mui/material/Fade";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import GenerateTabTitle from "../../app/utils/TitleGenerator";
 import { LoadingButton } from '@mui/lab';
+import Colors from "../../app/static/colors";
 
 const defaultTheme = createTheme();
 
@@ -123,7 +124,7 @@ const LogIn = () => {
               onSubmit={handleSubmit}
               sx={{
                 mt: 3,
-                border: "#000000",
+                border: Colors.black,
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
@@ -131,7 +132,7 @@ const LogIn = () => {
                 height: "100%",
                 width: isMobile ? "100%" : 450,
                 mb: 3,
-                backgroundColor: "#F5F5F5",
+                backgroundColor: Colors.secondaryWhite,
               }}
             >
               <Typography
@@ -235,7 +236,7 @@ const LogIn = () => {
                       color="primary"
                       underline="hover"
                       fontWeight="600"
-                      style={{ color: "#edb84c" }}
+                      style={{ color: Colors.primaryOrange }}
                     >
                       Registrate
                     </Link>
@@ -246,7 +247,7 @@ const LogIn = () => {
                     loading={loading}
                     type="submit"
                     style={{
-                      backgroundColor: "#1C478F",
+                      backgroundColor: Colors.primaryBlue,
                       width: "89%",
                       height: 50,
                     }}
@@ -270,11 +271,11 @@ const LogIn = () => {
                     href="/"
                     type="submit"
                     style={{
-                      backgroundColor: "#F5F5F5",
+                      backgroundColor: Colors.secondaryWhite,
                       width: "89%",
                       height: 50,
-                      border: "1px solid #1C478F",
-                      color: "#1C478F",
+                      border: "1px solid " + Colors.primaryBlue,
+                      color: Colors.primaryBlue,
                     }}
                     variant="contained"
                     sx={{

@@ -12,6 +12,8 @@ const secondaryYellow = "#FFDE9A";
 
 const secondarySkyblue = "#2CC5E0";
 
+const secondaryWhite = "#F5F5F5";
+
 const white = "#FFFFFF";
 
 const black = "#000000";
@@ -24,7 +26,9 @@ const Colors = {
   secondaryGreen,
   secondaryYellow,
   secondarySkyblue,
-  white
+  secondaryWhite,
+  white,
+  black
 };
 
 export default Colors;

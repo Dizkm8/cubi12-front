@@ -72,8 +72,6 @@ const EditProfile = () => {
     // User state
     const [user, setUser] = useState({name: "", firstLastName: "", secondLastName: "", rut: "", email: "", career: { id: "", name: "" }});
 
-    
-    
     // Load user data
     useEffect(() => {
         Agent.Auth.profile()

@@ -16,7 +16,6 @@ import { Subject } from "../../app/models/Subject";
 import { PreRequisite } from "../../app/models/PreRequisite";
 import { PostRequisite } from "../../app/models/PostRequisite";
 import { subjectsCapitalize } from "../../app/utils/StringUtils";
-import Agent from "../../app/api/agent";
 import HelpIcon from "@mui/icons-material/Help";
 import SquareIcon from "@mui/icons-material/Square";
 import SquareOutlinedIcon from "@mui/icons-material/SquareOutlined";
@@ -29,7 +28,7 @@ import { forEach } from "lodash";
 // Item style
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: Colors.primaryBlue,
-  color: "#FFF",
+  color: Colors.white,
   padding: theme.spacing(1),
   textAlign: "center",
 }));
@@ -71,7 +70,7 @@ const subjectsState = [
     type: "Asignaturas no cursadas",
     description:
       "Aquellas asignaturas que aún no cursas y que, probablemente, todavía no puedes cursar",
-    icon: <SquareOutlinedIcon style={{ fontSize: "200%", color: "#000" }} />,
+    icon: <SquareOutlinedIcon style={{ fontSize: "200%", color: Colors.black }} />,
   },
 ];
 
@@ -83,7 +82,9 @@ const MyProgressPage = () => {
   const preRequisites = useRef<PreRequisite>({});
   const PostRequisites = useRef<PostRequisite>({});
   const [loading, setLoading] = useState<boolean>(false);
-  const [userApprovedSubjects, setUserApprovedSubjects] = useState<string[]>([]);
+  const [userApprovedSubjects, setUserApprovedSubjects] = useState<string[]>(
+    []
+  );
 
   const isLargeScreen = useMediaQuery("(min-width:1600px)");
 
@@ -100,27 +101,32 @@ const MyProgressPage = () => {
 
   // Load user data
   useEffect(() => {
-    Agent.Auth.profile()
-    .then((response) => {
-      setUser(response);
-    })
-    .catch((error) => {
-      console.error("Error loading user:", error);
-    });
+    agent.Auth.profile()
+      .then((response) => {
+        setUser(response);
+      })
+      .catch((error) => {
+        console.error("Error loading user:", error);
+      });
   }, []);
 
   // Load user approved subjects
   useEffect(() => {
-    Agent.Auth.myProgress()
-    .then((response) => {
-      console.log(response);
-      const hardcode = ["iaf-001", "cal-001", "alg-001", "ing-001", "iue-001", "fge-001", "pii-001"]
-      setUserApprovedSubjects(hardcode);
-      approvedSubjects = hardcode;
-    })
-    .catch((error) => {
-      console.error("Error loading user approved subjects:", error);
-    });
+    agent.Auth.myProgress()
+      .then((response) => {
+        setUserApprovedSubjects([]);
+        approvedSubjects = [];
+        forEach(response, (value) => {
+          setUserApprovedSubjects((userApprovedSubjects) => [
+            ...userApprovedSubjects,
+            value.subjectCode,
+          ]);
+          approvedSubjects.push(value.subjectCode);
+        });
+      })
+      .catch((error) => {
+        console.error("Error loading user approved subjects:", error);
+      });
   }, []);
 
   // Load subjects
@@ -157,7 +163,8 @@ const MyProgressPage = () => {
   const hasPreReq = (subjectCode: string) => {
     let hasPreReq = true;
     const preReq = preRequisites.current[subjectCode];
-    if (!preReq && !userApprovedSubjects.includes(subjectCode)) hasPreReq = false;
+    if (!preReq && !userApprovedSubjects.includes(subjectCode))
+      hasPreReq = false;
     else if (preReq) {
       forEach(preReq, (value) => {
         if (!userApprovedSubjects.includes(value)) hasPreReq = false;
@@ -171,11 +178,43 @@ const MyProgressPage = () => {
     const preReq = preRequisites.current[subjectCode];
     return preReq ? preReq.length : 0;
   };
+
   // Validate if subject is out of projection
-  let studentLevel = Math.max(...subjects
-    .filter(subject => userApprovedSubjects.includes(subject.code))
-    .map(subject => subject.semester)
-  );
+  const iOutOfProyection = (subject: any) => {
+    if (approvedSubjects.length === 0) {
+      return false;
+    }
+
+    let studentLevel = Math.max(
+      ...subjects
+        .filter((subject) => userApprovedSubjects.includes(subject.code))
+        .map((subject) => subject.semester)
+    );
+
+    if (subject.semester > studentLevel + 2 && hasPreReq(subject.code)) {
+      return true;
+    } else if (
+      subject.semester > studentLevel + 2 &&
+      getPreReqLength(subject.code) === 0
+    ) {
+      return true;
+    }
+
+    return false;
+  };
+
+  // Put background color to subject
+  const backgroundColorButton = (subject: any) => {
+    if (userApprovedSubjects.includes(subject.code)) {
+      return Colors.primaryGray;
+    } else if (iOutOfProyection(subject)) {
+      return Colors.secondaryYellow;
+    } else if (hasPreReq(subject.code)) {
+      return Colors.secondaryGreen;
+    }
+
+    return Colors.white;
+  };
 
   // Map subjects by semester
   const mapSubjectsBySemester = (
@@ -185,18 +224,12 @@ const MyProgressPage = () => {
   ) =>
     subjects.map((subject) => {
       if (subject.semester === semester) {
-        
         const mappedSubject = (
           <ProgressCard
             key={subject.code}
             subject={subject}
             isLargeScreen={isLargeScreen}
-          backgroundColorButton={ 
-          userApprovedSubjects.includes(subject.code) ? Colors.primaryGray : 
-          ((subject.semester > studentLevel + 2 && hasPreReq(subject.code)) || (subject.semester > studentLevel + 2 && getPreReqLength(subject.code) === 0)) ? Colors.secondaryYellow :
-          hasPreReq(subject.code) ? Colors.secondaryGreen :
-          Colors.white
-        }
+            backgroundColorButton={backgroundColorButton(subject)}
           />
         );
         return mappedSubject;
@@ -212,26 +245,43 @@ const MyProgressPage = () => {
     setHelpDialogOpen(false);
   };
 
+  // Save subjects
   const saveSubjects = () => {
+    // If no changes, return
+    if (
+      modifySubject.addSubjects.length === 0 &&
+      modifySubject.deleteSubjects.length === 0
+    ) {
+      console.log("No changes to save");
+      return;
+    }
+
     console.log("Saving subjects...");
-    console.log(JSON.stringify(modifySubject, null, 2));
-    setLoading(true);
-    agent.Subjects.list()
-      .then((res: Subject[]) => {
-        res.forEach((s) => (s.name = subjectsCapitalize(s.name)));
-        setSubjects(res);
+    // Endpoint call
+    agent.Auth.updateMyProgress(modifySubject)
+      .then((res) => {
+        console.log("Subjects updated!");
+        // Delete all subjects from arrays
+
+        modifySubject.addSubjects = [];
+        modifySubject.deleteSubjects = [];
       })
-      .catch((err) => console.log(err))
-      .finally(() => setLoading(false));
-    modifySubject.addSubject = [];
-    modifySubject.deleteSubject = [];
+      .catch((err) => console.log(err));
   };
 
+  // Cancel subjects and clean arrays
   const cancelSubjects = () => {
+    if (
+      modifySubject.addSubjects.length === 0 &&
+      modifySubject.deleteSubjects.length === 0
+    ) {
+      console.log("No changes to cancel");
+      return;
+    }
     console.log("Canceling subjects...");
     // Delete all subjects from array
-    modifySubject.addSubject = [];
-    modifySubject.deleteSubject = [];
+    modifySubject.addSubjects = [];
+    modifySubject.deleteSubjects = [];
     setLoading(true);
     agent.Subjects.list()
       .then((res: Subject[]) => {

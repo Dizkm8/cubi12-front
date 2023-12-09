@@ -17,6 +17,7 @@ const requests = {
   post: (url: string, body: {}) => axios.post(url, body).then(responseBody),
   put: (url: string, body: {}) => axios.put(url, body).then(responseBody),
   delete: (url: string) => axios.delete(url).then(responseBody),
+  patch: (url: string, body: {}) => axios.patch(url, body).then(responseBody),
 };
 
 const Auth = {
@@ -32,6 +33,7 @@ const Auth = {
   updateProfile: (form: any) => requests.put("users/update-profile", form),
   profile: () => requests.get("users/profile"),
   myProgress: () => requests.get("users/my-progress"),
+  updateMyProgress: (form: any) => requests.patch("users/my-progress", form),
 };
 
 const Subjects = {

@@ -16,7 +16,7 @@ const style = {
   margin: "1rem 0",
   padding: "0.5rem",
   fontSize: "1rem",
-  backgroundColor: "#FFF",
+  backgroundColor: Colors.white,
 };
 
 // subject fontsize
@@ -55,8 +55,8 @@ interface Props {
 }
 
 export const modifySubject = {
-  addSubject: [] as string[],
-  deleteSubject: [] as string[],
+  addSubjects: [] as string[],
+  deleteSubjects: [] as string[],
 };
 
 export const ProgressCard = ({ subject, isLargeScreen, backgroundColorButton }: Props) => {
@@ -93,12 +93,12 @@ export const ProgressCard = ({ subject, isLargeScreen, backgroundColorButton }: 
       setBackgroundColor(Colors.white);
       // if subject is in approved subjects array, add subject to delete on array
       if(approvedSubjects.includes(code)) {
-        modifySubject.deleteSubject.push(code);
+        modifySubject.deleteSubjects.push(code);
       }
       else {
-        const index = modifySubject.addSubject.indexOf(code);
+        const index = modifySubject.addSubjects.indexOf(code);
         if (index !== -1) {
-          modifySubject.addSubject.splice(index, 1);
+          modifySubject.addSubjects.splice(index, 1);
         }
       }
     }
@@ -107,17 +107,18 @@ export const ProgressCard = ({ subject, isLargeScreen, backgroundColorButton }: 
     if (
       backgroundColor === Colors.secondarySkyblue ||
       backgroundColor === Colors.white ||
-      backgroundColor === Colors.secondaryGreen
+      backgroundColor === Colors.secondaryGreen ||
+      backgroundColor === Colors.secondaryYellow
     ) {
       setBackgroundColor(Colors.primaryGray);
       // add subject to array
       if(!approvedSubjects.includes(code)) {
-        modifySubject.addSubject.push(code);
+        modifySubject.addSubjects.push(code);
       }
       else {
-        const index = modifySubject.deleteSubject.indexOf(code);
+        const index = modifySubject.deleteSubjects.indexOf(code);
         if (index !== -1) {
-          modifySubject.deleteSubject.splice(index, 1);
+          modifySubject.deleteSubjects.splice(index, 1);
         }
       }
     }
