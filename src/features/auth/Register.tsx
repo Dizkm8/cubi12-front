@@ -18,10 +18,12 @@ import Alert from "@mui/material/Alert";
 import Fade from "@mui/material/Fade";
 import { LoadingButton } from "@mui/lab";
 import Colors from "../../app/static/colors";
+import { useMediaQuery } from "@mui/material";
 
 const rutRegex = /^(\d{1,3}(\.\d{3})*-\d|(\d{1,3}(\.\d{3})*-[Kk]))$/;
 const pwdRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{10,16}$/;
-const emailRegex = /^[a-zA-Z]+(?:\.[a-zA-Z]+)?\d*?@(?:([a-zA-Z]+\.)+)?\ucn\.cl$/;
+const emailRegex =
+  /^[a-zA-Z]+(?:\.[a-zA-Z]+)?\d*?@(?:([a-zA-Z]+\.)+)?\ucn\.cl$/;
 const nameRegex = /^[a-zA-Z]{3,50}$/;
 const flNameRegex = /^[a-zA-Z]{3,30}$/;
 
@@ -29,15 +31,30 @@ const nameErrorMsg = "Debe contener entre 3 y 50 caracteres, solo letras.";
 const flNameErrorMsg = "Debe contener entre 3 y 30 caracteres, solo letras.";
 const rutErrorMsg = "RUT con puntos y guión (Ej: 12.345.678-9)";
 const emailErrorMsg = "El correo debe ser del dominio ucn.";
-const pwdErrorMsg = "Debe contener al menos 10 caracteres, una mayúscula y un número.";
+const pwdErrorMsg =
+  "Debe contener al menos 10 caracteres, una mayúscula y un número.";
 const matchPwdErrorMsg = "La contraseña no coincide.";
+
+const formStyle = {
+  mt: 3,
+  border: Colors.black,
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.5)",
+  height: "80%",
+  width: "50%",
+  mb: 3,
+  backgroundColor: Colors.secondaryWhite,
+};
 
 const defaultTheme = createTheme();
 
 export default function SignUp() {
+  const isSmallScreen = useMediaQuery("(max-width:600px)");
   const { setAuthenticated } = useContext(AuthContext);
   const navigate = useNavigate();
-  
+
   const [name, setName] = useState<string>("");
   const [validName, setValidName] = useState<boolean>(false);
 
@@ -201,421 +218,411 @@ export default function SignUp() {
         display: "flex",
       }}
     >
-      <ThemeProvider theme={defaultTheme}>
-        <Container
-          component="main"
-          maxWidth="md"
+      <Container
+        component="main"
+        maxWidth="md"
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          margin: 0,
+        }}
+      >
+        <CssBaseline />
+
+        <Box
+          component="form"
+          noValidate
+          onSubmit={handleSubmit}
           sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
+            ...formStyle,
+            width: isSmallScreen ? "100%" : "50%",
           }}
         >
-          <CssBaseline />
-
-          <Box
-            component="form"
-            noValidate
-            onSubmit={handleSubmit}
+          <Typography
+            component="h1"
+            variant="h5"
+            className="font-title"
             sx={{
+              marginBottom: 1,
               mt: 3,
-              border: Colors.black,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.5)",
-              height: "80%",
-              width: "53%",
-              mb: 3,
-              backgroundColor: Colors.secondaryWhite,
+              fontSize: "2rem",
+              [defaultTheme.breakpoints.down("md")]: {
+                fontSize: "1.5rem",
+              },
+              [defaultTheme.breakpoints.down("sm")]: {
+                fontSize: "1rem",
+              },
             }}
           >
-            <Typography
-              component="h1"
-              variant="h5"
-              className="font-title"
-              sx={{
-                marginBottom: 1,
-                mt: 3,
-                fontSize: "2rem", 
-                [defaultTheme.breakpoints.down("md")]: {
-                  fontSize: "1.5rem",
-                },
-                [defaultTheme.breakpoints.down("sm")]: {
-                  fontSize: "1rem",
-                },
-              }}
-            >
-              REGÍSTRATE
-            </Typography>
+            REGÍSTRATE
+          </Typography>
 
-            <Grid container spacing={1.1} justifyContent="flex-end">
-              <Grid item xs={12} container>
-                {checked && (
-                  <Fade in={checked}>
-                    <Alert
-                      severity="error"
-                      sx={{
-                        width: "89.5%",
-                        ml: 3,
-                        mr: 3,
-                        mb: 1,
-                        textAlign: "center",
-                      }}
-                    >
-                      {errorType === "rut" && "El RUT ya está registrado"}
-                      {errorType === "email" &&
-                        "El correo electrónico ya está registrado"}
-                      {errorType === "general" &&
-                        "Ocurrio un error, intente nuevamente"}
-                    </Alert>
-                  </Fade>
-                )}
-                <TextField
-                  helperText={
-                    !validName && name.trim() !== ""
-                      ? nameErrorMsg
-                      : ""
-                  }
-                  aria-describedby="namenote"
-                  onChange={(e: { target: { value: React.SetStateAction<string>; }; }) => setName(e.target.value)}
-                  aria-invalid={validName && name.trim() !== ""}
-                  value={name}
-                  error={!validName && name.trim() !== ""}
-                  variant="filled"
-                  id="name"
-                  label="Nombre"
-                  name="name"
-                  required
-                  autoComplete="off"
-                  size="small"
-                  InputLabelProps={{
-                    sx: {
-                      fontSize: "14px",
-                      fontFamily: "Raleway",
-                    },
-                  }}
-                  sx={{
-                    width: "89.5%",
-                    ml: 3,
-                    mr: 3,
-                    boxShadow:
-                      validName
-                        ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
-                        : "none",
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} md={12} spacing={1.1} container>
-                <Grid item xs={6} md={6} container>
-                  <TextField
-                    helperText={
-                      !validFirstName && firstName.trim() !== ""
-                        ? flNameErrorMsg
-                        : ""
-                    }
-                    aria-describedby="flNote"
-                    onChange={(e: { target: { value: React.SetStateAction<string>; }; }) => setFirstName(e.target.value)}
-                    aria-invalid={validFirstName && firstName.trim() !== ""}
-                    value={firstName}
-                    error={!validFirstName && firstName.trim() !== ""}
-                    autoComplete="off"
-                    name="firstName"
-                    required
-                    variant="filled"
-                    id="firstName"
-                    label="Primer Apellido"
-                    size="small"
-                    InputLabelProps={{
-                      sx: {
-                        fontSize: "14px",
-                        fontFamily: "Raleway",
-                        width: "100%",
-                      },
-                    }}
+          <Grid container spacing={1.1} justifyContent="flex-end">
+            <Grid item xs={12} container>
+              {checked && (
+                <Fade in={checked}>
+                  <Alert
+                    severity="error"
                     sx={{
-                      ml: 3,
-                      boxShadow:
-                        validFirstName
-                          ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
-                          : "none",
-                    }}
-                  />
-                </Grid>
-                <Grid item xs={6} md={6} container>
-                  <TextField
-                    helperText={
-                      !validLastName && lastName.trim() !== ""
-                        ? flNameErrorMsg
-                        : ""
-                    }
-                    required
-                    onChange={(e: { target: { value: React.SetStateAction<string>; }; }) => setLastName(e.target.value)}
-                    aria-invalid={validLastName && lastName.trim() !== ""}
-                    value={lastName}
-                    error={!validLastName && lastName.trim() !== ""}
-                    aria-describedby="flNote"
-                    id="lastName"
-                    variant="filled"
-                    label="Segundo Apellido"
-                    name="lastName"
-                    autoComplete="off"
-                    size="small"
-                    InputLabelProps={{
-                      sx: {
-                        fontSize: "14px",
-                        fontFamily: "Raleway",
-                        width: "100%",
-                      },
-                    }}
-                    sx={{
-                      mr: 3,
-                      boxShadow:
-                        validLastName
-                        ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
-                        : "none",
-                    }}
-                  />
-                </Grid>
-              </Grid>
-              <Grid item xs={12} container>
-                <TextField
-                  helperText={
-                    !validRut && rut.trim() !== ""
-                      ? rutErrorMsg
-                      : ""
-                  }
-                  required
-                  onChange={(e: { target: { value: React.SetStateAction<string>; }; }) => setRut(e.target.value)}
-                  aria-invalid={validRut && rut.trim() !== ""}
-                  value={rut}
-                  error={!validRut && rut.trim() !== ""}
-                  aria-describedby="rutnote"
-                  variant="filled"
-                  id="rut"
-                  label="RUT"
-                  name="rut"
-                  autoComplete="rut"
-                  size="small"
-                  InputLabelProps={{
-                    sx: {
-                      fontSize: "14px",
-                      fontFamily: "Raleway",
-                    },
-                  }}
-                  sx={{
-                    width: "89.5%",
-                    ml: 3,
-                    mr: 3,
-                    boxShadow:
-                      validRut
-                        ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
-                        : "none",
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} container>
-                <TextField
-                  helperText={
-                    !validEmail && email.trim() !== ""
-                      ? emailErrorMsg
-                      : ""
-                  }
-                  error={!validEmail && email.trim() !== ""}
-                  aria-invalid={validEmail && email.trim() !== ""}
-                  value={email}
-                  onChange={(e: { target: { value: React.SetStateAction<string>; }; }) => setEmail(e.target.value)}
-                  required
-                  id="email"
-                  label="Correo electrónico"
-                  name="email"
-                  variant="filled"
-                  autoComplete="off"
-                  size="small"
-                  InputLabelProps={{
-                    sx: {
-                      fontSize: "14px",
-                      fontFamily: "Raleway",
-                    },
-                  }}
-                  sx={{
-                    width: "89.5%",
-                    ml: 3,
-                    mr: 3,
-                    boxShadow:
-                    validEmail
-                      ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
-                      : "none",
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} container>
-                <TextField
-                  required
-                  onChange={(e: { target: { value: React.SetStateAction<string>; }; }) => setCareer(e.target.value)}
-                  value={career}
-                  id="career"
-                  select
-                  label="Carrera"
-                  name="career"
-                  size="small"
-                  variant="filled"
-                  InputLabelProps={{
-                    sx: {
-                      fontSize: "14px",
-                      fontFamily: "Raleway",
-                    },
-                  }}
-                  sx={{
-                    width: "89.5%",
-                    ml: 3,
-                    mr: 3,
-                    boxShadow: "0px 2px 2px rgba(0, 0, 0, 0.2)",
-                  }}
-                >
-                  {careers.map((career, index) => (
-                    <MenuItem key={index} value={career["id"]}>
-                      {startCase(career["name"])}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              </Grid>
-
-              <Grid item xs={12} container>
-                <TextField
-                  helperText={
-                    !validPwd && pwd.trim() !== ""
-                      ? pwdErrorMsg
-                      : ""
-                  }
-                  required
-                  fullWidth
-                  aria-invalid={validPwd && pwd.trim() !== ""}
-                  onChange={(e: { target: { value: React.SetStateAction<string>; }; }) => setPwd(e.target.value)}
-                  value={pwd}
-                  error={!validPwd && pwd.trim() !== ""}
-                  aria-describedby="pwdnote"
-                  name="password"
-                  label="Contraseña"
-                  type="password"
-                  id="password"
-                  autoComplete="new-password"
-                  size="small"
-                  variant="filled"
-                  InputLabelProps={{
-                    sx: {
-                      fontSize: "14px",
-                      fontFamily: "Raleway",
-                    },
-                  }}
-                  sx={{
-                    width: "89.5%",
-                    ml: 3,
-                    mr: 3,
-                    boxShadow:
-                    validPwd
-                      ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
-                      : "none",
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} container>
-                <TextField
-                  helperText={
-                    !validMatch && matchPwd.trim() !== ""
-                      ? matchPwdErrorMsg
-                      : ""
-                  }
-                  required
-                  onChange={(e: { target: { value: React.SetStateAction<string>; }; }) => setMatchPwd(e.target.value)}
-                  aria-invalid={validMatch && matchPwd.trim() !== ""}
-                  value={matchPwd}
-                  error={!validMatch && matchPwd.trim() !== ""}
-                  type="password"
-                  id="repeatPassword"
-                  label="Repetir contraseña"
-                  name="repeatPassword"
-                  autoComplete="RepeatPassword"
-                  size="small"
-                  variant="filled"
-                  InputLabelProps={{
-                    sx: {
-                      fontSize: "14px",
-                      fontFamily: "Raleway",
-                    },
-                  }}
-                  sx={{
-                    width: "89.5%",
-                    ml: 3,
-                    mb: 1,
-                    mr: 3,
-                    boxShadow:
-                    validMatch
-                      ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
-                      : "none",
-                  }}
-                />
-              </Grid>
-              <Grid item>
-                <Typography
-                  variant="body2"
-                  color="textPrimary"
-                  textAlign="right"
-                  sx={{
-                    [defaultTheme.breakpoints.down("md")]: {
-                      fontSize: "0.8rem",
-                    },
-                    [defaultTheme.breakpoints.down("sm")]: {
-                      fontSize: "0.7rem",
+                      width: "89.5%",
                       ml: 3,
                       mr: 3,
-                    },
-                  }}
-                >
-                  ¿Ya tienes cuenta?{" "}
-                  <Link
-                    marginRight={3}
-                    href="/login"
-                    color="primary"
-                    underline="hover"
-                    fontWeight="600"
-                    style={{ color: Colors.primaryOrange }}
+                      mb: 1,
+                      textAlign: "center",
+                    }}
                   >
-                    Inicia Sesión
-                  </Link>
-                </Typography>
+                    {errorType === "rut" && "El RUT ya está registrado"}
+                    {errorType === "email" &&
+                      "El correo electrónico ya está registrado"}
+                    {errorType === "general" &&
+                      "Ocurrio un error, intente nuevamente"}
+                  </Alert>
+                </Fade>
+              )}
+              <TextField
+                helperText={
+                  !validName && name.trim() !== "" ? nameErrorMsg : ""
+                }
+                aria-describedby="namenote"
+                onChange={(e: {
+                  target: { value: React.SetStateAction<string> };
+                }) => setName(e.target.value)}
+                aria-invalid={validName && name.trim() !== ""}
+                value={name}
+                error={!validName && name.trim() !== ""}
+                variant="filled"
+                id="name"
+                label="Nombre"
+                name="name"
+                required
+                autoComplete="off"
+                size="small"
+                InputLabelProps={{
+                  sx: {
+                    fontSize: "14px",
+                    fontFamily: "Raleway",
+                  },
+                }}
+                sx={{
+                  width: "89.5%",
+                  ml: 3,
+                  mr: 3,
+                  boxShadow: validName
+                    ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
+                    : "none",
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} md={12} spacing={1.1} container>
+              <Grid item xs={6} md={6} container>
+                <TextField
+                  helperText={
+                    !validFirstName && firstName.trim() !== ""
+                      ? flNameErrorMsg
+                      : ""
+                  }
+                  aria-describedby="flNote"
+                  onChange={(e: {
+                    target: { value: React.SetStateAction<string> };
+                  }) => setFirstName(e.target.value)}
+                  aria-invalid={validFirstName && firstName.trim() !== ""}
+                  value={firstName}
+                  error={!validFirstName && firstName.trim() !== ""}
+                  autoComplete="off"
+                  name="firstName"
+                  required
+                  variant="filled"
+                  id="firstName"
+                  label="Primer Apellido"
+                  size="small"
+                  InputLabelProps={{
+                    sx: {
+                      fontSize: "14px",
+                      fontFamily: "Raleway",
+                      width: "100%",
+                    },
+                  }}
+                  sx={{
+                    ml: 3,
+                    boxShadow: validFirstName
+                      ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
+                      : "none",
+                  }}
+                />
+              </Grid>
+              <Grid item xs={6} md={6} container>
+                <TextField
+                  helperText={
+                    !validLastName && lastName.trim() !== ""
+                      ? flNameErrorMsg
+                      : ""
+                  }
+                  required
+                  onChange={(e: {
+                    target: { value: React.SetStateAction<string> };
+                  }) => setLastName(e.target.value)}
+                  aria-invalid={validLastName && lastName.trim() !== ""}
+                  value={lastName}
+                  error={!validLastName && lastName.trim() !== ""}
+                  aria-describedby="flNote"
+                  id="lastName"
+                  variant="filled"
+                  label="Segundo Apellido"
+                  name="lastName"
+                  autoComplete="off"
+                  size="small"
+                  InputLabelProps={{
+                    sx: {
+                      fontSize: "14px",
+                      fontFamily: "Raleway",
+                      width: "100%",
+                    },
+                  }}
+                  sx={{
+                    mr: 3,
+                    boxShadow: validLastName
+                      ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
+                      : "none",
+                  }}
+                />
               </Grid>
             </Grid>
-            <LoadingButton
-              loading={loading}
-              type="submit"
-              style={{ backgroundColor: Colors.primaryBlue, width: "89%", height: 50 }}
-              variant="contained"
-              sx={{
-                mt: 2,
-                mb: 2,
-                fontFamily: "Raleway, sans-serif",
-                fontSize: "20px",
-                fontWeight: 300,
-                textTransform: "none",
-              }}
-              disabled={
-                !validPwd ||
-                !validMatch ||
-                !validRut ||
-                !validName ||
-                !validFirstName ||
-                !validLastName ||
-                !validEmail
-                  ? true
-                  : false
-              }
-            >
-              Registrarme
-            </LoadingButton>
-          </Box>
-        </Container>
-      </ThemeProvider>
+            <Grid item xs={12} container>
+              <TextField
+                helperText={!validRut && rut.trim() !== "" ? rutErrorMsg : ""}
+                required
+                onChange={(e: {
+                  target: { value: React.SetStateAction<string> };
+                }) => setRut(e.target.value)}
+                aria-invalid={validRut && rut.trim() !== ""}
+                value={rut}
+                error={!validRut && rut.trim() !== ""}
+                aria-describedby="rutnote"
+                variant="filled"
+                id="rut"
+                label="RUT"
+                name="rut"
+                autoComplete="rut"
+                size="small"
+                InputLabelProps={{
+                  sx: {
+                    fontSize: "14px",
+                    fontFamily: "Raleway",
+                  },
+                }}
+                sx={{
+                  width: "89.5%",
+                  ml: 3,
+                  mr: 3,
+                  boxShadow: validRut
+                    ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
+                    : "none",
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} container>
+              <TextField
+                helperText={
+                  !validEmail && email.trim() !== "" ? emailErrorMsg : ""
+                }
+                error={!validEmail && email.trim() !== ""}
+                aria-invalid={validEmail && email.trim() !== ""}
+                value={email}
+                onChange={(e: {
+                  target: { value: React.SetStateAction<string> };
+                }) => setEmail(e.target.value)}
+                required
+                id="email"
+                label="Correo electrónico"
+                name="email"
+                variant="filled"
+                autoComplete="off"
+                size="small"
+                InputLabelProps={{
+                  sx: {
+                    fontSize: "14px",
+                    fontFamily: "Raleway",
+                  },
+                }}
+                sx={{
+                  width: "89.5%",
+                  ml: 3,
+                  mr: 3,
+                  boxShadow: validEmail
+                    ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
+                    : "none",
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} container>
+              <TextField
+                required
+                onChange={(e: {
+                  target: { value: React.SetStateAction<string> };
+                }) => setCareer(e.target.value)}
+                value={career}
+                id="career"
+                select
+                label="Carrera"
+                name="career"
+                size="small"
+                variant="filled"
+                InputLabelProps={{
+                  sx: {
+                    fontSize: "14px",
+                    fontFamily: "Raleway",
+                  },
+                }}
+                sx={{
+                  width: "89.5%",
+                  ml: 3,
+                  mr: 3,
+                  boxShadow: "0px 2px 2px rgba(0, 0, 0, 0.2)",
+                }}
+              >
+                {careers.map((career, index) => (
+                  <MenuItem key={index} value={career["id"]}>
+                    {startCase(career["name"])}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+
+            <Grid item xs={12} container>
+              <TextField
+                helperText={!validPwd && pwd.trim() !== "" ? pwdErrorMsg : ""}
+                required
+                fullWidth
+                aria-invalid={validPwd && pwd.trim() !== ""}
+                onChange={(e: {
+                  target: { value: React.SetStateAction<string> };
+                }) => setPwd(e.target.value)}
+                value={pwd}
+                error={!validPwd && pwd.trim() !== ""}
+                aria-describedby="pwdnote"
+                name="password"
+                label="Contraseña"
+                type="password"
+                id="password"
+                autoComplete="new-password"
+                size="small"
+                variant="filled"
+                InputLabelProps={{
+                  sx: {
+                    fontSize: "14px",
+                    fontFamily: "Raleway",
+                  },
+                }}
+                sx={{
+                  width: "89.5%",
+                  ml: 3,
+                  mr: 3,
+                  boxShadow: validPwd
+                    ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
+                    : "none",
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} container>
+              <TextField
+                helperText={
+                  !validMatch && matchPwd.trim() !== "" ? matchPwdErrorMsg : ""
+                }
+                required
+                onChange={(e: {
+                  target: { value: React.SetStateAction<string> };
+                }) => setMatchPwd(e.target.value)}
+                aria-invalid={validMatch && matchPwd.trim() !== ""}
+                value={matchPwd}
+                error={!validMatch && matchPwd.trim() !== ""}
+                type="password"
+                id="repeatPassword"
+                label="Repetir contraseña"
+                name="repeatPassword"
+                autoComplete="RepeatPassword"
+                size="small"
+                variant="filled"
+                InputLabelProps={{
+                  sx: {
+                    fontSize: "14px",
+                    fontFamily: "Raleway",
+                  },
+                }}
+                sx={{
+                  width: "89.5%",
+                  ml: 3,
+                  mb: 1,
+                  mr: 3,
+                  boxShadow: validMatch
+                    ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
+                    : "none",
+                }}
+              />
+            </Grid>
+            <Grid item>
+              <Typography
+                variant="body2"
+                color="textPrimary"
+                textAlign="right"
+                sx={{
+                  [defaultTheme.breakpoints.down("md")]: {
+                    fontSize: "0.8rem",
+                  },
+                  [defaultTheme.breakpoints.down("sm")]: {
+                    fontSize: "0.7rem",
+                    ml: 3,
+                    mr: 3,
+                  },
+                }}
+              >
+                ¿Ya tienes cuenta?{" "}
+                <Link
+                  marginRight={3}
+                  href="/login"
+                  color="primary"
+                  underline="hover"
+                  fontWeight="600"
+                  style={{ color: Colors.primaryOrange }}
+                >
+                  Inicia Sesión
+                </Link>
+              </Typography>
+            </Grid>
+          </Grid>
+          <LoadingButton
+            loading={loading}
+            type="submit"
+            style={{
+              backgroundColor: Colors.primaryBlue,
+              width: "89%",
+              height: 50,
+            }}
+            variant="contained"
+            sx={{
+              mt: 2,
+              mb: 2,
+              fontFamily: "Raleway, sans-serif",
+              fontSize: "20px",
+              fontWeight: 300,
+              textTransform: "none",
+            }}
+            disabled={
+              !validPwd ||
+              !validMatch ||
+              !validRut ||
+              !validName ||
+              !validFirstName ||
+              !validLastName ||
+              !validEmail
+                ? true
+                : false
+            }
+          >
+            Registrarme
+          </LoadingButton>
+        </Box>
+      </Container>
     </Paper>
   );
 }

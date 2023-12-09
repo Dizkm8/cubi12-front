@@ -29,7 +29,7 @@ const Navbar = () => {
     : ["Inicio", "Malla Interactiva"];
   const settings = authenticated
     ? [loggedName, "Mis datos", "Cerrar Sesión"]
-    : ["Invitado", "Iniciar Sesión"];
+    : ["Invitado", "Iniciar Sesión", "Registrarse"];
 
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
@@ -59,6 +59,7 @@ const Navbar = () => {
   // Identify direction
   const identifyDirection = (setting: string) => {
     if (setting === "Iniciar Sesión") return "/login";
+    if (setting === "Registrarse") return "/register";
     else if (setting === "Mis datos") return "/edit-profile";
     else if (setting === "Cerrar Sesión") return "/";
     return "#";
@@ -139,7 +140,18 @@ const Navbar = () => {
             >
               {pages.map((page) => (
                 <MenuItem key={page} onClick={handleCloseNavMenu}>
-                  <Typography textAlign="center">{page}</Typography>
+                  <Link
+                    to={
+                      page === "Inicio"
+                        ? "/"
+                        : page === "Malla Interactiva"
+                        ? "/interactive-mesh"
+                        : "/"
+                    }
+                    style={{ textDecoration: "none", color: "inherit" }}
+                  >
+                    <Typography textAlign="center">{page}</Typography>
+                  </Link>
                 </MenuItem>
               ))}
             </Menu>
@@ -216,7 +228,8 @@ const Navbar = () => {
                     disabled={
                       setting !== "Iniciar Sesión" &&
                       setting !== "Cerrar Sesión" &&
-                      setting !== "Mis datos"
+                      setting !== "Mis datos" &&
+                      setting !== "Registrarse"
                     }
                   >
                     <Typography
