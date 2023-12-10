@@ -348,10 +348,12 @@ const MyProgressPage = () => {
           color="secondary"
           style={{
             color: `${Colors.primaryRed}`,
-            transform: "scale(1.05)",
+            border: `1px solid ${Colors.primaryRed}`,
             fontFamily: "Raleway, sans-serif",
             fontSize: "85%",
+            transform: "scale(1.05)",
             marginLeft: "auto",
+            boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.2)",
           }}
           onClick={cancelSubjects}
         >
@@ -364,13 +366,13 @@ const MyProgressPage = () => {
           variant="contained"
           color="warning"
           style={{
-            transform: "scale(1.05)",
             color: "white",
-            marginLeft: "2%",
             backgroundColor: `${Colors.primaryBlue}`,
-            boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.2)",
             fontFamily: "Raleway, sans-serif",
             fontSize: "85%",
+            transform: "scale(1.05)",
+            marginLeft: "2%",
+            boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.2)",
           }}
           onClick={saveSubjects}
         >

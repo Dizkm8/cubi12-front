@@ -495,6 +495,7 @@ const EditProfile = () => {
                                                 boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.2)",
                                                 fontFamily: "Raleway, sans-serif",
                                                 fontSize: "85%",
+                                                border: `1px solid ${Colors.primaryRed}`,
                                             }}
                                             onClick={() => { clearInputs(true, false, true) }}
                                         >Cancelar
@@ -635,6 +636,7 @@ const EditProfile = () => {
                                                 boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.2)",
                                                 fontFamily: "Raleway, sans-serif",
                                                 fontSize: "85%",
+                                                border: `1px solid ${Colors.primaryRed}`,
                                             }}
                                             onClick={() => { clearInputs(false, true, true) }}
                                         >Cancelar
