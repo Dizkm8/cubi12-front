@@ -157,10 +157,6 @@ const MyProgressPage = () => {
       .catch((err) => console.log(err));
   }, []);
 
-  useEffect(() => {
-    
-  }, []);
-
   // Validate if subject has pre-requisites
   const hasPreReq = (subjectCode: string) => {
     let hasPreReq = true;
@@ -247,14 +243,6 @@ const MyProgressPage = () => {
     setHelpDialogOpen(false);
   };
 
-  // Modify approved subjects
-  const modifyApprovedSubjects = () => {
-    approvedSubjects.push(...modifySubject.addSubjects);
-    approvedSubjects = approvedSubjects.filter(subject => !modifySubject.deleteSubjects.includes(subject));
-    setUserApprovedSubjects(approvedSubjects);
-    cancelSubjects();
-  }
-
   // Save subjects
   const saveSubjects = () => {
     // If no changes, return
@@ -265,12 +253,13 @@ const MyProgressPage = () => {
       console.log("No changes to save");
       return;
     }
-    console.log("Saving subjects...");
     // Endpoint call
     agent.Auth.updateMyProgress(modifySubject)
       .then((res) => {
-        console.log("Subjects updated!");
-        modifyApprovedSubjects();
+        approvedSubjects.push(...modifySubject.addSubjects);
+        approvedSubjects = approvedSubjects.filter(subject => !modifySubject.deleteSubjects.includes(subject));
+        setUserApprovedSubjects(approvedSubjects);
+        cancelSubjects();
       })
       .catch((err) => console.log(err));
   };
@@ -284,7 +273,6 @@ const MyProgressPage = () => {
       console.log("No changes to cancel");
       return;
     }
-    console.log("Canceling subjects...");
     // Delete all subjects from array
     modifySubject.addSubjects = [];
     modifySubject.deleteSubjects = [];
