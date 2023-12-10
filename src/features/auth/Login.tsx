@@ -9,43 +9,27 @@ import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Paper from "@mui/material/Paper";
 import Agent from "../../app/api/agent";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { AuthContext } from "../../app/context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import Alert from "@mui/material/Alert";
 import Fade from "@mui/material/Fade";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import GenerateTabTitle from "../../app/utils/TitleGenerator";
-import { LoadingButton } from '@mui/lab';
+import { LoadingButton } from "@mui/lab";
 import Colors from "../../app/static/colors";
+import Regex from "../../app/utils/Regex";
 
 const defaultTheme = createTheme();
 
-const pwdRegex: RegExp = /^.+$/;
-const emailRegex: RegExp =
-/^[a-zA-Z]+(?:\.[a-zA-Z]+)?\d*?@(?:([a-zA-Z]+\.)+)?\ucn\.cl$/;
-
-
 const LogIn = () => {
-  document.title = GenerateTabTitle("Iniciar Sesión");
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<boolean>(false);
   const { setAuthenticated } = useContext(AuthContext);
+  const isMobile = useMediaQuery(defaultTheme.breakpoints.down("sm"));
   const navigate = useNavigate();
 
-  const [pwd, setPwd] = useState<string>("");
-  const [email, setemail] = useState<string>("");
-
-  const [emailError, setEmailError] = useState<boolean>(false);
-  const [pwdError, setPwdError] = useState<boolean>(false);
-
-  const emailErrorMsg: string = "Ingrese un correo electrónico válido";
-  const pwdErrorMsg: string = "El campo está vacío";
-
-  const [checked, setChecked] = useState(false);
-  const [disabled, setDisabled] = useState(true);
-
-  const isMobile = useMediaQuery(defaultTheme.breakpoints.down("sm"));
-
-  const [loading, setLoading] = useState<boolean>(false);
+  document.title = GenerateTabTitle("Iniciar Sesión");
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -55,43 +39,27 @@ const LogIn = () => {
     sendData(Email, Password);
   };
 
-  useEffect(() => {
-    if (emailError || pwdError || !email || !pwd) {
-      setDisabled(true);
-    } else {
-      setDisabled(false);
-    }
-  }, [emailError, pwdError, email, pwd]);
+  const handleSuccessfullyLogin = (data: any) => {
+    Agent.token = data;
+    localStorage.setItem("token", data);
+    setAuthenticated(true);
+    navigate("/");
+  };
 
   const handleFieldChange = (event: any) => {
-    const { name, value } = event.target;
-    if (name === "email") {
-      setemail(value);
-      const isValid = emailRegex.test(value);
-      setEmailError(!isValid);
-    } else if (name === "password") {
-      setPwd(value);
-      const isValid = pwdRegex.test(value);
-      setPwdError(!isValid);
-    }
+    if (error) setError(false);
   };
+
   const sendData = (email: string, password: string) => {
+    if (!Regex.emailRegex.test(email) || !Regex.pwdRegex.test(password)) {
+      setError(true);
+      return;
+    }
     setLoading(true);
     Agent.Auth.login({ email, password })
-      .then((data) => {
-        Agent.token = data;
-        localStorage.setItem("token", data);
-        setAuthenticated(true);
-        navigate("/");
-      })
-      .catch((err) => {
-        console.log(err);
-        setChecked(true);
-      })
-      .finally(()=>{
-        setLoading(false);
-      });
-
+      .then(handleSuccessfullyLogin)
+      .catch(() => setError(true))
+      .finally(() => setLoading(false));
   };
 
   return (
@@ -145,8 +113,8 @@ const LogIn = () => {
               </Typography>
               <Grid container spacing={1.1} justifyContent="flex-end">
                 <Grid item xs={12}>
-                  {checked && (
-                    <Fade in={checked}>
+                  {error && (
+                    <Fade in={error}>
                       <Alert
                         severity="error"
                         sx={{
@@ -169,10 +137,7 @@ const LogIn = () => {
                     label="Correo electrónico"
                     name="email"
                     variant="filled"
-                    value={email}
                     onChange={handleFieldChange}
-                    error={emailError}
-                    helperText={emailError ? emailErrorMsg : ""}
                     autoComplete="email"
                     size="small"
                     InputLabelProps={{
@@ -185,9 +150,6 @@ const LogIn = () => {
                       width: "89%",
                       ml: 3,
                       mr: 3,
-                      boxShadow: !emailError
-                        ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
-                        : "none",
                     }}
                   />
                 </Grid>
@@ -197,12 +159,10 @@ const LogIn = () => {
                     required
                     fullWidth
                     onChange={handleFieldChange}
-                    error={pwdError}
                     name="password"
                     label="Contraseña"
                     type="password"
                     id="password"
-                    helperText={pwdError ? pwdErrorMsg : ""}
                     autoComplete="password"
                     size="small"
                     variant="filled"
@@ -217,9 +177,6 @@ const LogIn = () => {
                       ml: 3,
                       mr: 3,
                       mb: 1,
-                      boxShadow: !pwdError
-                        ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
-                        : "none",
                     }}
                   />
                 </Grid>
@@ -261,7 +218,6 @@ const LogIn = () => {
                       fontWeight: 300,
                       textTransform: "none",
                     }}
-                    disabled={disabled}
                   >
                     Ingresar
                   </LoadingButton>
@@ -298,6 +254,6 @@ const LogIn = () => {
       </Paper>
     </Grid>
   );
-}
+};
 
 export default LogIn;

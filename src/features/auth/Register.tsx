@@ -1,12 +1,11 @@
 import * as React from "react";
-import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
 import Link from "@mui/material/Link";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { createTheme } from "@mui/material/styles";
 import Paper from "@mui/material/Paper";
 import MenuItem from "@mui/material/MenuItem";
 import Agent from "../../app/api/agent";
@@ -19,33 +18,41 @@ import Fade from "@mui/material/Fade";
 import { LoadingButton } from "@mui/lab";
 import Colors from "../../app/static/colors";
 import { useMediaQuery } from "@mui/material";
+import Regex from "../../app/utils/Regex";
+import { ApiMessages, Messages } from "../../app/utils/Constants";
+import { emptyString, translateApiMessages } from "../../app/utils/StringUtils";
 
-const rutRegex = /^(\d{1,3}(\.\d{3})*-\d|(\d{1,3}(\.\d{3})*-[Kk]))$/;
-const pwdRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{10,16}$/;
-const emailRegex =
-  /^[a-zA-Z]+(?:\.[a-zA-Z]+)?\d*?@(?:([a-zA-Z]+\.)+)?\ucn\.cl$/;
-const nameRegex = /^[a-zA-Z]{3,50}$/;
-const flNameRegex = /^[a-zA-Z]{3,30}$/;
-
-const nameErrorMsg = "Debe contener entre 3 y 50 caracteres, solo letras.";
-const flNameErrorMsg = "Debe contener entre 3 y 30 caracteres, solo letras.";
-const rutErrorMsg = "RUT con puntos y guión (Ej: 12.345.678-9)";
-const emailErrorMsg = "El correo debe ser del dominio ucn.";
-const pwdErrorMsg =
-  "Debe contener al menos 10 caracteres, una mayúscula y un número.";
-const matchPwdErrorMsg = "La contraseña no coincide.";
-
-const formStyle = {
-  mt: 3,
-  border: Colors.black,
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.5)",
-  height: "80%",
-  width: "50%",
-  mb: 3,
-  backgroundColor: Colors.secondaryWhite,
+const styles = {
+  paper: {
+    backgroundImage: "url(/background.jpg)",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
+    height: "100vh",
+    justifyContent: "center",
+    alignItems: "center",
+    display: "flex",
+    width: "100vw",
+  },
+  form: {
+    mt: 3,
+    border: Colors.black,
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.5)",
+    height: "100%",
+    width: "100%",
+    mb: 3,
+    backgroundColor: Colors.secondaryWhite,
+  },
+  alert: {
+    width: "89.5%",
+    ml: 3,
+    mr: 3,
+    mb: 1,
+    textAlign: "center",
+  },
 };
 
 const defaultTheme = createTheme();
@@ -55,59 +62,102 @@ export default function SignUp() {
   const { setAuthenticated } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const [name, setName] = useState<string>("");
+  const [name, setName] = useState<string>(emptyString);
   const [validName, setValidName] = useState<boolean>(false);
 
-  const [firstName, setFirstName] = useState<string>("");
+  const [firstName, setFirstName] = useState<string>(emptyString);
   const [validFirstName, setValidFirstName] = useState<boolean>(false);
 
-  const [lastName, setLastName] = useState<string>("");
+  const [lastName, setLastName] = useState<string>(emptyString);
   const [validLastName, setValidLastName] = useState<boolean>(false);
 
-  const [email, setEmail] = useState<string>("");
+  const [email, setEmail] = useState<string>(emptyString);
   const [validEmail, setValidEmail] = useState<boolean>(false);
 
-  const [rut, setRut] = useState<string>("");
+  const [rut, setRut] = useState<string>(emptyString);
   const [validRut, setValidRut] = useState<boolean>(false);
 
-  const [pwd, setPwd] = useState<string>("");
+  const [pwd, setPwd] = useState<string>(emptyString);
   const [validPwd, setValidPwd] = useState<boolean>(false);
 
-  const [matchPwd, setMatchPwd] = useState<string>("");
+  const [matchPwd, setMatchPwd] = useState<string>(emptyString);
   const [validMatch, setValidMatch] = useState<boolean>(false);
 
-  const [career, setCareer] = useState<string>("");
+  const [career, setCareer] = useState<string>(emptyString);
   const [careers, setCareers] = useState([]);
 
   const [checked, setChecked] = useState<boolean>(false);
-  const [errorType, setErrorType] = useState<
-    null | "rut" | "email" | "general"
-  >(null);
+  const [errorMessage, setErrorMessage] = useState<string>(emptyString);
 
   const [loading, setLoading] = useState<boolean>(false);
 
-  const validateBoxShadow = () => {
-    if (validFirstName && validLastName) {
-      return "0px 2px 2px rgba(0, 0, 0, 0.2)";
-    } else {
-      return "none";
+  useEffect(() => {
+    Agent.requests
+      .get("Careers")
+      .then((response) => setCareers(response))
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    setValidPwd(Regex.pwdRegex.test(pwd));
+    setValidMatch(pwd === matchPwd);
+    setValidRut(Regex.rutRegex.test(rut));
+    setValidName(Regex.nameRegex.test(name));
+    setValidFirstName(Regex.lastNameRegex.test(firstName));
+    setValidLastName(Regex.lastNameRegex.test(lastName));
+    setValidEmail(Regex.emailRegex.test(email));
+  }, [email, firstName, lastName, matchPwd, name, pwd, rut]);
+
+  const handleSuccessfullyLogin = (data: any) => {
+    Agent.token = data;
+    localStorage.setItem("token", data);
+    setAuthenticated(true);
+    navigate("/");
+  };
+
+  const handleCatchApiErrors = (err: any) => {
+    let translatedError: string = translateApiMessages(
+      ApiMessages.defaultErrorMsg
+    );
+    const errorDetail = err.response.data?.detail;
+    const rutError = err?.response?.data?.errors?.RUT[0];
+
+    if (errorDetail) {
+      translatedError = translateApiMessages(errorDetail);
+    } else if (rutError) {
+      translatedError = translateApiMessages(rutError);
     }
+
+    setErrorMessage(translatedError);
+    setChecked(true);
+  };
+
+  const sendData = (user: any) => {
+    setLoading(true);
+    Agent.Auth.register(user)
+      .then(handleSuccessfullyLogin)
+      .catch(handleCatchApiErrors)
+      .finally(() => setLoading(false));
   };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    const name: string = data.get("name")?.toString() ?? "";
-    const FirstLastName: string = data.get("firstName")?.toString() ?? "";
-    const SecondLastName: string = data.get("lastName")?.toString() ?? "";
-    const RUT: string = data.get("rut")?.toString() ?? "";
-    const CareerId: number = parseInt(data.get("career")?.toString() ?? "");
-    const email: string = data.get("email")?.toString() ?? "";
-    const Password: string = data.get("password")?.toString() ?? "";
+    const name: string = data.get("name")?.toString() ?? emptyString;
+    const FirstLastName: string =
+      data.get("firstName")?.toString() ?? emptyString;
+    const SecondLastName: string =
+      data.get("lastName")?.toString() ?? emptyString;
+    const RUT: string = data.get("rut")?.toString() ?? emptyString;
+    const CareerId: number = parseInt(
+      data.get("career")?.toString() ?? emptyString
+    );
+    const email: string = data.get("email")?.toString() ?? emptyString;
+    const Password: string = data.get("password")?.toString() ?? emptyString;
     const RepeatedPassword: string =
-      data.get("repeatPassword")?.toString() ?? "";
+      data.get("repeatPassword")?.toString() ?? emptyString;
 
-    sendData(
+    sendData({
       name,
       FirstLastName,
       SecondLastName,
@@ -115,117 +165,12 @@ export default function SignUp() {
       CareerId,
       email,
       Password,
-      RepeatedPassword
-    );
+      RepeatedPassword,
+    });
   };
-
-  const sendData = (
-    name: string,
-    firstLastName: string,
-    secondLastName: string,
-    rut: string,
-    careerId: number,
-    email: string,
-    password: string,
-    repeatedPassword: string
-  ) => {
-    setLoading(true);
-    Agent.Auth.register({
-      name,
-      firstLastName,
-      secondLastName,
-      rut,
-      email,
-      careerId,
-      password,
-      repeatedPassword,
-    })
-      .then((res) => {
-        Agent.token = res;
-        localStorage.setItem("token", res);
-        setAuthenticated(true);
-        navigate("/");
-      })
-      .catch((err) => {
-        console.log(err);
-        if (!err?.response) {
-          setChecked(true);
-          setErrorType("general");
-        } else if (err.response?.status === 400) {
-          const errorData = err.response.data;
-          if (errorData?.detail === "RUT already in use") {
-            setChecked(true);
-            setErrorType("rut");
-          } else if (errorData?.detail === "Email already in use") {
-            setChecked(true);
-            setErrorType("email");
-          } else {
-            setChecked(true);
-            setErrorType("general");
-          }
-        } else {
-          setChecked(true);
-          setErrorType("general");
-        }
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  };
-
-  useEffect(() => {
-    try {
-      Agent.requests
-        .get("Careers")
-        .then((response) => {
-          setCareers(response.map((career: any) => career));
-        })
-        .catch((error) => {
-          console.error("Error loading careers:", error);
-        });
-    } catch (error) {
-      console.error("Error loading careers:", error);
-    }
-  }, []);
-
-  useEffect(() => {
-    setValidPwd(pwdRegex.test(pwd));
-    setValidMatch(pwd === matchPwd);
-  }, [pwd, matchPwd]);
-
-  useEffect(() => {
-    setValidRut(rutRegex.test(rut));
-  }, [rut]);
-
-  useEffect(() => {
-    setValidName(nameRegex.test(name));
-  }, [name]);
-
-  useEffect(() => {
-    setValidFirstName(flNameRegex.test(firstName));
-  }, [firstName]);
-
-  useEffect(() => {
-    setValidLastName(flNameRegex.test(lastName));
-  }, [lastName]);
-
-  useEffect(() => {
-    setValidEmail(emailRegex.test(email));
-  }, [email]);
 
   return (
-    <Paper
-      style={{
-        backgroundImage: "url(/background.jpg)",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-        height: "100vh",
-        justifyContent: "center",
-        alignItems: "center",
-        display: "flex",
-      }}
-    >
+    <Paper style={styles.paper}>
       <Container
         component="main"
         maxWidth="md"
@@ -236,14 +181,12 @@ export default function SignUp() {
           margin: 0,
         }}
       >
-        <CssBaseline />
-
         <Box
           component="form"
           noValidate
           onSubmit={handleSubmit}
           sx={{
-            ...formStyle,
+            ...styles.form,
             width: isSmallScreen ? "100%" : "50%",
           }}
         >
@@ -270,35 +213,27 @@ export default function SignUp() {
             <Grid item xs={12} container>
               {checked && (
                 <Fade in={checked}>
-                  <Alert
-                    severity="error"
-                    sx={{
-                      width: "89.5%",
-                      ml: 3,
-                      mr: 3,
-                      mb: 1,
-                      textAlign: "center",
-                    }}
-                  >
-                    {errorType === "rut" && "El RUT ya está registrado"}
-                    {errorType === "email" &&
-                      "El correo electrónico ya está registrado"}
-                    {errorType === "general" &&
-                      "Ocurrio un error, intente nuevamente"}
+                  <Alert severity="error" sx={styles.alert}>
+                    {errorMessage}
                   </Alert>
                 </Fade>
               )}
               <TextField
                 helperText={
-                  !validName && name.trim() !== "" ? nameErrorMsg : ""
+                  !validName && name.trim() !== emptyString
+                    ? Messages.nameErrorMsg
+                    : emptyString
                 }
                 aria-describedby="namenote"
                 onChange={(e: {
                   target: { value: React.SetStateAction<string> };
-                }) => setName(e.target.value)}
-                aria-invalid={validName && name.trim() !== ""}
+                }) => {
+                  setName(e.target.value);
+                  setChecked(false);
+                }}
+                aria-invalid={validName && name.trim() !== emptyString}
                 value={name}
-                error={!validName && name.trim() !== ""}
+                error={!validName && name.trim() !== emptyString}
                 variant="filled"
                 id="name"
                 label="Nombre"
@@ -327,17 +262,19 @@ export default function SignUp() {
               <Grid item xs={6} md={6} container>
                 <TextField
                   helperText={
-                    !validFirstName && firstName.trim() !== ""
-                      ? flNameErrorMsg
-                      : ""
+                    !validFirstName && firstName.trim() !== emptyString
+                      ? Messages.lastNameErrorMsg
+                      : emptyString
                   }
                   aria-describedby="flNote"
                   onChange={(e: {
                     target: { value: React.SetStateAction<string> };
                   }) => setFirstName(e.target.value)}
-                  aria-invalid={validFirstName && firstName.trim() !== ""}
+                  aria-invalid={
+                    validFirstName && firstName.trim() !== emptyString
+                  }
                   value={firstName}
-                  error={!validFirstName && firstName.trim() !== ""}
+                  error={!validFirstName && firstName.trim() !== emptyString}
                   autoComplete="off"
                   name="firstName"
                   required
@@ -365,17 +302,19 @@ export default function SignUp() {
               <Grid item xs={6} md={6} container>
                 <TextField
                   helperText={
-                    !validLastName && lastName.trim() !== ""
-                      ? flNameErrorMsg
-                      : ""
+                    !validLastName && lastName.trim() !== emptyString
+                      ? Messages.lastNameErrorMsg
+                      : emptyString
                   }
                   required
                   onChange={(e: {
                     target: { value: React.SetStateAction<string> };
                   }) => setLastName(e.target.value)}
-                  aria-invalid={validLastName && lastName.trim() !== ""}
+                  aria-invalid={
+                    validLastName && lastName.trim() !== emptyString
+                  }
                   value={lastName}
-                  error={!validLastName && lastName.trim() !== ""}
+                  error={!validLastName && lastName.trim() !== emptyString}
                   aria-describedby="flNote"
                   id="lastName"
                   variant="filled"
@@ -403,14 +342,18 @@ export default function SignUp() {
             </Grid>
             <Grid item xs={12} container>
               <TextField
-                helperText={!validRut && rut.trim() !== "" ? rutErrorMsg : ""}
+                helperText={
+                  !validRut && rut.trim() !== emptyString
+                    ? Messages.rutErrorMsg
+                    : emptyString
+                }
                 required
                 onChange={(e: {
                   target: { value: React.SetStateAction<string> };
                 }) => setRut(e.target.value)}
-                aria-invalid={validRut && rut.trim() !== ""}
+                aria-invalid={validRut && rut.trim() !== emptyString}
                 value={rut}
-                error={!validRut && rut.trim() !== ""}
+                error={!validRut && rut.trim() !== emptyString}
                 aria-describedby="rutnote"
                 variant="filled"
                 id="rut"
@@ -438,10 +381,12 @@ export default function SignUp() {
             <Grid item xs={12} container>
               <TextField
                 helperText={
-                  !validEmail && email.trim() !== "" ? emailErrorMsg : ""
+                  !validEmail && email.trim() !== emptyString
+                    ? Messages.emailErrorMsg
+                    : emptyString
                 }
-                error={!validEmail && email.trim() !== ""}
-                aria-invalid={validEmail && email.trim() !== ""}
+                error={!validEmail && email.trim() !== emptyString}
+                aria-invalid={validEmail && email.trim() !== emptyString}
                 value={email}
                 onChange={(e: {
                   target: { value: React.SetStateAction<string> };
@@ -506,15 +451,19 @@ export default function SignUp() {
 
             <Grid item xs={12} container>
               <TextField
-                helperText={!validPwd && pwd.trim() !== "" ? pwdErrorMsg : ""}
+                helperText={
+                  !validPwd && pwd.trim() !== emptyString
+                    ? Messages.pwdErrorMsg
+                    : emptyString
+                }
                 required
                 fullWidth
-                aria-invalid={validPwd && pwd.trim() !== ""}
+                aria-invalid={validPwd && pwd.trim() !== emptyString}
                 onChange={(e: {
                   target: { value: React.SetStateAction<string> };
                 }) => setPwd(e.target.value)}
                 value={pwd}
-                error={!validPwd && pwd.trim() !== ""}
+                error={!validPwd && pwd.trim() !== emptyString}
                 aria-describedby="pwdnote"
                 name="password"
                 label="Contraseña"
@@ -543,15 +492,17 @@ export default function SignUp() {
             <Grid item xs={12} container>
               <TextField
                 helperText={
-                  !validMatch && matchPwd.trim() !== "" ? matchPwdErrorMsg : ""
+                  !validMatch && matchPwd.trim() !== emptyString
+                    ? Messages.matchPwdErrorMsg
+                    : emptyString
                 }
                 required
                 onChange={(e: {
                   target: { value: React.SetStateAction<string> };
                 }) => setMatchPwd(e.target.value)}
-                aria-invalid={validMatch && matchPwd.trim() !== ""}
+                aria-invalid={validMatch && matchPwd.trim() !== emptyString}
                 value={matchPwd}
-                error={!validMatch && matchPwd.trim() !== ""}
+                error={!validMatch && matchPwd.trim() !== emptyString}
                 type="password"
                 id="repeatPassword"
                 label="Repetir contraseña"
