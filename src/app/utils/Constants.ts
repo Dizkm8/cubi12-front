@@ -18,3 +18,14 @@ export const Messages = {
   matchPwdErrorMsg,
 };
 
+const rutAlreadyExists = "RUT already in use";
+const emailAlreadyExists = "Email already in use";
+const invalidRut = "The field RUT is invalid.";
+const defaultErrorMsg = "An error has occurred, try again later.";
+
+export const ApiMessages = {
+  rutAlreadyExists,
+  emailAlreadyExists,
+  invalidRut,
+  defaultErrorMsg,
+};

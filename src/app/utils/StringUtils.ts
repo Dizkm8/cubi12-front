@@ -1,3 +1,5 @@
+import { ApiMessages } from "./Constants";
+
 export const subjectsCapitalize = (phrase: string) => {
   phrase = phrase
     .split(" ")
@@ -34,3 +36,18 @@ export const subjectsCapitalize = (phrase: string) => {
 };
 
 export const emptyString = "";
+
+export const translateApiMessages = (message: string) => {
+  switch (message) {
+    case ApiMessages.rutAlreadyExists:
+      return "El RUT ya está en uso.";
+    case ApiMessages.emailAlreadyExists:
+      return "El correo ya está en uso.";
+    case ApiMessages.invalidRut:
+      return "El RUT es inválido.";
+    case ApiMessages.defaultErrorMsg:
+      return "Ha Ocurrido un problema, intente más tarde.";
+    default:
+      return "Ha Ocurrido un problema, intente más tarde.";
+  }
+};
