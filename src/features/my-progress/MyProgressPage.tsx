@@ -23,7 +23,7 @@ import NearMeIcon from "@mui/icons-material/NearMe";
 import Colors from "../../app/static/colors";
 import GenerateTabTitle from "../../app/utils/TitleGenerator";
 import ProgressCard, { modifySubject } from "./ProgressCard";
-import { forEach } from "lodash";
+import { forEach, set } from "lodash";
 
 // Item style
 const Item = styled(Paper)(({ theme }) => ({
@@ -255,16 +255,13 @@ const MyProgressPage = () => {
       console.log("No changes to save");
       return;
     }
-
     console.log("Saving subjects...");
     // Endpoint call
     agent.Auth.updateMyProgress(modifySubject)
       .then((res) => {
         console.log("Subjects updated!");
-        // Delete all subjects from arrays
+        window.location.reload();
 
-        modifySubject.addSubjects = [];
-        modifySubject.deleteSubjects = [];
       })
       .catch((err) => console.log(err));
   };
