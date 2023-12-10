@@ -23,7 +23,7 @@ import NearMeIcon from "@mui/icons-material/NearMe";
 import Colors from "../../app/static/colors";
 import GenerateTabTitle from "../../app/utils/TitleGenerator";
 import ProgressCard, { modifySubject } from "./ProgressCard";
-import { forEach, set } from "lodash";
+import { forEach } from "lodash";
 
 // Item style
 const Item = styled(Paper)(({ theme }) => ({
@@ -252,7 +252,6 @@ const MyProgressPage = () => {
     approvedSubjects.push(...modifySubject.addSubjects);
     approvedSubjects = approvedSubjects.filter(subject => !modifySubject.deleteSubjects.includes(subject));
     setUserApprovedSubjects(approvedSubjects);
-    console.log(userApprovedSubjects);
     cancelSubjects();
   }
 
