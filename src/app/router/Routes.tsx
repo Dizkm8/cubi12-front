@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useLocation } from "react-router-dom";
 import { Routes as Router, Navigate, Outlet, Route } from "react-router-dom";
 import EditProfile from "../../features/home/EditProfile";
@@ -8,6 +8,8 @@ import Navbar from "../components/Navbar";
 import HomePage from "../../features/home/HomePage";
 import MyProgressPage from '../../features/my-progress/MyProgressPage';
 import InteractiveMeshPage from '../../features/interactive-mesh/InteractiveMeshPage';
+import { jwtDecode } from 'jwt-decode';
+import { AuthContext } from "../../app/context/AuthContext";
 
 type Props = {};
 
@@ -22,6 +24,19 @@ const PrivateRoutes = () => {
 const Routes = (props: Props) => {
   const location = useLocation();
   const views = ["/", "/edit-profile", "/interactive-mesh", "/my-progress"];
+  
+  const token = localStorage.getItem('token');
+  const { setAuthenticated } = useContext(AuthContext);
+
+  if (token) {
+    const decodedToken: any = jwtDecode(token);
+    const currentDate = new Date();
+    if (decodedToken.exp * 1000 < currentDate.getTime()) {
+      localStorage.removeItem('token');
+      setAuthenticated(false);
+      console.log('Token expirado');
+  }
+}
   return (
     <Router>
       <Route
