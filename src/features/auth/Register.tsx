@@ -86,6 +86,14 @@ export default function SignUp() {
 
   const [loading, setLoading] = useState<boolean>(false);
 
+  const validateBoxShadow = () => {
+    if (validFirstName && validLastName) {
+      return "0px 2px 2px rgba(0, 0, 0, 0.2)";
+    } else {
+      return "none";
+    }
+  };
+
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -308,9 +316,10 @@ export default function SignUp() {
                   width: "89.5%",
                   ml: 3,
                   mr: 3,
-                  boxShadow: validName
-                    ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
-                    : "none",
+                  boxShadow:
+                    validName || !name
+                      ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
+                      : "none",
                 }}
               />
             </Grid>
@@ -345,9 +354,11 @@ export default function SignUp() {
                   }}
                   sx={{
                     ml: 3,
-                    boxShadow: validFirstName
-                      ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
-                      : "none",
+                    boxShadow:
+                      (validFirstName || !firstName) &&
+                      (validLastName || !lastName)
+                        ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
+                        : "none",
                   }}
                 />
               </Grid>
@@ -381,9 +392,11 @@ export default function SignUp() {
                   }}
                   sx={{
                     mr: 3,
-                    boxShadow: validLastName
-                      ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
-                      : "none",
+                    boxShadow:
+                      (validLastName || !lastName) &&
+                      (validFirstName || !firstName)
+                        ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
+                        : "none",
                   }}
                 />
               </Grid>
@@ -415,9 +428,10 @@ export default function SignUp() {
                   width: "89.5%",
                   ml: 3,
                   mr: 3,
-                  boxShadow: validRut
-                    ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
-                    : "none",
+                  boxShadow:
+                    validRut || !rut
+                      ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
+                      : "none",
                 }}
               />
             </Grid>
@@ -449,9 +463,10 @@ export default function SignUp() {
                   width: "89.5%",
                   ml: 3,
                   mr: 3,
-                  boxShadow: validEmail
-                    ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
-                    : "none",
+                  boxShadow:
+                    validEmail || !email
+                      ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
+                      : "none",
                 }}
               />
             </Grid>
@@ -518,9 +533,10 @@ export default function SignUp() {
                   width: "89.5%",
                   ml: 3,
                   mr: 3,
-                  boxShadow: validPwd
-                    ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
-                    : "none",
+                  boxShadow:
+                    validPwd || !pwd
+                      ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
+                      : "none",
                 }}
               />
             </Grid>
@@ -554,9 +570,10 @@ export default function SignUp() {
                   ml: 3,
                   mb: 1,
                   mr: 3,
-                  boxShadow: validMatch
-                    ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
-                    : "none",
+                  boxShadow:
+                    validMatch || !matchPwd
+                      ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
+                      : "none",
                 }}
               />
             </Grid>
