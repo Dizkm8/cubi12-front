@@ -114,8 +114,6 @@ const MyProgressPage = () => {
   useEffect(() => {
     agent.Auth.myProgress()
       .then((response) => {
-        setUserApprovedSubjects([]);
-        approvedSubjects = [];
         forEach(response, (value) => {
           setUserApprovedSubjects((userApprovedSubjects) => [
             ...userApprovedSubjects,
@@ -157,6 +155,10 @@ const MyProgressPage = () => {
         PostRequisites.current = res;
       })
       .catch((err) => console.log(err));
+  }, []);
+
+  useEffect(() => {
+    
   }, []);
 
   // Validate if subject has pre-requisites
@@ -245,6 +247,15 @@ const MyProgressPage = () => {
     setHelpDialogOpen(false);
   };
 
+  // Modify approved subjects
+  const modifyApprovedSubjects = () => {
+    approvedSubjects.push(...modifySubject.addSubjects);
+    approvedSubjects = approvedSubjects.filter(subject => !modifySubject.deleteSubjects.includes(subject));
+    setUserApprovedSubjects(approvedSubjects);
+    console.log(userApprovedSubjects);
+    cancelSubjects();
+  }
+
   // Save subjects
   const saveSubjects = () => {
     // If no changes, return
@@ -260,8 +271,7 @@ const MyProgressPage = () => {
     agent.Auth.updateMyProgress(modifySubject)
       .then((res) => {
         console.log("Subjects updated!");
-        window.location.reload();
-
+        modifyApprovedSubjects();
       })
       .catch((err) => console.log(err));
   };
