@@ -6,7 +6,7 @@ import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { createTheme } from "@mui/material/styles";
 import Paper from "@mui/material/Paper";
 import MenuItem from "@mui/material/MenuItem";
 import Agent from "../../app/api/agent";
@@ -19,13 +19,7 @@ import Fade from "@mui/material/Fade";
 import { LoadingButton } from "@mui/lab";
 import Colors from "../../app/static/colors";
 import { useMediaQuery } from "@mui/material";
-
-const rutRegex = /^(\d{1,3}(\.\d{3})*-\d|(\d{1,3}(\.\d{3})*-[Kk]))$/;
-const pwdRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{10,16}$/;
-const emailRegex =
-  /^[a-zA-Z]+(?:\.[a-zA-Z]+)?\d*?@(?:([a-zA-Z]+\.)+)?\ucn\.cl$/;
-const nameRegex = /^[a-zA-Z]{3,50}$/;
-const flNameRegex = /^[a-zA-Z]{3,30}$/;
+import Regex from "../../app/utils/Regex";
 
 const nameErrorMsg = "Debe contener entre 3 y 50 caracteres, solo letras.";
 const flNameErrorMsg = "Debe contener entre 3 y 30 caracteres, solo letras.";
@@ -85,6 +79,14 @@ export default function SignUp() {
   >(null);
 
   const [loading, setLoading] = useState<boolean>(false);
+
+  const validateBoxShadow = () => {
+    if (validFirstName && validLastName) {
+      return "0px 2px 2px rgba(0, 0, 0, 0.2)";
+    } else {
+      return "none";
+    }
+  };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -181,29 +183,14 @@ export default function SignUp() {
   }, []);
 
   useEffect(() => {
-    setValidPwd(pwdRegex.test(pwd));
+    setValidPwd(Regex.pwdRegex.test(pwd));
     setValidMatch(pwd === matchPwd);
-  }, [pwd, matchPwd]);
-
-  useEffect(() => {
-    setValidRut(rutRegex.test(rut));
-  }, [rut]);
-
-  useEffect(() => {
-    setValidName(nameRegex.test(name));
-  }, [name]);
-
-  useEffect(() => {
-    setValidFirstName(flNameRegex.test(firstName));
-  }, [firstName]);
-
-  useEffect(() => {
-    setValidLastName(flNameRegex.test(lastName));
-  }, [lastName]);
-
-  useEffect(() => {
-    setValidEmail(emailRegex.test(email));
-  }, [email]);
+    setValidRut(Regex.rutRegex.test(rut));
+    setValidName(Regex.nameRegex.test(name));
+    setValidFirstName(Regex.lastNameRegex.test(firstName));
+    setValidLastName(Regex.lastNameRegex.test(lastName));
+    setValidEmail(Regex.emailRegex.test(email));
+  }, [email, firstName, lastName, matchPwd, name, pwd, rut]);
 
   return (
     <Paper
@@ -308,9 +295,10 @@ export default function SignUp() {
                   width: "89.5%",
                   ml: 3,
                   mr: 3,
-                  boxShadow: validName
-                    ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
-                    : "none",
+                  boxShadow:
+                    validName || !name
+                      ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
+                      : "none",
                 }}
               />
             </Grid>
@@ -345,9 +333,11 @@ export default function SignUp() {
                   }}
                   sx={{
                     ml: 3,
-                    boxShadow: validFirstName
-                      ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
-                      : "none",
+                    boxShadow:
+                      (validFirstName || !firstName) &&
+                      (validLastName || !lastName)
+                        ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
+                        : "none",
                   }}
                 />
               </Grid>
@@ -381,9 +371,11 @@ export default function SignUp() {
                   }}
                   sx={{
                     mr: 3,
-                    boxShadow: validLastName
-                      ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
-                      : "none",
+                    boxShadow:
+                      (validLastName || !lastName) &&
+                      (validFirstName || !firstName)
+                        ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
+                        : "none",
                   }}
                 />
               </Grid>
@@ -415,9 +407,10 @@ export default function SignUp() {
                   width: "89.5%",
                   ml: 3,
                   mr: 3,
-                  boxShadow: validRut
-                    ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
-                    : "none",
+                  boxShadow:
+                    validRut || !rut
+                      ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
+                      : "none",
                 }}
               />
             </Grid>
@@ -449,9 +442,10 @@ export default function SignUp() {
                   width: "89.5%",
                   ml: 3,
                   mr: 3,
-                  boxShadow: validEmail
-                    ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
-                    : "none",
+                  boxShadow:
+                    validEmail || !email
+                      ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
+                      : "none",
                 }}
               />
             </Grid>
@@ -518,9 +512,10 @@ export default function SignUp() {
                   width: "89.5%",
                   ml: 3,
                   mr: 3,
-                  boxShadow: validPwd
-                    ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
-                    : "none",
+                  boxShadow:
+                    validPwd || !pwd
+                      ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
+                      : "none",
                 }}
               />
             </Grid>
@@ -554,9 +549,10 @@ export default function SignUp() {
                   ml: 3,
                   mb: 1,
                   mr: 3,
-                  boxShadow: validMatch
-                    ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
-                    : "none",
+                  boxShadow:
+                    validMatch || !matchPwd
+                      ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
+                      : "none",
                 }}
               />
             </Grid>

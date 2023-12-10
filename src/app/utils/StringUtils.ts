@@ -19,7 +19,7 @@ export const subjectsCapitalize = (phrase: string) => {
       else if (
         word === "e" ||
         word === "a" ||
-        word === "y" || 
+        word === "y" ||
         word === "de" ||
         word === "la" ||
         word === "al"
@@ -32,3 +32,5 @@ export const subjectsCapitalize = (phrase: string) => {
 
   return phrase;
 };
+
+export const emptyString = "";
