@@ -12,6 +12,8 @@ import Agent from "../../app/api/agent";
 import { useContext, useState } from "react";
 import { AuthContext } from "../../app/context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import Alert from "@mui/material/Alert";
+import Fade from "@mui/material/Fade";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import GenerateTabTitle from "../../app/utils/TitleGenerator";
 import { LoadingButton } from "@mui/lab";
@@ -21,13 +23,13 @@ import Regex from "../../app/utils/Regex";
 const defaultTheme = createTheme();
 
 const LogIn = () => {
-  document.title = GenerateTabTitle("Iniciar Sesión");
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<boolean>(false);
   const { setAuthenticated } = useContext(AuthContext);
+  const isMobile = useMediaQuery(defaultTheme.breakpoints.down("sm"));
   const navigate = useNavigate();
 
-  const isMobile = useMediaQuery(defaultTheme.breakpoints.down("sm"));
-
-  const [loading, setLoading] = useState<boolean>(false);
+  document.title = GenerateTabTitle("Iniciar Sesión");
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -37,29 +39,27 @@ const LogIn = () => {
     sendData(Email, Password);
   };
 
-  const handleFieldChange = (event: any) => {
-    const { name, value } = event.target;
-    if (name === "email") {
-      const isValid = Regex.emailRegex.test(value);
-    } else if (name === "password") {
-      const isValid = Regex.pwdRegex.test(value);
-    }
+  const handleSuccessfullyLogin = (data: any) => {
+    Agent.token = data;
+    localStorage.setItem("token", data);
+    setAuthenticated(true);
+    navigate("/");
   };
+
+  const handleFieldChange = (event: any) => {
+    if (error) setError(false);
+  };
+
   const sendData = (email: string, password: string) => {
+    if (!Regex.emailRegex.test(email) || !Regex.pwdRegex.test(password)) {
+      setError(true);
+      return;
+    }
     setLoading(true);
     Agent.Auth.login({ email, password })
-      .then((data) => {
-        Agent.token = data;
-        localStorage.setItem("token", data);
-        setAuthenticated(true);
-        navigate("/");
-      })
-      .catch((err) => {
-        console.log(err);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+      .then(handleSuccessfullyLogin)
+      .catch(() => setError(true))
+      .finally(() => setLoading(false));
   };
 
   return (
@@ -112,6 +112,24 @@ const LogIn = () => {
                 INICIAR SESIÓN
               </Typography>
               <Grid container spacing={1.1} justifyContent="flex-end">
+                <Grid item xs={12}>
+                  {error && (
+                    <Fade in={error}>
+                      <Alert
+                        severity="error"
+                        sx={{
+                          width: "89%",
+                          ml: 3,
+                          mr: 3,
+                          textAlign: "center",
+                        }}
+                      >
+                        Credenciales incorrectas
+                      </Alert>
+                    </Fade>
+                  )}
+                </Grid>
+
                 <Grid item xs={12}>
                   <TextField
                     required
