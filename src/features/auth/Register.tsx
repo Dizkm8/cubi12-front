@@ -22,17 +22,37 @@ import Regex from "../../app/utils/Regex";
 import { ApiMessages, Messages } from "../../app/utils/Constants";
 import { emptyString, translateApiMessages } from "../../app/utils/StringUtils";
 
-const formStyle = {
-  mt: 3,
-  border: Colors.black,
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.5)",
-  height: "80%",
-  width: "50%",
-  mb: 3,
-  backgroundColor: Colors.secondaryWhite,
+const styles = {
+  paper: {
+    backgroundImage: "url(/background.jpg)",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
+    height: "100vh",
+    justifyContent: "center",
+    alignItems: "center",
+    display: "flex",
+    width: "100vw",
+  },
+  form: {
+    mt: 3,
+    border: Colors.black,
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.5)",
+    height: "100%",
+    width: "100%",
+    mb: 3,
+    backgroundColor: Colors.secondaryWhite,
+  },
+  alert: {
+    width: "89.5%",
+    ml: 3,
+    mr: 3,
+    mb: 1,
+    textAlign: "center",
+  },
 };
 
 const defaultTheme = createTheme();
@@ -150,18 +170,7 @@ export default function SignUp() {
   };
 
   return (
-    <Paper
-      style={{
-        backgroundImage: "url(/background.jpg)",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-        height: "100vh",
-        justifyContent: "center",
-        alignItems: "center",
-        display: "flex",
-      }}
-    >
+    <Paper style={styles.paper}>
       <Container
         component="main"
         maxWidth="md"
@@ -177,7 +186,7 @@ export default function SignUp() {
           noValidate
           onSubmit={handleSubmit}
           sx={{
-            ...formStyle,
+            ...styles.form,
             width: isSmallScreen ? "100%" : "50%",
           }}
         >
@@ -204,16 +213,7 @@ export default function SignUp() {
             <Grid item xs={12} container>
               {checked && (
                 <Fade in={checked}>
-                  <Alert
-                    severity="error"
-                    sx={{
-                      width: "89.5%",
-                      ml: 3,
-                      mr: 3,
-                      mb: 1,
-                      textAlign: "center",
-                    }}
-                  >
+                  <Alert severity="error" sx={styles.alert}>
                     {errorMessage}
                   </Alert>
                 </Fade>
