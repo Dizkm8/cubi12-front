@@ -1,6 +1,5 @@
-import React from "react";
+import React, { FormEvent } from "react";
 import Button from "@mui/material/Button";
-import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
 import Link from "@mui/material/Link";
 import Grid from "@mui/material/Grid";
@@ -8,43 +7,31 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import "./Login.css";
 import Paper from "@mui/material/Paper";
 import Agent from "../../app/api/agent";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { AuthContext } from "../../app/context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import Alert from "@mui/material/Alert";
 import Fade from "@mui/material/Fade";
 import useMediaQuery from "@mui/material/useMediaQuery";
-
+import GenerateTabTitle from "../../app/utils/TitleGenerator";
+import { LoadingButton } from "@mui/lab";
+import Colors from "../../app/static/colors";
+import Regex from "../../app/utils/Regex";
 
 const defaultTheme = createTheme();
 
-const pwdRegex: RegExp = /^.+$/;
-const emailRegex: RegExp =
-/^([A-Z]+|[a-z]+)+[.]([A-Z]+|[a-z]+)+[0-9]*(@(.+[.])*ucn[.]cl){1}$/;
-
-export default function LogIn() {
+const LogIn = () => {
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<boolean>(false);
   const { setAuthenticated } = useContext(AuthContext);
+  const isMobile = useMediaQuery(defaultTheme.breakpoints.down("sm"));
   const navigate = useNavigate();
 
-  const [pwd, setPwd] = useState<string>("");
-  const [email, setemail] = useState<string>("");
+  document.title = GenerateTabTitle("Iniciar Sesión");
 
-  const [emailError, setEmailError] = useState<boolean>(false);
-  const [pwdError, setPwdError] = useState<boolean>(false);
-
-  const emailErrorMsg: string = "Ingrese un correo electrónico válido";
-  const pwdErrorMsg: string = "El campo esta vacío";
-
-  const [checked, setChecked] = React.useState(false);
-  const [disabled, setDisabled] = React.useState(true);
-
-  const isMobile = useMediaQuery(defaultTheme.breakpoints.down("sm"));
-
-
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const Email: string = data.get("email")?.toString() ?? "";
@@ -52,42 +39,31 @@ export default function LogIn() {
     sendData(Email, Password);
   };
 
-  useEffect(() => {
-    if (emailError || pwdError || !email || !pwd) {
-      setDisabled(true);
-    } else {
-      setDisabled(false);
-    }
-  });
+  const handleSuccessfullyLogin = (data: any) => {
+    Agent.token = data;
+    localStorage.setItem("token", data);
+    setAuthenticated(true);
+    navigate("/");
+  };
 
   const handleFieldChange = (event: any) => {
-    const { name, value } = event.target;
-    if (name === "email") {
-      setemail(value);
-      const isValid = emailRegex.test(value);
-      setEmailError(!isValid);
-    } else if (name === "password") {
-      setPwd(value);
-      const isValid = pwdRegex.test(value);
-      setPwdError(!isValid);
-    }
+    if (error) setError(false);
   };
+
   const sendData = (email: string, password: string) => {
+    if (!Regex.emailRegex.test(email) || !Regex.pwdRegex.test(password)) {
+      setError(true);
+      return;
+    }
+    setLoading(true);
     Agent.Auth.login({ email, password })
-      .then((data) => {
-        Agent.token = data;
-        localStorage.setItem("token", data);
-        setAuthenticated(true);
-        navigate("/");
-      })
-      .catch((err) => {
-        console.log(err);
-        setChecked(true);
-      });
+      .then(handleSuccessfullyLogin)
+      .catch(() => setError(true))
+      .finally(() => setLoading(false));
   };
 
   return (
-    <div data-testing="LogIn" className="s">
+    <Grid data-testing="LogIn" className="s">
       <Paper
         style={{
           backgroundImage: "url(/background.jpg)",
@@ -110,23 +86,21 @@ export default function LogIn() {
               alignItems: "center",
             }}
           >
-            <CssBaseline />
-
             <Box
               component="form"
               noValidate
               onSubmit={handleSubmit}
               sx={{
                 mt: 3,
-                border: "#000000",
+                border: Colors.black,
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
                 boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.5)",
                 height: "100%",
-                width: isMobile ? "100%" : 450, 
+                width: isMobile ? "100%" : 450,
                 mb: 3,
-                backgroundColor: "#F5F5F5",
+                backgroundColor: Colors.secondaryWhite,
               }}
             >
               <Typography
@@ -139,14 +113,14 @@ export default function LogIn() {
               </Typography>
               <Grid container spacing={1.1} justifyContent="flex-end">
                 <Grid item xs={12}>
-                  {checked && (
-                    <Fade in={checked}>
+                  {error && (
+                    <Fade in={error}>
                       <Alert
                         severity="error"
                         sx={{
                           width: "89%",
-                          ml:3,
-                          mr:3,
+                          ml: 3,
+                          mr: 3,
                           textAlign: "center",
                         }}
                       >
@@ -156,17 +130,14 @@ export default function LogIn() {
                   )}
                 </Grid>
 
-                <Grid item xs={12} >
+                <Grid item xs={12}>
                   <TextField
                     required
                     id="email"
                     label="Correo electrónico"
                     name="email"
                     variant="filled"
-                    value={email}
                     onChange={handleFieldChange}
-                    error={emailError}
-                    helperText={emailError ? emailErrorMsg : ""}
                     autoComplete="email"
                     size="small"
                     InputLabelProps={{
@@ -177,11 +148,8 @@ export default function LogIn() {
                     }}
                     sx={{
                       width: "89%",
-                      ml:3,
-                      mr:3,
-                      boxShadow: !emailError
-                        ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
-                        : "none",
+                      ml: 3,
+                      mr: 3,
                     }}
                   />
                 </Grid>
@@ -191,12 +159,10 @@ export default function LogIn() {
                     required
                     fullWidth
                     onChange={handleFieldChange}
-                    error={pwdError}
                     name="password"
                     label="Contraseña"
                     type="password"
                     id="password"
-                    helperText={pwdError ? pwdErrorMsg : ""}
                     autoComplete="password"
                     size="small"
                     variant="filled"
@@ -208,16 +174,13 @@ export default function LogIn() {
                     }}
                     sx={{
                       width: "89%",
-                      ml:3,
-                      mr:3,
-                      mb:1,
-                      boxShadow: !pwdError
-                        ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
-                        : "none",
+                      ml: 3,
+                      mr: 3,
+                      mb: 1,
                     }}
                   />
                 </Grid>
-                <Grid item >
+                <Grid item>
                   <Typography
                     variant="body2"
                     color="textPrimary"
@@ -230,50 +193,50 @@ export default function LogIn() {
                       color="primary"
                       underline="hover"
                       fontWeight="600"
-                      style={{ color: "#edb84c" }}
+                      style={{ color: Colors.primaryOrange }}
                     >
                       Registrate
                     </Link>
                   </Typography>
                 </Grid>
                 <Grid item xs={12}>
-                  <Button
+                  <LoadingButton
+                    loading={loading}
                     type="submit"
                     style={{
-                      backgroundColor: "#1C478F",
+                      backgroundColor: Colors.primaryBlue,
                       width: "89%",
                       height: 50,
                     }}
                     variant="contained"
                     sx={{
-                      mt:1,
-                      ml:3,
-                      mr:3,
+                      mt: 1,
+                      ml: 3,
+                      mr: 3,
                       fontFamily: "Raleway, sans-serif",
                       fontSize: "20px",
                       fontWeight: 300,
                       textTransform: "none",
                     }}
-                    disabled={disabled}
                   >
                     Ingresar
-                  </Button>
+                  </LoadingButton>
                 </Grid>
-                <Grid item xs={12}> 
+                <Grid item xs={12}>
                   <Button
                     href="/"
                     type="submit"
                     style={{
-                      backgroundColor: "#F5F5F5",
+                      backgroundColor: Colors.secondaryWhite,
                       width: "89%",
                       height: 50,
-                      border: "1px solid #1C478F",
-                      color: "#1C478F",
+                      border: "1px solid " + Colors.primaryBlue,
+                      color: Colors.primaryBlue,
                     }}
                     variant="contained"
                     sx={{
-                      ml:3,
-                      mr:3,
+                      ml: 3,
+                      mr: 3,
                       mb: 3,
                       fontFamily: "Raleway, sans-serif",
                       fontSize: "20px",
@@ -289,7 +252,8 @@ export default function LogIn() {
           </Container>
         </ThemeProvider>
       </Paper>
-    </div>
+    </Grid>
   );
-}
+};
 
+export default LogIn;

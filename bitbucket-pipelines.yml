@@ -5,25 +5,6 @@ definitions:
       docker:
          memory: 3072
 pipelines:
-  # Only want to build and deploy on specific branches
-  # Should be a good option to build images in lower branch
-  # But it costs time of pipelines
-  # default:
-  #   - parallel:
-  #       - step:
-  #           name: Build and Test
-  #           script:
-  #             - IMAGE_NAME=$BITBUCKET_REPO_SLUG
-  #             - docker build . --file Dockerfile --tag ${IMAGE_NAME} --build-arg backend_url=${PROD_API_URL}
-  #           services:
-  #             - docker
-  #           caches:
-  #             - docker
-  #       - step:
-  #           name: Lint the Dockerfile
-  #           image: hadolint/hadolint:latest-debian
-  #           script:
-  #             - hadolint Dockerfile
   branches:
     main:
       - step:

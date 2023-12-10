@@ -1,534 +1,596 @@
-import * as React from 'react';
-import Button from '@mui/material/Button';
-import CssBaseline from '@mui/material/CssBaseline';
-import TextField from '@mui/material/TextField';
-import Link from '@mui/material/Link';
-import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import "./Register.css"
-import Paper from '@mui/material/Paper';
-import MenuItem from '@mui/material/MenuItem';
-import Agent from '../../app/api/agent';
-import { useState, useEffect, useContext } from "react";
-import FormHelperText from '@mui/material/FormHelperText';
-import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { AuthContext } from '../../app/context/AuthContext';
-import { useNavigate } from 'react-router-dom';
-import { startCase } from 'lodash';
-import Alert from '@mui/material/Alert';
-import Fade from '@mui/material/Fade';
+import * as React from "react";
+import TextField from "@mui/material/TextField";
+import Link from "@mui/material/Link";
+import Grid from "@mui/material/Grid";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Container from "@mui/material/Container";
+import { createTheme } from "@mui/material/styles";
+import Paper from "@mui/material/Paper";
+import MenuItem from "@mui/material/MenuItem";
+import Agent from "../../app/api/agent";
+import { useState, useEffect, useContext, FormEvent } from "react";
+import { AuthContext } from "../../app/context/AuthContext";
+import { useNavigate } from "react-router-dom";
+import { startCase } from "lodash";
+import Alert from "@mui/material/Alert";
+import Fade from "@mui/material/Fade";
+import { LoadingButton } from "@mui/lab";
+import Colors from "../../app/static/colors";
+import { useMediaQuery } from "@mui/material";
+import Regex from "../../app/utils/Regex";
+import { ApiMessages, Messages } from "../../app/utils/Constants";
+import { emptyString, translateApiMessages } from "../../app/utils/StringUtils";
 
-
-const rutRegex = /^(\d{1,3}(\.\d{3})*-\d|(\d{1,3}(\.\d{3})*-[Kk]))$/;
-const pwdRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{10,16}$/;
-const emailRegex = /^([A-Z]+|[a-z]+)+[.]([A-Z]+|[a-z]+)+[0-9]*(@(.+[.])*ucn[.]cl){1}$/;
-const nameRegex = /^[a-zA-Z]{3,50}$/;
-const flNameRegex = /^[a-zA-Z]{3,30}$/;
+const styles = {
+  paper: {
+    backgroundImage: "url(/background.jpg)",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
+    height: "100vh",
+    justifyContent: "center",
+    alignItems: "center",
+    display: "flex",
+    width: "100vw",
+  },
+  form: {
+    mt: 3,
+    border: Colors.black,
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.5)",
+    height: "100%",
+    width: "100%",
+    mb: 3,
+    backgroundColor: Colors.secondaryWhite,
+  },
+  alert: {
+    width: "89.5%",
+    ml: 3,
+    mr: 3,
+    mb: 1,
+    textAlign: "center",
+  },
+};
 
 const defaultTheme = createTheme();
 
 export default function SignUp() {
-  const { authenticated, setAuthenticated } = useContext(AuthContext);
+  const isSmallScreen = useMediaQuery("(max-width:600px)");
+  const { setAuthenticated } = useContext(AuthContext);
   const navigate = useNavigate();
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    const name: string = data.get("name")?.toString() ?? "";
-    const FirstLastName: string = data.get("firstName")?.toString() ?? "";
-    const SecondLastName: string = data.get("lastName")?.toString() ?? "";
-    const RUT: string = data.get("rut")?.toString() ?? "";
-    const CareerId: number = parseInt(data.get("career")?.toString() ?? "");
-    const email: string = data.get("email")?.toString() ?? "";
-    const Password: string = data.get("password")?.toString() ?? "";
-    const RepeatedPassword: string = data.get("repeatPassword")?.toString() ?? "";
 
-  
-    sendData(name,FirstLastName, SecondLastName, RUT, CareerId, email, Password, RepeatedPassword);
-    };
-    const sendData =(name: string , firstLastName: string, secondLastName: string, rut: string, careerId: number, email: string, password: string, repeatedPassword: string) => {
-        Agent.Auth.register({name,firstLastName,secondLastName,rut,email,careerId,password,repeatedPassword})
-        .then(res => {
-            Agent.token = res;
-            localStorage.setItem("token", res);
-            setAuthenticated(true);
-            navigate("/");
-        })
-        .catch((err)=>{
-          console.log(err);
-          
-          if (!err?.response) {
-            setChecked(true);
-            setErrorType('general');
-          } else if (err.response?.status === 400) {
-            const errorData = err.response.data;
-            if (errorData?.detail === 'RUT already in use') {
-              setChecked(true);
-              setErrorType('rut');
-            } else if (errorData?.detail === 'Email already in use') {
-              setChecked(true);
-              setErrorType('email');
-            } else {
-              setChecked(true);
-              setErrorType('general');
-            }
-          } else {
-            setChecked(true);
-            setErrorType('general');
-          }
-        
-        })
-  };
-  
-    useEffect(() => {
-        try{
-            Agent.requests.get('Careers')
-            .then(response => {
-                setCareers(response.map((career: any) => career));
-                })
-                .catch(error => {
-                    console.error('Error loading careers:', error);
-                });
-        }catch(error){
-            console.error('Error loading careers:', error);
-        }
-    }, []);
-      
+  const [name, setName] = useState<string>(emptyString);
+  const [validName, setValidName] = useState<boolean>(false);
 
-  const [name, setName] = useState('');
-  const [validName, setValidName] = useState(false);
-  const [nameFocus, setNameFocus] = useState(false);
+  const [firstName, setFirstName] = useState<string>(emptyString);
+  const [validFirstName, setValidFirstName] = useState<boolean>(false);
 
-  const [firstName, setFirstName] = useState('');
-  const [validFirstName, setValidFirstName] = useState(false);
-  const [firstNameFocus, setFirstNameFocus] = useState(false);
+  const [lastName, setLastName] = useState<string>(emptyString);
+  const [validLastName, setValidLastName] = useState<boolean>(false);
 
-  const [lastName, setLastName] = useState('');
-  const [validLastName, setValidLastName] = useState(false);
-  const [lastNameFocus, setLastNameFocus] = useState(false);
+  const [email, setEmail] = useState<string>(emptyString);
+  const [validEmail, setValidEmail] = useState<boolean>(false);
 
-  const [email, setEmail] = useState('');
-  const [validEmail, setValidEmail] = useState(false);
-  const [emailFocus, setEmailFocus] = useState(false);
+  const [rut, setRut] = useState<string>(emptyString);
+  const [validRut, setValidRut] = useState<boolean>(false);
 
-  const [rut, setRut] = useState('');
-  const [validRut, setValidRut] = useState(false);
-  const [rutFocus, setRutFocus] = useState(false);
+  const [pwd, setPwd] = useState<string>(emptyString);
+  const [validPwd, setValidPwd] = useState<boolean>(false);
 
-  const [pwd, setPwd] = useState('');
-  const [validPwd, setValidPwd] = useState(false);
-  const [pwdFocus, setPwdFocus] = useState(false);
+  const [matchPwd, setMatchPwd] = useState<string>(emptyString);
+  const [validMatch, setValidMatch] = useState<boolean>(false);
 
-  const [matchPwd, setMatchPwd] = useState('');
-  const [validMatch, setValidMatch] = useState(false);
-  const [matchFocus, setMatchFocus] = useState(false);
-
-  const [career, setCareer] = useState('');
+  const [career, setCareer] = useState<string>(emptyString);
   const [careers, setCareers] = useState([]);
 
-  const [checked, setChecked] = React.useState(false);
-  const [errorType, setErrorType] = useState<null | 'rut' | 'email' | 'general'>(null);
+  const [checked, setChecked] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>(emptyString);
+
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    setValidPwd(pwdRegex.test(pwd));
+    Agent.requests
+      .get("Careers")
+      .then((response) => setCareers(response))
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    setValidPwd(Regex.pwdRegex.test(pwd));
     setValidMatch(pwd === matchPwd);
-}, [pwd, matchPwd])
+    setValidRut(Regex.rutRegex.test(rut));
+    setValidName(Regex.nameRegex.test(name));
+    setValidFirstName(Regex.lastNameRegex.test(firstName));
+    setValidLastName(Regex.lastNameRegex.test(lastName));
+    setValidEmail(Regex.emailRegex.test(email));
+  }, [email, firstName, lastName, matchPwd, name, pwd, rut]);
 
-useEffect(() => {
-  setValidRut(rutRegex.test(rut));
-}, [rut])
+  const handleSuccessfullyLogin = (data: any) => {
+    Agent.token = data;
+    localStorage.setItem("token", data);
+    setAuthenticated(true);
+    navigate("/");
+  };
 
-useEffect(() => {
-  setValidName(nameRegex.test(name));
-}, [name])
+  const handleCatchApiErrors = (err: any) => {
+    let translatedError: string = translateApiMessages(
+      ApiMessages.defaultErrorMsg
+    );
+    const errorDetail = err.response.data?.detail;
+    const rutError = err?.response?.data?.errors?.RUT[0];
 
-useEffect(() => {
-  setValidFirstName(flNameRegex.test(firstName));
-}, [firstName])
+    if (errorDetail) {
+      translatedError = translateApiMessages(errorDetail);
+    } else if (rutError) {
+      translatedError = translateApiMessages(rutError);
+    }
 
-useEffect(() => {
-  setValidLastName(flNameRegex.test(lastName));
-}, [lastName])
+    setErrorMessage(translatedError);
+    setChecked(true);
+  };
 
-useEffect(() => {
-  setValidEmail(emailRegex.test(email));
-}, [email])
+  const sendData = (user: any) => {
+    setLoading(true);
+    Agent.Auth.register(user)
+      .then(handleSuccessfullyLogin)
+      .catch(handleCatchApiErrors)
+      .finally(() => setLoading(false));
+  };
 
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    const name: string = data.get("name")?.toString() ?? emptyString;
+    const FirstLastName: string =
+      data.get("firstName")?.toString() ?? emptyString;
+    const SecondLastName: string =
+      data.get("lastName")?.toString() ?? emptyString;
+    const RUT: string = data.get("rut")?.toString() ?? emptyString;
+    const CareerId: number = parseInt(
+      data.get("career")?.toString() ?? emptyString
+    );
+    const email: string = data.get("email")?.toString() ?? emptyString;
+    const Password: string = data.get("password")?.toString() ?? emptyString;
+    const RepeatedPassword: string =
+      data.get("repeatPassword")?.toString() ?? emptyString;
 
-return (
-  <Paper style={{
-      backgroundImage: 'url(/background.jpg)',
-      backgroundSize: 'cover', 
-      backgroundPosition: 'center',
-      backgroundRepeat: 'no-repeat',
-      height: '100vh',
-      justifyContent:"center", 
-      alignItems:"center",
-      display:"flex"
-  }}>
-  <ThemeProvider theme={defaultTheme}>
-    <Container component="main" maxWidth="md" sx={{display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',}}>
-      <CssBaseline />
-        
-        <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3,
-          border:"#000000",
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          boxShadow:'0px 4px 6px rgba(0, 0, 0, 0.5)', 
-          height:'80%', //height: 575
-          width: '53%',
-          mb:3,
-          backgroundColor: '#F5F5F5',    
-       }}>
-  
-           <Typography component="h1" variant="h5" className='font-title' sx={{marginBottom:1, mt:3,  fontSize: '2rem', // Tamaño de texto predeterminado
-            [defaultTheme.breakpoints.down('md')]: {
-              fontSize: '1.5rem', 
-            },
-            [defaultTheme.breakpoints.down('sm')]: {
-              fontSize: '1rem', 
-            },       
-        }}>
-             REGÍSTRATE
-           </Typography>
+    sendData({
+      name,
+      FirstLastName,
+      SecondLastName,
+      RUT,
+      CareerId,
+      email,
+      Password,
+      RepeatedPassword,
+    });
+  };
 
-          <Grid container spacing={1.1} justifyContent="flex-end" >
-              <Grid item xs={12} >
+  return (
+    <Paper style={styles.paper}>
+      <Container
+        component="main"
+        maxWidth="md"
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          margin: 0,
+        }}
+      >
+        <Box
+          component="form"
+          noValidate
+          onSubmit={handleSubmit}
+          sx={{
+            ...styles.form,
+            width: isSmallScreen ? "100%" : "50%",
+          }}
+        >
+          <Typography
+            component="h1"
+            variant="h5"
+            className="font-title"
+            sx={{
+              marginBottom: 1,
+              mt: 3,
+              fontSize: "2rem",
+              [defaultTheme.breakpoints.down("md")]: {
+                fontSize: "1.5rem",
+              },
+              [defaultTheme.breakpoints.down("sm")]: {
+                fontSize: "1rem",
+              },
+            }}
+          >
+            REGÍSTRATE
+          </Typography>
+
+          <Grid container spacing={1.1} justifyContent="flex-end">
+            <Grid item xs={12} container>
               {checked && (
-                  <Fade in={checked}>
-                      <Alert severity="error" sx={{
-                        width: '89.5%',
-                        ml: 3,
-                        mr: 3,
-                        mb: 1,
-                        textAlign: 'center',
-                      }}>
-                        {errorType === 'rut' && 'El RUT ya está registrado'}
-                        {errorType === 'email' && 'El correo electrónico ya está registrado'}
-                        {errorType === 'general' && 'Ocurrio un error, intente nuevamente'}
-                      </Alert>
-                    </Fade>
-                )}
-                  <TextField
-                  helperText={!validName && nameFocus ? "Debe contener entre 3 y 50 caracteres, solo letras." : ""}
-                  aria-describedby="namenote"
-                  onChange={(e) => setName(e.target.value)}
-                  aria-invalid={validName ? "false" : "true"}
-                  onFocus={() => setNameFocus(true)}
-                  onBlur={() => setNameFocus(false)}
-                  value={name}
-                  error={!validName && nameFocus}
-                  variant='filled'
-                  id="name"
-                  label="Nombre"
-                  name="name"
-                  required
-                  autoComplete="off"
-                  size='small'
-                  InputLabelProps={{
-                      sx: {
-                        fontSize: '14px',
-                        fontFamily: 'Raleway',
-                      }
-                  }}
-                  sx={{   
-                      width:'89.5%',
-                      ml:3,
-                      mr:3,
-                      boxShadow: ((!validName && !nameFocus)|| validName ) ? '0px 2px 2px rgba(0, 0, 0, 0.2)' : 'none',                                             
-                  }}
-                  
-                  />
-                  
-              </Grid>
-            <Grid item xs={12} md={12} spacing={1.1} container >
-              <Grid item xs={6} md={6}>
+                <Fade in={checked}>
+                  <Alert severity="error" sx={styles.alert}>
+                    {errorMessage}
+                  </Alert>
+                </Fade>
+              )}
+              <TextField
+                helperText={
+                  !validName && name.trim() !== emptyString
+                    ? Messages.nameErrorMsg
+                    : emptyString
+                }
+                aria-describedby="namenote"
+                onChange={(e: {
+                  target: { value: React.SetStateAction<string> };
+                }) => {
+                  setName(e.target.value);
+                  setChecked(false);
+                }}
+                aria-invalid={validName && name.trim() !== emptyString}
+                value={name}
+                error={!validName && name.trim() !== emptyString}
+                variant="filled"
+                id="name"
+                label="Nombre"
+                name="name"
+                required
+                autoComplete="off"
+                size="small"
+                InputLabelProps={{
+                  sx: {
+                    fontSize: "14px",
+                    fontFamily: "Raleway",
+                  },
+                }}
+                sx={{
+                  width: "89.5%",
+                  ml: 3,
+                  mr: 3,
+                  boxShadow:
+                    validName || !name
+                      ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
+                      : "none",
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} md={12} spacing={1.1} container>
+              <Grid item xs={6} md={6} container>
                 <TextField
-                  helperText={!validFirstName && firstNameFocus ? "Debe contener entre 3 y 30 caracteres, solo letras." : ""}
+                  helperText={
+                    !validFirstName && firstName.trim() !== emptyString
+                      ? Messages.lastNameErrorMsg
+                      : emptyString
+                  }
                   aria-describedby="flNote"
-                  onChange={(e) => setFirstName(e.target.value)}
-                  aria-invalid={validFirstName ? "false" : "true"}
-                  onFocus={() => setFirstNameFocus(true)}
-                  onBlur={() => setFirstNameFocus(false)}
+                  onChange={(e: {
+                    target: { value: React.SetStateAction<string> };
+                  }) => setFirstName(e.target.value)}
+                  aria-invalid={
+                    validFirstName && firstName.trim() !== emptyString
+                  }
                   value={firstName}
-                  error={!validFirstName && firstNameFocus} 
+                  error={!validFirstName && firstName.trim() !== emptyString}
                   autoComplete="off"
                   name="firstName"
                   required
-                  variant='filled'                  
+                  variant="filled"
                   id="firstName"
-                  label="Primer Apellido"                  
-                  size='small'
+                  label="Primer Apellido"
+                  size="small"
                   InputLabelProps={{
                     sx: {
-                      fontSize: '14px',
-                      fontFamily: 'Raleway',
-                      width:'100%',                       
-                    }
-                }}
+                      fontSize: "14px",
+                      fontFamily: "Raleway",
+                      width: "100%",
+                    },
+                  }}
                   sx={{
-                    ml:3,
-                    boxShadow: ((!validFirstName && !firstNameFocus)|| validFirstName ) ? '0px 2px 2px rgba(0, 0, 0, 0.2)' : 'none',
+                    ml: 3,
+                    boxShadow:
+                      (validFirstName || !firstName) &&
+                      (validLastName || !lastName)
+                        ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
+                        : "none",
                   }}
                 />
-                
               </Grid>
-              <Grid item xs={6} md={6}>
+              <Grid item xs={6} md={6} container>
                 <TextField
-                  helperText={!validLastName && lastNameFocus ? "Debe contener entre 3 y 30 caracteres, solo letras." : ""}
+                  helperText={
+                    !validLastName && lastName.trim() !== emptyString
+                      ? Messages.lastNameErrorMsg
+                      : emptyString
+                  }
                   required
-                  onChange={(e) => setLastName(e.target.value)}
-                  aria-invalid={validLastName ? "false" : "true"}
-                  onFocus={() => setLastNameFocus(true)}
-                  onBlur={() => setLastNameFocus(false)}
+                  onChange={(e: {
+                    target: { value: React.SetStateAction<string> };
+                  }) => setLastName(e.target.value)}
+                  aria-invalid={
+                    validLastName && lastName.trim() !== emptyString
+                  }
                   value={lastName}
-                  error={!validLastName && lastNameFocus}
+                  error={!validLastName && lastName.trim() !== emptyString}
                   aria-describedby="flNote"
                   id="lastName"
-                  variant='filled'
+                  variant="filled"
                   label="Segundo Apellido"
                   name="lastName"
                   autoComplete="off"
-                  size='small'
+                  size="small"
                   InputLabelProps={{
                     sx: {
-                      fontSize: '14px',
-                      fontFamily: 'Raleway',
-                      width:'100%'                        
-                    }
-                }}
+                      fontSize: "14px",
+                      fontFamily: "Raleway",
+                      width: "100%",
+                    },
+                  }}
                   sx={{
-                    mr:3,
-                    boxShadow: ((!validLastName && !lastNameFocus)|| validLastName ) ? '0px 2px 2px rgba(0, 0, 0, 0.2)' : 'none',
+                    mr: 3,
+                    boxShadow:
+                      (validLastName || !lastName) &&
+                      (validFirstName || !firstName)
+                        ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
+                        : "none",
                   }}
                 />
-                  
               </Grid>
-
             </Grid>
-            <Grid item xs={12} >
-              
-                  <TextField
-                  required
-                  onChange={(e) => setRut(e.target.value)}
-                  aria-invalid={validRut ? "false" : "true"}
-                  onFocus={() => setRutFocus(true)}
-                  onBlur={() => setRutFocus(false)}
-                  value={rut}
-                  error={!validRut && rutFocus}  
-                  aria-describedby="rutnote"
-                  variant='filled'
-                  id="rut"
-                  label="RUT"
-                  name="rut"
-                  autoComplete="rut"
-                  size='small'
-                  InputLabelProps={{
-                      sx: {
-                        fontSize: '14px',
-                        fontFamily: 'Raleway',
-                      },
-                  }}
-                  sx={{
-                    width:'89.5%',
-                    ml:3,
-                    mr:3,
-                    boxShadow: !validRut ? '0px 2px 2px rgba(0, 0, 0, 0.2)' : 'none',
-                  }}
-                  />
-                  {rutFocus && (
-                  <FormHelperText id="rutnote" className={!validRut ? "instructions" : "offscreen"} sx={{
-                    ml:3, mr:3,
-                  }}>
-                    <div>
-                          <FontAwesomeIcon icon={faInfoCircle} style={{ marginRight: '5px' }}  />
-                          RUT con puntos y guión (Ej: 12.345.678-9)      
-                    </div>                          
-                  </FormHelperText>
-                  )}
-                   
-              </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={12} container>
               <TextField
-                error={!validEmail && emailFocus}
-                aria-invalid={validEmail ? "false" : "true"}
-                onFocus={() => setEmailFocus(true)}
-                onBlur={() => setEmailFocus(false)}
+                helperText={
+                  !validRut && rut.trim() !== emptyString
+                    ? Messages.rutErrorMsg
+                    : emptyString
+                }
+                required
+                onChange={(e: {
+                  target: { value: React.SetStateAction<string> };
+                }) => setRut(e.target.value)}
+                aria-invalid={validRut && rut.trim() !== emptyString}
+                value={rut}
+                error={!validRut && rut.trim() !== emptyString}
+                aria-describedby="rutnote"
+                variant="filled"
+                id="rut"
+                label="RUT"
+                name="rut"
+                autoComplete="rut"
+                size="small"
+                InputLabelProps={{
+                  sx: {
+                    fontSize: "14px",
+                    fontFamily: "Raleway",
+                  },
+                }}
+                sx={{
+                  width: "89.5%",
+                  ml: 3,
+                  mr: 3,
+                  boxShadow:
+                    validRut || !rut
+                      ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
+                      : "none",
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} container>
+              <TextField
+                helperText={
+                  !validEmail && email.trim() !== emptyString
+                    ? Messages.emailErrorMsg
+                    : emptyString
+                }
+                error={!validEmail && email.trim() !== emptyString}
+                aria-invalid={validEmail && email.trim() !== emptyString}
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e: {
+                  target: { value: React.SetStateAction<string> };
+                }) => setEmail(e.target.value)}
                 required
                 id="email"
                 label="Correo electrónico"
                 name="email"
-                variant='filled'
+                variant="filled"
                 autoComplete="off"
-                size='small'
+                size="small"
                 InputLabelProps={{
                   sx: {
-                    fontSize: '14px',
-                    fontFamily: 'Raleway', 
-                  }
-              }}
-              sx={{
-                  width:'89.5%',
-                  ml:3,
-                  mr:3,
-                  boxShadow:'0px 2px 2px rgba(0, 0, 0, 0.2)',                  
-              }}
+                    fontSize: "14px",
+                    fontFamily: "Raleway",
+                  },
+                }}
+                sx={{
+                  width: "89.5%",
+                  ml: 3,
+                  mr: 3,
+                  boxShadow:
+                    validEmail || !email
+                      ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
+                      : "none",
+                }}
               />
-              {emailFocus && (
-                  <FormHelperText id="emailNote" className={!validEmail ? "instructions" : "offscreen"} sx={{
-                    ml:3, mr:3,
-                  }}>
-                    
-                    <div>
-                          <FontAwesomeIcon icon={faInfoCircle} style={{ marginRight: '5px' }}  />
-                          El correo debe ser del dominio ucn.      
-                    </div>
-                         
-                  </FormHelperText>
-                )}
             </Grid>
-            <Grid item xs={12} >
-                  <TextField
-                  required
-                  onChange={(e) => setCareer(e.target.value)}
-                  value={career}
-                  id="career"
-                  select
-                  label="Carrera"
-                  name="career"
-                  size='small'
-                  variant='filled'
-                  InputLabelProps={{
-                      sx: {
-                        fontSize: '14px',
-                        fontFamily: 'Raleway',                               
-                      }
-                  }}
-                  sx={{
-                      width:'89.5%',
-                      ml:3,
-                      boxShadow:'0px 2px 2px rgba(0, 0, 0, 0.2)',                
-                  }}
-                  >
-
-                  {careers.map((career,index) => (
-                  <MenuItem key={index} value={career['id']}>
-                  {startCase(career['name'])}
+            <Grid item xs={12} container>
+              <TextField
+                required
+                onChange={(e: {
+                  target: { value: React.SetStateAction<string> };
+                }) => setCareer(e.target.value)}
+                value={career}
+                id="career"
+                select
+                label="Carrera"
+                name="career"
+                size="small"
+                variant="filled"
+                InputLabelProps={{
+                  sx: {
+                    fontSize: "14px",
+                    fontFamily: "Raleway",
+                  },
+                }}
+                sx={{
+                  width: "89.5%",
+                  ml: 3,
+                  mr: 3,
+                  boxShadow: "0px 2px 2px rgba(0, 0, 0, 0.2)",
+                }}
+              >
+                {careers.map((career, index) => (
+                  <MenuItem key={index} value={career["id"]}>
+                    {startCase(career["name"])}
                   </MenuItem>
-                  ))}
-                  </TextField>              
-              </Grid>
-                  
-            <Grid item xs={12}>      
-              <TextField    
+                ))}
+              </TextField>
+            </Grid>
+
+            <Grid item xs={12} container>
+              <TextField
+                helperText={
+                  !validPwd && pwd.trim() !== emptyString
+                    ? Messages.pwdErrorMsg
+                    : emptyString
+                }
                 required
                 fullWidth
-                aria-invalid={validPwd ? "false" : "true"}
-                onChange={(e) => setPwd(e.target.value)}
-                onFocus={() => setPwdFocus(true)}
-                onBlur={() => setPwdFocus(false)}
+                aria-invalid={validPwd && pwd.trim() !== emptyString}
+                onChange={(e: {
+                  target: { value: React.SetStateAction<string> };
+                }) => setPwd(e.target.value)}
                 value={pwd}
-                error={!validPwd && pwdFocus}
+                error={!validPwd && pwd.trim() !== emptyString}
                 aria-describedby="pwdnote"
                 name="password"
                 label="Contraseña"
                 type="password"
                 id="password"
                 autoComplete="new-password"
-                size='small'
-                variant='filled'
+                size="small"
+                variant="filled"
                 InputLabelProps={{
                   sx: {
-                    fontSize: '14px',
-                    fontFamily: 'Raleway', 
-                  }
-              }}
-              sx={{
-                  width:'89.5%',
-                  ml:3,
-                  boxShadow:'0px 2px 2px rgba(0, 0, 0, 0.2)',                 
-              }}      
-              />      
-              {pwdFocus && (
-                  <FormHelperText id="pwdnote" className={!validPwd ? "instructions" : "offscreen"} sx={{
-                    ml:3, mr:3,
-                  }}>
-                    
-                    <div>
-                          <FontAwesomeIcon icon={faInfoCircle} style={{ marginRight: '5px' }}  />
-                          Debe contener al menos 10 caracteres, una mayúscula y un número.      
-                    </div>
-                         
-                  </FormHelperText>
-                )}
+                    fontSize: "14px",
+                    fontFamily: "Raleway",
+                  },
+                }}
+                sx={{
+                  width: "89.5%",
+                  ml: 3,
+                  mr: 3,
+                  boxShadow:
+                    validPwd || !pwd
+                      ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
+                      : "none",
+                }}
+              />
             </Grid>
-            <Grid item xs={12}>
-                  <TextField
-                  required
-                  onChange={(e) => setMatchPwd(e.target.value)}
-                  aria-invalid={validMatch ? "false" : "true"}
-                  onFocus={() => setMatchFocus(true)}
-                  onBlur={() => setMatchFocus(false)}
-                  value={matchPwd}
-                  error={!validMatch && matchFocus}
-                  type="password"
-                  id="repeatPassword"
-                  label="Repetir contraseña"
-                  name="repeatPassword"
-                  autoComplete="RepeatPassword"
-                  size='small'
-                  variant='filled'
-                  InputLabelProps={{
-                      sx: {
-                        fontSize: '14px',
-                        fontFamily: 'Raleway',  
-                      }
-                  }}
-                  sx={{
-                      width:'89.5%',
-                      ml:3,
-                      mb:1,
-                      boxShadow:'0px 2px 2px rgba(0, 0, 0, 0.2)',         
-                  }}
-                  />
-              </Grid>
-              <Grid item>
-              <Typography variant="body2" color="textPrimary" textAlign="right" >
-                  ¿Ya tienes cuenta?{' '}
-                  <Link
-                      marginRight={3}
-                      href="/login"
-                      color="primary"
-                      underline="hover"
-                      fontWeight="600"
-                      style={{ color: '#edb84c' }}
-                  >
-                      Inicia Sesión
-                  </Link>
-                  </Typography>
-              </Grid>
-            
+            <Grid item xs={12} container>
+              <TextField
+                helperText={
+                  !validMatch && matchPwd.trim() !== emptyString
+                    ? Messages.matchPwdErrorMsg
+                    : emptyString
+                }
+                required
+                onChange={(e: {
+                  target: { value: React.SetStateAction<string> };
+                }) => setMatchPwd(e.target.value)}
+                aria-invalid={validMatch && matchPwd.trim() !== emptyString}
+                value={matchPwd}
+                error={!validMatch && matchPwd.trim() !== emptyString}
+                type="password"
+                id="repeatPassword"
+                label="Repetir contraseña"
+                name="repeatPassword"
+                autoComplete="RepeatPassword"
+                size="small"
+                variant="filled"
+                InputLabelProps={{
+                  sx: {
+                    fontSize: "14px",
+                    fontFamily: "Raleway",
+                  },
+                }}
+                sx={{
+                  width: "89.5%",
+                  ml: 3,
+                  mb: 1,
+                  mr: 3,
+                  boxShadow:
+                    validMatch || !matchPwd
+                      ? "0px 2px 2px rgba(0, 0, 0, 0.2)"
+                      : "none",
+                }}
+              />
+            </Grid>
+            <Grid item>
+              <Typography
+                variant="body2"
+                color="textPrimary"
+                textAlign="right"
+                sx={{
+                  [defaultTheme.breakpoints.down("md")]: {
+                    fontSize: "0.8rem",
+                  },
+                  [defaultTheme.breakpoints.down("sm")]: {
+                    fontSize: "0.7rem",
+                    ml: 3,
+                    mr: 3,
+                  },
+                }}
+              >
+                ¿Ya tienes cuenta?{" "}
+                <Link
+                  marginRight={3}
+                  href="/login"
+                  color="primary"
+                  underline="hover"
+                  fontWeight="600"
+                  style={{ color: Colors.primaryOrange }}
+                >
+                  Inicia Sesión
+                </Link>
+              </Typography>
+            </Grid>
           </Grid>
-          <Button
+          <LoadingButton
+            loading={loading}
             type="submit"
-            style={{ backgroundColor: '#1C478F', width:'89%', height:50}}
+            style={{
+              backgroundColor: Colors.primaryBlue,
+              width: "89%",
+              height: 50,
+            }}
             variant="contained"
-            sx={{ mt: 2, mb: 2, fontFamily: 'Raleway, sans-serif', fontSize: '20px', fontWeight: 300,textTransform: 'none'}}
-            disabled={!validPwd || !validMatch || !validRut || !validName || !validFirstName || !validLastName || !validEmail ? true : false}
+            sx={{
+              mt: 2,
+              mb: 2,
+              fontFamily: "Raleway, sans-serif",
+              fontSize: "20px",
+              fontWeight: 300,
+              textTransform: "none",
+            }}
+            disabled={
+              !validPwd ||
+              !validMatch ||
+              !validRut ||
+              !validName ||
+              !validFirstName ||
+              !validLastName ||
+              !validEmail
+                ? true
+                : false
+            }
           >
-          Registrarme
-          </Button>     
-      </Box> 
-    </Container>
-  </ThemeProvider>
-  </Paper>
-);
+            Registrarme
+          </LoadingButton>
+        </Box>
+      </Container>
+    </Paper>
+  );
 }
