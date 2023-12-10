@@ -1,15 +1,16 @@
 import React from "react";
 import { Grid, Typography, useMediaQuery } from "@mui/material";
-import { Link } from "react-router-dom";
+import GenerateTabTitle from "../../app/utils/TitleGenerator";
 import BlueButton from "../../app/components/BlueButton";
+import { Link } from "react-router-dom";
 // @ts-ignore
 import Cubi12Logo from "../../app/static/images/cubi12.svg";
-import ColorButton from "../../app/components/BlueButton";
 
 const imgStyle = { filter: 'grayscale(100%)', maxWidth: "15%", height: "auto" };
 const imgPhoneStyle = { filter: 'grayscale(100%)', maxWidth: "40%", height: "auto" };
 
 const NotFound = () => {
+  document.title = GenerateTabTitle("Página no encontrada");
 
   const isSmallScreen = useMediaQuery("(max-width:430px)");
 
