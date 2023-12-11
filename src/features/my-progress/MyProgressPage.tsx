@@ -92,10 +92,10 @@ const MyProgressPage = () => {
   const [userApprovedSubjects, setUserApprovedSubjects] = useState<string[]>(
     []
   );
+  const [helpDialogOpen, setHelpDialogOpen] = useState<boolean>(false);
+  const [isSavingChanges, setIsSavingChanges] = useState<boolean>(false);
 
   const isLargeScreen = useMediaQuery("(min-width:1600px)");
-
-  const [helpDialogOpen, setHelpDialogOpen] = useState(false);
 
   useEffect(() => {
     setIsLoading(true);
@@ -221,14 +221,13 @@ const MyProgressPage = () => {
 
   // Save subjects
   const saveSubjects = () => {
-    // If no changes, return
     if (
       modifySubject.addSubjects.length === 0 &&
       modifySubject.deleteSubjects.length === 0
     ) {
       return;
     }
-    // Endpoint call
+    setIsSavingChanges(true);
     agent.Auth.updateMyProgress(modifySubject)
       .then((res) => {
         approvedSubjects.push(...modifySubject.addSubjects);
@@ -238,7 +237,8 @@ const MyProgressPage = () => {
         setUserApprovedSubjects(approvedSubjects);
         cancelSubjects();
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setIsSavingChanges(false));
   };
 
   // Cancel subjects and clean arrays
@@ -262,7 +262,7 @@ const MyProgressPage = () => {
       .finally(() => setIsLoading(false));
   };
 
-  if (isLoading) return <LoadingSpinner />;
+  if (isLoading || isSavingChanges) return <LoadingSpinner />;
 
   return (
     <Box sx={{ flexGrow: 1, padding: "0 1rem 0", marginTop: "1.5rem" }}>
