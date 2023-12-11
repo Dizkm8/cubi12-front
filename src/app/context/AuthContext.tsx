@@ -34,7 +34,6 @@ const AuthProvider = ({ children }: Props) => {
     const storedToken = localStorage.getItem("token");
     const storedUsername = localStorage.getItem("username") ?? undefined;
     if (storedToken) {
-      Agent.token = storedToken;
       setAuthenticated(true);
       setUsername(storedUsername);
     }

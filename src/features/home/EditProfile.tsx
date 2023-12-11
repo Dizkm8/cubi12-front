@@ -210,8 +210,7 @@ const EditProfile = () => {
 
   const handleCloseDialog = () => {
     setChangePasswordSuccess(false);
-    Agent.token = "";
-    localStorage.setItem("token", "");
+    localStorage.removeItem("token");
     setAuthenticated(false);
     navigate("/");
   };

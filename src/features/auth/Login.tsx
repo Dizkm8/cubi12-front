@@ -41,8 +41,6 @@ const LogIn = () => {
   };
 
   const handleSuccessfullyLogin = (data: LoginUser) => {
-    Agent.token = data.token;
-    
     localStorage.setItem("token", data.token);
     localStorage.setItem("username", data.name);
 

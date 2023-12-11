@@ -113,8 +113,6 @@ export default function SignUp() {
   }, [email, firstName, lastName, matchPwd, name, pwd, rut]);
 
   const handleSuccessfullyLogin = (data: LoginUser) => {
-    Agent.token = data.token;
-
     localStorage.setItem("token", data.token);
     localStorage.setItem("username", data.name);
 

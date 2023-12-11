@@ -1,10 +1,10 @@
 import axios, { AxiosResponse } from "axios";
 
-let token = localStorage.getItem("token");
 
 axios.defaults.baseURL = process.env.REACT_APP_API_URL;
 axios.defaults.withCredentials = true;
 axios.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
   config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
@@ -37,6 +37,6 @@ const Subjects = {
   postRequisites: () => requests.get("subjects/postrequisites-map"),
 };
 
-const agent = { Auth, requests, Subjects, token };
+const agent = { Auth, requests, Subjects };
 
 export default agent;

@@ -16,7 +16,6 @@ import Cubi12Logo from "../static/images/cubi12.svg";
 import { Link } from "react-router-dom";
 import { useContext, useEffect, useState, MouseEvent } from "react";
 import { AuthContext } from "../context/AuthContext";
-import Agent from "../api/agent";
 import Colors from "../static/colors";
 
 const Navbar = () => {
@@ -51,7 +50,6 @@ const Navbar = () => {
   };
 
   const handleLogout = () => {
-    Agent.token = "";
     localStorage.removeItem("token");
     localStorage.removeItem("username");
     setAuthenticated(false);
@@ -182,7 +180,7 @@ const Navbar = () => {
           </Box>
 
           <Box sx={{ flexGrow: 0 }}>
-            <Tooltip title="Open settings">
+            <Tooltip title="Configuraciones">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <Avatar alt="Remy Sharp" src={""} />
               </IconButton>
