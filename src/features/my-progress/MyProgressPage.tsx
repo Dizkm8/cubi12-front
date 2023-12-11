@@ -283,7 +283,7 @@ const MyProgressPage = () => {
           >
             {username}
           </Typography>
-          ! Bienvenido a tu progreso
+          ! Bienvenid@ a tu progreso
         </Typography>
         <HelpIcon
           style={{ fontSize: "350%", color: Colors.primaryOrange }}
