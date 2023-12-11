@@ -83,11 +83,13 @@ const Navbar = () => {
     <AppBar position="static" sx={{ backgroundColor: Colors.primaryBlue }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          <Avatar
-            sx={{ display: { xs: "none", md: "flex" }, mr: 1 }}
-            alt="Cubi12 Logo"
-            src={Cubi12Logo}
-          />
+          <Link to="/">
+            <Avatar
+              sx={{ display: { xs: "none", md: "flex" }, mr: 1 }}
+              alt="Cubi12 Logo"
+              src={Cubi12Logo}
+            />
+          </Link>
           <Typography
             variant="h6"
             noWrap
