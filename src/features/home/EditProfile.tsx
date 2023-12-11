@@ -587,7 +587,7 @@ const EditProfile = () => {
                       fontFamily: "Raleway, sans-serif",
                     }}
                   >
-                    Nueva Contraseña
+                    Nueva Contraseña
                   </Typography>
                   <TextField
                     id="new-password"
