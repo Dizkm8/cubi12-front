@@ -23,7 +23,7 @@ import NearMeIcon from "@mui/icons-material/NearMe";
 import Colors from "../../app/static/colors";
 import GenerateTabTitle from "../../app/utils/TitleGenerator";
 import ProgressCard, { modifySubject } from "./ProgressCard";
-import { forEach, set } from "lodash";
+import { forEach } from "lodash";
 
 // Item style
 const Item = styled(Paper)(({ theme }) => ({
@@ -114,8 +114,6 @@ const MyProgressPage = () => {
   useEffect(() => {
     agent.Auth.myProgress()
       .then((response) => {
-        setUserApprovedSubjects([]);
-        approvedSubjects = [];
         forEach(response, (value) => {
           setUserApprovedSubjects((userApprovedSubjects) => [
             ...userApprovedSubjects,
@@ -255,13 +253,13 @@ const MyProgressPage = () => {
       console.log("No changes to save");
       return;
     }
-    console.log("Saving subjects...");
     // Endpoint call
     agent.Auth.updateMyProgress(modifySubject)
       .then((res) => {
-        console.log("Subjects updated!");
-        window.location.reload();
-
+        approvedSubjects.push(...modifySubject.addSubjects);
+        approvedSubjects = approvedSubjects.filter(subject => !modifySubject.deleteSubjects.includes(subject));
+        setUserApprovedSubjects(approvedSubjects);
+        cancelSubjects();
       })
       .catch((err) => console.log(err));
   };
@@ -275,7 +273,6 @@ const MyProgressPage = () => {
       console.log("No changes to cancel");
       return;
     }
-    console.log("Canceling subjects...");
     // Delete all subjects from array
     modifySubject.addSubjects = [];
     modifySubject.deleteSubjects = [];
@@ -351,10 +348,12 @@ const MyProgressPage = () => {
           color="secondary"
           style={{
             color: `${Colors.primaryRed}`,
-            transform: "scale(1.05)",
+            border: `1px solid ${Colors.primaryRed}`,
             fontFamily: "Raleway, sans-serif",
             fontSize: "85%",
+            transform: "scale(1.05)",
             marginLeft: "auto",
+            boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.2)",
           }}
           onClick={cancelSubjects}
         >
@@ -367,13 +366,13 @@ const MyProgressPage = () => {
           variant="contained"
           color="warning"
           style={{
-            transform: "scale(1.05)",
             color: "white",
-            marginLeft: "2%",
             backgroundColor: `${Colors.primaryBlue}`,
-            boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.2)",
             fontFamily: "Raleway, sans-serif",
             fontSize: "85%",
+            transform: "scale(1.05)",
+            marginLeft: "2%",
+            boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.2)",
           }}
           onClick={saveSubjects}
         >

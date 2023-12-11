@@ -8,6 +8,7 @@ import Navbar from "../components/Navbar";
 import HomePage from "../../features/home/HomePage";
 import MyProgressPage from '../../features/my-progress/MyProgressPage';
 import InteractiveMeshPage from '../../features/interactive-mesh/InteractiveMeshPage';
+import NotFound from '../../features/error/NotFound';
 import { jwtDecode } from 'jwt-decode';
 import { AuthContext } from "../../app/context/AuthContext";
 
@@ -42,10 +43,10 @@ const Routes = (props: Props) => {
       <Route
         path="/"
         element={
-          <div>
+          <>
             {views.includes(location.pathname) && <Navbar />}
             <Outlet />
-          </div>
+          </>
         }
       >
         <Route path="/" element={<HomePage />} />
@@ -57,6 +58,7 @@ const Routes = (props: Props) => {
       </Route>
       <Route path="/register" element={<Register />} />
       <Route path="/login" element={<Login />} />
+      <Route path="*" element={ <><Navbar /><NotFound /></> } />
     </Router>
   );
 };

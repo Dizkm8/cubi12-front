@@ -10,6 +10,8 @@ import { AuthContext } from "../../app/context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import Colors from "../../app/static/colors";
 import GenerateTabTitle from "../../app/utils/TitleGenerator";
+import { emptyString } from "../../app/utils/StringUtils";
+
 
 // Regex for password and names
 const pwdRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{10,16}$/;
@@ -18,6 +20,8 @@ const namesRegex = /^[A-Za-záéíóúüñÁÉÍÓÚÜÑ\s]{3,50}$/;
 // Messages
 const invalidPwd = "Contraseña inválida";
 const invalidNames = "Debe contener mínimo 3 letras, sin caracteres especiales o números";
+const requisitesPwd = "Contraseña debe contener entre 10 a 16 caracteres, una mayúscula, una minúscula y un número"
+const invalidMatchPwd = "Contraseñas no coinciden"
 const updateSuccess = "Actualización exitosa";
 
 const EditProfile = () => {
@@ -35,36 +39,36 @@ const EditProfile = () => {
     const errorRef = useRef<HTMLInputElement>(null);
 
     // Names state
-    const [name, setName] = useState("");
-    const [firstLastName, setFirstLastName] = useState("");
-    const [secondLastName, setSecondLastName] = useState("");
+    const [name, setName] = useState<string>(emptyString);
+    const [firstLastName, setFirstLastName] = useState<string>(emptyString);
+    const [secondLastName, setSecondLastName] = useState<string>(emptyString);
 
     // User data state
-    const [rut, setRut] = useState("");
-    const [email, setEmail] = useState("");
-    const [career, setCareer] = useState("");
+    const [rut, setRut] = useState<string>(emptyString);
+    const [email, setEmail] = useState<string>(emptyString);
+    const [career, setCareer] = useState<string>(emptyString);
 
     // Password state
-    const [currentPwd, setCurrentPwd] = useState("");
-    const [pwd, setPwd] = useState("");
-    const [matchPwd, setMatchPwd] = useState("");
+    const [currentPwd, setCurrentPwd] = useState<string>(emptyString);
+    const [pwd, setPwd] = useState<string>(emptyString);
+    const [matchPwd, setMatchPwd] = useState<string>(emptyString);
 
     // Valid names state
-    const [validName, setValidName] = useState(false);
-    const [validFirstLastName, setValidFirstLastName] = useState(false);
-    const [validSecondLastName, setValidSecondLastName] = useState(false);
+    const [validName, setValidName] = useState<boolean>(false);
+    const [validFirstLastName, setValidFirstLastName] = useState<boolean>(false);
+    const [validSecondLastName, setValidSecondLastName] = useState<boolean>(false);
 
     // Valid password state
     const [validCurrentPwd, setCurrentValidPwd] = useState(true);
-    const[validPwd, setValidPwd] = useState(false);
-    const [validMatchPwd, setValidMatchPwd] = useState(false);
+    const[validPwd, setValidPwd] = useState<boolean>(false);
+    const [validMatchPwd, setValidMatchPwd] = useState<boolean>(false);
 
     // Success message state
-    const [success, setSuccess] = useState(false);
-    const [changePasswordSuccess, setChangePasswordSuccess] = useState(false);
+    const [success, setSuccess] = useState<boolean>(false);
+    const [changePasswordSuccess, setChangePasswordSuccess] = useState<boolean>(false);
 
     // Different names state
-    const [differentNames, setDifferentNames] = useState(false);
+    const [differentNames, setDifferentNames] = useState<boolean>(false);
 
     // Tab state
     const [tab, setTab] = useState("info");
@@ -495,6 +499,7 @@ const EditProfile = () => {
                                                 boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.2)",
                                                 fontFamily: "Raleway, sans-serif",
                                                 fontSize: "85%",
+                                                border: `1px solid ${Colors.primaryRed}`,
                                             }}
                                             onClick={() => { clearInputs(true, false, true) }}
                                         >Cancelar
@@ -549,7 +554,7 @@ const EditProfile = () => {
                                     />
                                 </Grid>
                                 {/* New password input */}
-                                <Grid item xs={12}>
+                                <Grid item xs={12} container>
                                     <Typography
                                         style={{
                                             marginRight: "100%",
@@ -564,18 +569,13 @@ const EditProfile = () => {
                                         name="new-password"
                                         type="password"
                                         value={ pwd }
-                                        error={ !pwd ? false : !validPwd }
+                                        error={ !validPwd && pwd.trim() !== emptyString }
+                                        helperText={ !validPwd && pwd.trim() !== emptyString ? requisitesPwd : "" }
                                         label=""
                                         required
                                         fullWidth
                                         onChange={ (e) => setPwd(e.target.value) }
                                     />
-                                    {(!validPwd && pwd) && (
-                                        <FormHelperText id="pwdnote" className={ !validPwd ? "instructions" : "offscreen" } sx={{ ml:3 }}>    
-                                        <FontAwesomeIcon icon={ faInfoCircle } style={{ marginRight: "5px" }} />
-                                                Contraseña debe contener entre 10 a 16 caracteres, una mayúscula, una minúscula y un número.
-                                        </FormHelperText>
-                                    )}
                                 </Grid>
                                 {/* Repeat new password input */}
                                 <Grid item xs={12}>
@@ -593,18 +593,13 @@ const EditProfile = () => {
                                         name="repeat-new-password"
                                         type="password"
                                         value={ matchPwd }
-                                        error={ !validMatchPwd }
+                                        error={ !validMatchPwd && matchPwd.trim() !== emptyString }
+                                        helperText={ !validMatchPwd && matchPwd.trim() !== emptyString ? invalidMatchPwd : "" }
                                         label=""
                                         required
                                         fullWidth
                                         onChange={ (e) => setMatchPwd(e.target.value) }
                                     />
-                                    {!validMatchPwd && (
-                                        <FormHelperText id="pwdnote" className={ !validPwd ? "instructions" : "offscreen" } sx={{ ml:3 }}>    
-                                        <FontAwesomeIcon icon={ faInfoCircle } style={{ marginRight: "5px" }} />
-                                                Contraseñas no coinciden.
-                                        </FormHelperText>
-                                    )}
                                 </Grid>
                                 {/* Buttons */}
                                 <Grid item xs={12}>
@@ -635,6 +630,7 @@ const EditProfile = () => {
                                                 boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.2)",
                                                 fontFamily: "Raleway, sans-serif",
                                                 fontSize: "85%",
+                                                border: `1px solid ${Colors.primaryRed}`,
                                             }}
                                             onClick={() => { clearInputs(false, true, true) }}
                                         >Cancelar

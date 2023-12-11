@@ -5,6 +5,7 @@ import Cubi12Logo from "../../app/static/images/cubi12.svg";
 import GenerateTabTitle from "../../app/utils/TitleGenerator";
 import BlueButton from "../../app/components/BlueButton";
 import { Link } from "react-router-dom";
+import Colors from "../../app/static/colors";
 
 const imgStyle = { maxWidth: "15%", height: "auto" };
 const imgPhoneStyle = { maxWidth: "40%", height: "auto" };
@@ -36,8 +37,8 @@ const HomePage = () => {
         sx={{
           marginTop: "2rem",
           marginBottom: "1rem",
-          backgroundColor: "#f7b52c",
-          color: "#F5F5F5",
+          backgroundColor: Colors.primaryOrange,
+          color: Colors.secondaryWhite,
         }}
       />
       <Link to={"/interactive-mesh"}>
