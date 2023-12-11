@@ -16,13 +16,13 @@ import Cubi12Logo from "../static/images/cubi12.svg";
 import { Link } from "react-router-dom";
 import { useContext, useEffect, useState, MouseEvent } from "react";
 import { AuthContext } from "../context/AuthContext";
-import Agent from "../api/agent";
 import Colors from "../static/colors";
 
 const Navbar = () => {
-  const [loggedName, setLoggedName] = useState("");
+  const [loggedName, setLoggedName] = useState<string>("");
 
-  const { authenticated, setAuthenticated } = useContext(AuthContext);
+  const { authenticated, setAuthenticated, setUsername, username } =
+    useContext(AuthContext);
 
   const pages = authenticated
     ? ["Inicio", "Malla Interactiva", "Mi Progreso"]
@@ -50,9 +50,10 @@ const Navbar = () => {
   };
 
   const handleLogout = () => {
-    Agent.token = "";
     localStorage.removeItem("token");
+    localStorage.removeItem("username");
     setAuthenticated(false);
+    setUsername("");
     handleCloseUserMenu();
   };
 
@@ -73,18 +74,10 @@ const Navbar = () => {
   };
 
   useEffect(() => {
-    if (localStorage.getItem("token")) {
-      Agent.Auth.profile()
-        .then((response) => {
-          setLoggedName(
-            response.name.split(" ")[0] + " " + response.firstLastName
-          );
-        })
-        .catch((error) => {
-          console.error("Error loading user:", error);
-        });
+    if (authenticated) {
+      setLoggedName(username ?? "");
     }
-  }, []);
+  }, [authenticated, username]);
 
   return (
     <AppBar position="static" sx={{ backgroundColor: Colors.primaryBlue }}>
@@ -146,7 +139,7 @@ const Navbar = () => {
                         ? "/"
                         : page === "Malla Interactiva"
                         ? "/interactive-mesh"
-                        : "/"
+                        : "/my-progress"
                     }
                     style={{ textDecoration: "none", color: "inherit" }}
                   >
@@ -187,7 +180,7 @@ const Navbar = () => {
           </Box>
 
           <Box sx={{ flexGrow: 0 }}>
-            <Tooltip title="Open settings">
+            <Tooltip title="Configuraciones">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <Avatar alt="Remy Sharp" src={""} />
               </IconButton>

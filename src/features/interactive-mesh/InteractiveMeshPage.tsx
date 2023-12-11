@@ -2,7 +2,7 @@ import React from "react";
 import { styled } from "@mui/material/styles";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
-import { Box, Skeleton, Typography, useMediaQuery } from "@mui/material";
+import { Box, Typography, useMediaQuery } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import agent from "../../app/api/agent";
 import SubjectCard from "./SubjectCard";
@@ -14,8 +14,15 @@ import { subjectsCapitalize } from "../../app/utils/StringUtils";
 import GenerateTabTitle from "../../app/utils/TitleGenerator";
 import SquareIcon from "@mui/icons-material/Square";
 import Colors from "../../app/static/colors";
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+} from "@mui/material";
 import HelpIcon from "@mui/icons-material/Help";
+import LoadingSpinner from "../../app/layout/LoadingSpinner";
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: "#1C478F",
@@ -62,7 +69,7 @@ const InteractiveMeshPage = () => {
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const preRequisites = useRef<PreRequisite>({});
   const PostRequisites = useRef<PostRequisite>({});
-  const [loading, setLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const { setPreReqCodes, setPostReqCodes } = useSubjectCodeContext();
 
@@ -71,32 +78,25 @@ const InteractiveMeshPage = () => {
   const [helpDialogOpen, setHelpDialogOpen] = useState(false);
 
   useEffect(() => {
-    setLoading(true);
-    agent.Subjects.list()
-      .then((res: Subject[]) => {
-        res.forEach((s) => (s.name = subjectsCapitalize(s.name)));
-        setSubjects(res);
-      })
-      .catch((err) => console.log(err))
-      .finally(() => setLoading(false));
-  }, []);
+    setIsLoading(true);
 
-  useEffect(() => {
-    agent.Subjects.preRequisites()
-      .then((res) => {
-        preRequisites.current = res;
-      })
-      .catch((err) => console.log(err));
-  }, []);
+    const loadSubjects = agent.Subjects.list().then((res: Subject[]) => {
+      res.forEach((s) => (s.name = subjectsCapitalize(s.name)));
+      setSubjects(res);
+    });
 
-  useEffect(() => {
-    agent.Subjects.postRequisites()
-      .then((res) => {
-        PostRequisites.current = res;
-      })
-      .catch((err) => console.log(err));
+    const loadPreRequisites = agent.Subjects.preRequisites().then((res) => {
+      preRequisites.current = res;
+    });
+
+    const loadPostRequisites = agent.Subjects.postRequisites().then((res) => {
+      PostRequisites.current = res;
+    });
+
+    Promise.all([loadSubjects, loadPreRequisites, loadPostRequisites])
+      .catch(() => {})
+      .finally(() => setIsLoading(false));
   }, []);
-  
 
   const setPreRequisitesColors = (subjectPreRequisites: string[]) => {
     if (!subjectPreRequisites) return;
@@ -142,27 +142,18 @@ const InteractiveMeshPage = () => {
       return null;
     });
 
-    const openHelpDialog = () => {
-      setHelpDialogOpen(true);
-    };
-  
-    const closeHelpDialog = () => {
-      setHelpDialogOpen(false);
-    };
-
-  const mapSubjectsBySemesterSkeleton = (amount: number) => {
-    return Array.from({ length: amount }).map((_, index) => (
-      <Skeleton
-        key={index}
-        variant="rectangular"
-        sx={{ width: "100%", height: "10vh", margin: "0.5rem 0" }}
-      />
-    ));
+  const openHelpDialog = () => {
+    setHelpDialogOpen(true);
   };
+
+  const closeHelpDialog = () => {
+    setHelpDialogOpen(false);
+  };
+
+  if (isLoading) return <LoadingSpinner />;
 
   return (
     <Box sx={{ flexGrow: 1, padding: "0 1rem 0", marginTop: "1.5rem" }}>
-      {/* Title and subject type info */}
       <Grid
         container
         alignItems="center"
@@ -177,7 +168,6 @@ const InteractiveMeshPage = () => {
           onClick={openHelpDialog}
         />
       </Grid>
-      {/* Subject types top info */}
       <Grid
         container
         alignItems="center"
@@ -196,20 +186,16 @@ const InteractiveMeshPage = () => {
           </React.Fragment>
         ))}
       </Grid>
-      {/* Interactive Mesh */}
       <Grid container spacing={2} sx={{ margin: "0.1rem 0 1rem" }}>
         <Grid item xs={1} />
         {Array.from({ length: 10 }).map((_, index) => (
           <Grid item xs={12} md={3} lg={1} key={index}>
             <Item>{romanNumeral(index + 1)}</Item>
-            {loading
-              ? mapSubjectsBySemesterSkeleton(6)
-              : mapSubjectsBySemester(subjects, index + 1, isLargeScreen)}
+            {mapSubjectsBySemester(subjects, index + 1, isLargeScreen)}
           </Grid>
         ))}
         <Grid item xs={1} />
       </Grid>
-      {/* Subject types pop-up info */}
       <Dialog open={helpDialogOpen} onClose={closeHelpDialog}>
         <DialogTitle
           style={{

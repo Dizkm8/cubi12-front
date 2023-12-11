@@ -22,10 +22,20 @@ const rutAlreadyExists = "RUT already in use";
 const emailAlreadyExists = "Email already in use";
 const invalidRut = "The field RUT is invalid.";
 const defaultErrorMsg = "An error has occurred, try again later.";
+const invalidPwd = "Contraseña inválida";
+const invalidNames =
+  "Debe contener mínimo 3 letras, sin caracteres especiales o números";
+const requisitesPwd =
+  "Contraseña debe contener entre 10 a 16 caracteres, una mayúscula, una minúscula y un número";
+const invalidMatchPwd = "Contraseñas no coinciden";
 
 export const ApiMessages = {
   rutAlreadyExists,
   emailAlreadyExists,
   invalidRut,
   defaultErrorMsg,
+  invalidPwd,
+  invalidNames,
+  requisitesPwd,
+  invalidMatchPwd,
 };

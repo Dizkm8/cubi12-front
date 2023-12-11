@@ -17,6 +17,7 @@ const style = {
   padding: "0.5rem",
   fontSize: "1rem",
   backgroundColor: Colors.white,
+
 };
 
 // subject fontsize
@@ -42,6 +43,13 @@ const selectStyle = (
   isLargeScreen: boolean,
   backgroundColor: string
 ) => {
+  if(backgroundColor === Colors.primaryBlue){
+    return {
+      ...getFontSizeByLength(style, name, isLargeScreen),
+      backgroundColor,
+      color: Colors.white,
+    };
+  }
   return {
     ...getFontSizeByLength(style, name, isLargeScreen),
     backgroundColor,
@@ -83,7 +91,7 @@ export const ProgressCard = ({ subject, isLargeScreen, backgroundColorButton }: 
       backgroundColor === Colors.secondaryGreen
     )
       return;
-    setBackgroundColor(Colors.secondarySkyblue);
+    setBackgroundColor(Colors.primaryBlue);
   };
 
   // if user click on subject, change color
@@ -105,7 +113,7 @@ export const ProgressCard = ({ subject, isLargeScreen, backgroundColorButton }: 
     
     // if user click on subject default, change to green
     if (
-      backgroundColor === Colors.secondarySkyblue ||
+      backgroundColor === Colors.primaryBlue ||
       backgroundColor === Colors.white ||
       backgroundColor === Colors.secondaryGreen ||
       backgroundColor === Colors.secondaryYellow

@@ -17,10 +17,11 @@ import Alert from "@mui/material/Alert";
 import Fade from "@mui/material/Fade";
 import { LoadingButton } from "@mui/lab";
 import Colors from "../../app/static/colors";
-import { useMediaQuery } from "@mui/material";
+import { CircularProgress, useMediaQuery } from "@mui/material";
 import Regex from "../../app/utils/Regex";
 import { ApiMessages, Messages } from "../../app/utils/Constants";
 import { emptyString, translateApiMessages } from "../../app/utils/StringUtils";
+import { LoginUser } from "../../app/models/LoginUser";
 
 const styles = {
   paper: {
@@ -59,7 +60,7 @@ const defaultTheme = createTheme();
 
 export default function SignUp() {
   const isSmallScreen = useMediaQuery("(max-width:600px)");
-  const { setAuthenticated } = useContext(AuthContext);
+  const { setAuthenticated, setUsername } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const [name, setName] = useState<string>(emptyString);
@@ -89,13 +90,16 @@ export default function SignUp() {
   const [checked, setChecked] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>(emptyString);
 
-  const [loading, setLoading] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
+    setIsLoading(true);
     Agent.requests
       .get("Careers")
       .then((response) => setCareers(response))
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setIsLoading(false));
   }, []);
 
   useEffect(() => {
@@ -108,10 +112,12 @@ export default function SignUp() {
     setValidEmail(Regex.emailRegex.test(email));
   }, [email, firstName, lastName, matchPwd, name, pwd, rut]);
 
-  const handleSuccessfullyLogin = (data: any) => {
-    Agent.token = data;
-    localStorage.setItem("token", data);
+  const handleSuccessfullyLogin = (data: LoginUser) => {
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("username", data.name);
+
     setAuthenticated(true);
+    setUsername(data.name);
     navigate("/");
   };
 
@@ -133,11 +139,11 @@ export default function SignUp() {
   };
 
   const sendData = (user: any) => {
-    setLoading(true);
+    setIsSubmitting(true);
     Agent.Auth.register(user)
       .then(handleSuccessfullyLogin)
       .catch(handleCatchApiErrors)
-      .finally(() => setLoading(false));
+      .finally(() => setIsSubmitting(false));
   };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -168,6 +174,39 @@ export default function SignUp() {
       RepeatedPassword,
     });
   };
+
+  if (isLoading)
+    return (
+      <Paper style={styles.paper}>
+        <Container
+          component="main"
+          maxWidth="md"
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            margin: 0,
+          }}
+        >
+          <CircularProgress
+            size={90}
+            sx={{
+              color: Colors.primaryOrange,
+              marginBottom: "2rem",
+            }}
+          />
+          <Typography
+            variant="h4"
+            component="h3"
+            sx={{
+              color: Colors.primaryOrange,
+            }}
+          >
+            Cargando...
+          </Typography>
+        </Container>
+      </Paper>
+    );
 
   return (
     <Paper style={styles.paper}>
@@ -559,7 +598,7 @@ export default function SignUp() {
             </Grid>
           </Grid>
           <LoadingButton
-            loading={loading}
+            loading={isSubmitting}
             type="submit"
             style={{
               backgroundColor: Colors.primaryBlue,

@@ -19,13 +19,14 @@ import GenerateTabTitle from "../../app/utils/TitleGenerator";
 import { LoadingButton } from "@mui/lab";
 import Colors from "../../app/static/colors";
 import Regex from "../../app/utils/Regex";
+import { LoginUser } from "../../app/models/LoginUser";
 
 const defaultTheme = createTheme();
 
 const LogIn = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
-  const { setAuthenticated } = useContext(AuthContext);
+  const { setAuthenticated, setUsername } = useContext(AuthContext);
   const isMobile = useMediaQuery(defaultTheme.breakpoints.down("sm"));
   const navigate = useNavigate();
 
@@ -39,10 +40,12 @@ const LogIn = () => {
     sendData(Email, Password);
   };
 
-  const handleSuccessfullyLogin = (data: any) => {
-    Agent.token = data;
-    localStorage.setItem("token", data);
+  const handleSuccessfullyLogin = (data: LoginUser) => {
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("username", data.name);
+
     setAuthenticated(true);
+    setUsername(data.name);
     navigate("/");
   };
 
