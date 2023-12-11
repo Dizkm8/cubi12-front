@@ -9,7 +9,7 @@ import {
   DialogContent,
   DialogActions,
 } from "@mui/material";
-import { Box, Skeleton, Typography, useMediaQuery } from "@mui/material";
+import { Box, Typography, useMediaQuery } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import agent from "../../app/api/agent";
 import { Subject } from "../../app/models/Subject";
@@ -24,6 +24,7 @@ import Colors from "../../app/static/colors";
 import GenerateTabTitle from "../../app/utils/TitleGenerator";
 import ProgressCard, { modifySubject } from "./ProgressCard";
 import { forEach } from "lodash";
+import LoadingSpinner from "../../app/layout/LoadingSpinner";
 
 // Item style
 const Item = styled(Paper)(({ theme }) => ({
@@ -70,7 +71,9 @@ const subjectsState = [
     type: "Asignaturas no cursadas",
     description:
       "Aquellas asignaturas que aún no cursas y que, probablemente, todavía no puedes cursar",
-    icon: <SquareOutlinedIcon style={{ fontSize: "200%", color: Colors.black }} />,
+    icon: (
+      <SquareOutlinedIcon style={{ fontSize: "200%", color: Colors.black }} />
+    ),
   },
 ];
 
@@ -81,7 +84,7 @@ const MyProgressPage = () => {
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const preRequisites = useRef<PreRequisite>({});
   const PostRequisites = useRef<PostRequisite>({});
-  const [loading, setLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [userApprovedSubjects, setUserApprovedSubjects] = useState<string[]>(
     []
   );
@@ -99,62 +102,45 @@ const MyProgressPage = () => {
 
   const [helpDialogOpen, setHelpDialogOpen] = useState(false);
 
-  // Load user data
   useEffect(() => {
-    agent.Auth.profile()
-      .then((response) => {
-        setUser(response);
-      })
-      .catch((error) => {
-        console.error("Error loading user:", error);
+    setIsLoading(true);
+
+    const loadSubjects = agent.Subjects.list().then((res: Subject[]) => {
+      res.forEach((s) => (s.name = subjectsCapitalize(s.name)));
+      setSubjects(res);
+    });
+
+    const loadPreRequisites = agent.Subjects.preRequisites().then((res) => {
+      preRequisites.current = res;
+    });
+
+    const loadPostRequisites = agent.Subjects.postRequisites().then((res) => {
+      PostRequisites.current = res;
+    });
+
+    const userProfile = agent.Auth.profile().then((response) => {
+      setUser(response);
+    });
+
+    const userProgress = agent.Auth.myProgress().then((response) => {
+      forEach(response, (value) => {
+        setUserApprovedSubjects((userApprovedSubjects) => [
+          ...userApprovedSubjects,
+          value.subjectCode,
+        ]);
+        approvedSubjects.push(value.subjectCode);
       });
-  }, []);
+    });
 
-  // Load user approved subjects
-  useEffect(() => {
-    agent.Auth.myProgress()
-      .then((response) => {
-        forEach(response, (value) => {
-          setUserApprovedSubjects((userApprovedSubjects) => [
-            ...userApprovedSubjects,
-            value.subjectCode,
-          ]);
-          approvedSubjects.push(value.subjectCode);
-        });
-      })
-      .catch((error) => {
-        console.error("Error loading user approved subjects:", error);
-      });
-  }, []);
-
-  // Load subjects
-  useEffect(() => {
-    setLoading(true);
-    agent.Subjects.list()
-      .then((res: Subject[]) => {
-        res.forEach((s) => (s.name = subjectsCapitalize(s.name)));
-        setSubjects(res);
-      })
-      .catch((err) => console.log(err))
-      .finally(() => setLoading(false));
-  }, []);
-
-  // Load pre-requisites
-  useEffect(() => {
-    agent.Subjects.preRequisites()
-      .then((res) => {
-        preRequisites.current = res;
-      })
-      .catch((err) => console.log(err));
-  }, []);
-
-  // Load post-requisites
-  useEffect(() => {
-    agent.Subjects.postRequisites()
-      .then((res) => {
-        PostRequisites.current = res;
-      })
-      .catch((err) => console.log(err));
+    Promise.all([
+      loadSubjects,
+      loadPreRequisites,
+      loadPostRequisites,
+      userProfile,
+      userProgress,
+    ])
+      .catch(() => {})
+      .finally(() => setIsLoading(false));
   }, []);
 
   // Validate if subject has pre-requisites
@@ -250,18 +236,19 @@ const MyProgressPage = () => {
       modifySubject.addSubjects.length === 0 &&
       modifySubject.deleteSubjects.length === 0
     ) {
-      console.log("No changes to save");
       return;
     }
     // Endpoint call
     agent.Auth.updateMyProgress(modifySubject)
       .then((res) => {
         approvedSubjects.push(...modifySubject.addSubjects);
-        approvedSubjects = approvedSubjects.filter(subject => !modifySubject.deleteSubjects.includes(subject));
+        approvedSubjects = approvedSubjects.filter(
+          (subject) => !modifySubject.deleteSubjects.includes(subject)
+        );
         setUserApprovedSubjects(approvedSubjects);
         cancelSubjects();
       })
-      .catch((err) => console.log(err));
+      .catch(() => {});
   };
 
   // Cancel subjects and clean arrays
@@ -270,32 +257,22 @@ const MyProgressPage = () => {
       modifySubject.addSubjects.length === 0 &&
       modifySubject.deleteSubjects.length === 0
     ) {
-      console.log("No changes to cancel");
       return;
     }
     // Delete all subjects from array
     modifySubject.addSubjects = [];
     modifySubject.deleteSubjects = [];
-    setLoading(true);
+    setIsLoading(true);
     agent.Subjects.list()
       .then((res: Subject[]) => {
         res.forEach((s) => (s.name = subjectsCapitalize(s.name)));
         setSubjects(res);
       })
-      .catch((err) => console.log(err))
-      .finally(() => setLoading(false));
+      .catch(() => {})
+      .finally(() => setIsLoading(false));
   };
 
-  // Map subjects by semester skeleton
-  const mapSubjectsBySemesterSkeleton = (amount: number) => {
-    return Array.from({ length: amount }).map((_, index) => (
-      <Skeleton
-        key={index}
-        variant="rectangular"
-        sx={{ width: "100%", height: "10vh", margin: "0.5rem 0" }}
-      />
-    ));
-  };
+  if (isLoading) return <LoadingSpinner />;
 
   return (
     <Box sx={{ flexGrow: 1, padding: "0 1rem 0", marginTop: "1.5rem" }}>
@@ -385,9 +362,7 @@ const MyProgressPage = () => {
         {Array.from({ length: 10 }).map((_, index) => (
           <Grid item xs={12} md={3} lg={1} key={index}>
             <Item>{romanNumeral(index + 1)}</Item>
-            {loading
-              ? mapSubjectsBySemesterSkeleton(6)
-              : mapSubjectsBySemester(subjects, index + 1, isLargeScreen)}
+            {mapSubjectsBySemester(subjects, index + 1, isLargeScreen)}
           </Grid>
         ))}
         <Grid item xs={1} />
