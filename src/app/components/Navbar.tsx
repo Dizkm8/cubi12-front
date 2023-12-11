@@ -20,9 +20,10 @@ import Agent from "../api/agent";
 import Colors from "../static/colors";
 
 const Navbar = () => {
-  const [loggedName, setLoggedName] = useState("");
+  const [loggedName, setLoggedName] = useState<string>("");
 
-  const { authenticated, setAuthenticated } = useContext(AuthContext);
+  const { authenticated, setAuthenticated, setUsername, username } =
+    useContext(AuthContext);
 
   const pages = authenticated
     ? ["Inicio", "Malla Interactiva", "Mi Progreso"]
@@ -52,7 +53,9 @@ const Navbar = () => {
   const handleLogout = () => {
     Agent.token = "";
     localStorage.removeItem("token");
+    localStorage.removeItem("username");
     setAuthenticated(false);
+    setUsername("");
     handleCloseUserMenu();
   };
 
@@ -73,18 +76,10 @@ const Navbar = () => {
   };
 
   useEffect(() => {
-    if (localStorage.getItem("token")) {
-      Agent.Auth.profile()
-        .then((response) => {
-          setLoggedName(
-            response.name.split(" ")[0] + " " + response.firstLastName
-          );
-        })
-        .catch((error) => {
-          console.error("Error loading user:", error);
-        });
+    if (authenticated) {
+      setLoggedName(username ?? "");
     }
-  }, []);
+  }, [authenticated, username]);
 
   return (
     <AppBar position="static" sx={{ backgroundColor: Colors.primaryBlue }}>

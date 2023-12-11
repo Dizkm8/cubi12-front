@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { styled } from "@mui/material/styles";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
@@ -25,6 +25,7 @@ import GenerateTabTitle from "../../app/utils/TitleGenerator";
 import ProgressCard, { modifySubject } from "./ProgressCard";
 import { forEach } from "lodash";
 import LoadingSpinner from "../../app/layout/LoadingSpinner";
+import { AuthContext } from "../../app/context/AuthContext";
 
 // Item style
 const Item = styled(Paper)(({ theme }) => ({
@@ -81,6 +82,9 @@ export let approvedSubjects = [] as string[];
 
 const MyProgressPage = () => {
   document.title = GenerateTabTitle("Mi Progreso");
+
+  const { username } = useContext(AuthContext);
+
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const preRequisites = useRef<PreRequisite>({});
   const PostRequisites = useRef<PostRequisite>({});
@@ -90,15 +94,6 @@ const MyProgressPage = () => {
   );
 
   const isLargeScreen = useMediaQuery("(min-width:1600px)");
-
-  const [user, setUser] = useState({
-    name: "",
-    firstLastName: "",
-    secondLastName: "",
-    rut: "",
-    email: "",
-    career: { id: "", name: "" },
-  });
 
   const [helpDialogOpen, setHelpDialogOpen] = useState(false);
 
@@ -118,10 +113,6 @@ const MyProgressPage = () => {
       PostRequisites.current = res;
     });
 
-    const userProfile = agent.Auth.profile().then((response) => {
-      setUser(response);
-    });
-
     const userProgress = agent.Auth.myProgress().then((response) => {
       forEach(response, (value) => {
         setUserApprovedSubjects((userApprovedSubjects) => [
@@ -136,7 +127,6 @@ const MyProgressPage = () => {
       loadSubjects,
       loadPreRequisites,
       loadPostRequisites,
-      userProfile,
       userProgress,
     ])
       .catch(() => {})
@@ -291,7 +281,7 @@ const MyProgressPage = () => {
             component="span"
             style={{ color: Colors.primaryBlue, display: "inline" }}
           >
-            {user.name.split(" ")[0]}
+            {username}
           </Typography>
           ! Bienvenido a tu progreso
         </Typography>

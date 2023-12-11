@@ -21,7 +21,7 @@ import { CircularProgress, useMediaQuery } from "@mui/material";
 import Regex from "../../app/utils/Regex";
 import { ApiMessages, Messages } from "../../app/utils/Constants";
 import { emptyString, translateApiMessages } from "../../app/utils/StringUtils";
-import LoadingSpinner from "../../app/layout/LoadingSpinner";
+import { LoginUser } from "../../app/models/LoginUser";
 
 const styles = {
   paper: {
@@ -60,7 +60,7 @@ const defaultTheme = createTheme();
 
 export default function SignUp() {
   const isSmallScreen = useMediaQuery("(max-width:600px)");
-  const { setAuthenticated } = useContext(AuthContext);
+  const { setAuthenticated, setUsername } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const [name, setName] = useState<string>(emptyString);
@@ -112,10 +112,14 @@ export default function SignUp() {
     setValidEmail(Regex.emailRegex.test(email));
   }, [email, firstName, lastName, matchPwd, name, pwd, rut]);
 
-  const handleSuccessfullyLogin = (data: any) => {
-    Agent.token = data;
-    localStorage.setItem("token", data);
+  const handleSuccessfullyLogin = (data: LoginUser) => {
+    Agent.token = data.token;
+
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("username", data.name);
+
     setAuthenticated(true);
+    setUsername(data.name);
     navigate("/");
   };
 

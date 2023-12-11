@@ -21,14 +21,9 @@ const requests = {
 };
 
 const Auth = {
-  register: (form: any) =>
-    requests
-      .post("auth/register", form)
-      .then((response) => (token = response.token)),
-  login: (form: any) =>
-    requests
-      .post("auth/login", form)
-      .then((response) => (token = response.token)),
+  register: (form: any) => requests.post("auth/register", form),
+  login: (form: any) => requests.post("auth/login", form),
+
   updatePassword: (form: any) => requests.put("auth/update-password", form),
   updateProfile: (form: any) => requests.put("users/update-profile", form),
   profile: () => requests.get("users/profile"),
