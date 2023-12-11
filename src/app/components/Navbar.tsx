@@ -139,7 +139,7 @@ const Navbar = () => {
                         ? "/"
                         : page === "Malla Interactiva"
                         ? "/interactive-mesh"
-                        : "/"
+                        : "/my-progress"
                     }
                     style={{ textDecoration: "none", color: "inherit" }}
                   >
